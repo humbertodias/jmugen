@@ -2,20 +2,13 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>Syntax</groupId>
   <artifactId>Syntax</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-  <packaging>jar</packaging>
 
-  <!--
-  <build>
-    <sourceDirectory>src</sourceDirectory>
-    <resources>
-      <resource>
-        <directory>src</directory>
-        <excludes>
-          <exclude>**/*.java</exclude>
-        </excludes>
-      </resource>
-    </resources>
-  </build>
-  -->
+  <parent>
+    <groupId>JMugen.Parent</groupId>
+    <artifactId>JMugen.Parent</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+
+
 </project>

@@ -2,7 +2,31 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>JMugen.Common</groupId>
   <artifactId>JMugen.Common</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-  <packaging>jar</packaging>
+
+  <parent>
+    <groupId>JMugen.Parent</groupId>
+    <artifactId>JMugen.Parent</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+
+  <dependencies>
+
+    <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>2.18.0</version>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/commons-beanutils/commons-beanutils -->
+    <dependency>
+      <groupId>commons-beanutils</groupId>
+      <artifactId>commons-beanutils</artifactId>
+      <version>1.10.0</version>
+    </dependency>
+
+
+  </dependencies>
 
 </project>

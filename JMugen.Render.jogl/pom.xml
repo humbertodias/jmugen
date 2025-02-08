@@ -3,8 +3,13 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>JMugen.Render.jogl</groupId>
     <artifactId>JMugen.Render.jogl</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <packaging>jar</packaging>
+
+    <parent>
+        <groupId>JMugen.Parent</groupId>
+        <artifactId>JMugen.Parent</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
 
     <dependencies>
 

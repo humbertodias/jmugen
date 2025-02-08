@@ -2,8 +2,13 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>JMugen.Debug</groupId>
   <artifactId>JMugen.Debug</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-  <packaging>jar</packaging>
+
+  <parent>
+    <groupId>JMugen.Parent</groupId>
+    <artifactId>JMugen.Parent</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
 
   <dependencies>
 
@@ -22,7 +27,7 @@
     </dependency>
 
     <dependency>
-      <groupId>org.lee</groupId>
+      <groupId>JMugen</groupId>
       <artifactId>JMugen</artifactId>
       <version>0.0.1-SNAPSHOT</version>
       <scope>compile</scope>
