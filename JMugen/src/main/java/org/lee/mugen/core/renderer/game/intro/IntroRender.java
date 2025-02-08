@@ -17,8 +17,8 @@ public class IntroRender extends BaseRender {
 	
 	public IntroRender() {
 //		intro = new Intro("E:/dev/workspace/JMugen/resource/chars/kfm/intro.def");
-//		intro = new Intro(JMugenConstant.RESOURCE + "chars/kfm/ending.def");
-		intro = new Intro("I:/My Old Laptop/Mugen Works/GrandmasterMugenScreenpack/data/intro.def");
+		intro = new Intro(JMugenConstant.RESOURCE + "chars/kfm/ending.def");
+//		intro = new Intro("I:/My Old Laptop/Mugen Works/GrandmasterMugenScreenpack/data/intro.def");
 		try {
 			intro.parse();
 		} catch (Exception e) {
