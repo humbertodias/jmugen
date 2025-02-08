@@ -17,7 +17,6 @@
             <groupId>JMugen.Common</groupId>
             <artifactId>JMugen.Common</artifactId>
             <version>${jmugen.version}</version>
-            <scope>compile</scope>
         </dependency>
 
 

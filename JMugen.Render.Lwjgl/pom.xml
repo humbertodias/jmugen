@@ -31,13 +31,8 @@
             <groupId>JMugen.Common</groupId>
             <artifactId>JMugen.Common</artifactId>
             <version>${jmugen.version}</version>
-            <scope>compile</scope>
         </dependency>
 
     </dependencies>
-
-    <properties>
-        <lwjgl.version>2.9.3</lwjgl.version>
-    </properties>
 
 </project>

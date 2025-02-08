@@ -16,7 +16,6 @@
       <groupId>JMugen.Debug</groupId>
       <artifactId>JMugen.Debug</artifactId>
       <version>${jmugen.version}</version>
-      <scope>compile</scope>
     </dependency>
 
   </dependencies>

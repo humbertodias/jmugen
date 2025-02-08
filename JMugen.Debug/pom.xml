@@ -16,29 +16,33 @@
       <groupId>JMugen.Common</groupId>
       <artifactId>JMugen.Common</artifactId>
       <version>${jmugen.version}</version>
-      <scope>compile</scope>
     </dependency>
 
     <dependency>
       <groupId>JMugen.Properties</groupId>
       <artifactId>JMugen.Properties</artifactId>
       <version>${jmugen.version}</version>
-      <scope>compile</scope>
     </dependency>
 
     <dependency>
       <groupId>JMugen</groupId>
       <artifactId>JMugen</artifactId>
       <version>${jmugen.version}</version>
-      <scope>compile</scope>
     </dependency>
 
     <dependency>
       <groupId>Syntax</groupId>
       <artifactId>Syntax</artifactId>
       <version>${jmugen.version}</version>
-      <scope>compile</scope>
     </dependency>
+
+    <dependency>
+      <groupId>JMugen.Render.Lwjgl</groupId>
+      <artifactId>JMugen.Render.Lwjgl</artifactId>
+      <version>${jmugen.version}</version>
+    </dependency>
+
+
 
   </dependencies>
 
