@@ -21,6 +21,7 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
 import org.lee.framework.swing.WindowsUtils;
+import org.lee.mugen.ResourceBundleHelper;
 import org.lee.mugen.core.AbstractGameFight;
 import org.lee.mugen.core.Game;
 import org.lee.mugen.core.AbstractGameFight.DebugAction;
@@ -165,7 +166,7 @@ public class JoglGameWindow implements GameWindow, GLEventListener {
 	
 
 	private void initKeys() throws IllegalArgumentException, SecurityException, IllegalAccessException, NoSuchFieldException {
-		ResourceBundle bundle = ResourceBundle.getBundle("keys");
+		ResourceBundle bundle = ResourceBundleHelper.getBundle("keys");
 		
 		// P1
 		String prefix = "VK_";

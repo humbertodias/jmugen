@@ -1,15 +1,13 @@
 package org.lee.mugen.renderer;
 
-import java.util.ResourceBundle;
+import org.lee.mugen.ResourceBundleHelper;
 
 
 public class GraphicsWrapper {
 	
 	private static MugenDrawer instanceOfMugenDrawer;
 	public static void init() throws Exception {
-		// TODO: Review
-//		String className = ResourceBundle.getBundle("render").getString("renderClass");
-		String className = System.getProperty("renderClass", "org.lee.mugen.renderer.lwjgl.LMugenDrawer");
+		String className = ResourceBundleHelper.getBundle("render").getString("renderClass");
 		instanceOfMugenDrawer = (MugenDrawer) Class.forName(className).newInstance();
 	}
 	

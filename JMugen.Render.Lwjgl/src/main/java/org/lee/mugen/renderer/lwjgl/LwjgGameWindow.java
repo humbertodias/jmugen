@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import org.lee.mugen.ResourceBundleHelper;
 import org.lee.mugen.core.AbstractGameFight;
 import org.lee.mugen.core.Game;
 import org.lee.mugen.core.AbstractGameFight.DebugAction;
@@ -357,7 +358,7 @@ public class LwjgGameWindow implements GameWindow {
 	
 	
 	private void initKeys() throws IllegalArgumentException, SecurityException, IllegalAccessException, NoSuchFieldException {
-		ResourceBundle bundle = ResourceBundle.getBundle("keys");
+		ResourceBundle bundle = ResourceBundleHelper.getBundle("keys");
 		{
 			CmdProcessListener cmdProcessListener = new CmdProcessListener();
 			cmdProcessListener.setKeys(new int[] {Keyboard.KEY_ESCAPE, Keyboard.KEY_F1, Keyboard.KEY_F2, Keyboard.KEY_F3, Keyboard.KEY_F4, Keyboard.KEY_F5,Keyboard.KEY_F6, Keyboard.KEY_F7, Keyboard.KEY_F8,Keyboard.KEY_F9, Keyboard.KEY_F10, Keyboard.KEY_F11, Keyboard.KEY_F12});

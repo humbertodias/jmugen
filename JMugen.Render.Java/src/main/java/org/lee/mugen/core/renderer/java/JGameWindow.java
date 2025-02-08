@@ -19,6 +19,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import org.lee.framework.swing.WindowsUtils;
+import org.lee.mugen.ResourceBundleHelper;
 import org.lee.mugen.core.AbstractGameFight;
 import org.lee.mugen.core.Game;
 import org.lee.mugen.core.AbstractGameFight.DebugAction;
@@ -69,7 +70,7 @@ public class JGameWindow extends Canvas implements GameWindow {
 		
 	}
 	private void initKeys() throws IllegalArgumentException, SecurityException, IllegalAccessException, NoSuchFieldException {
-		ResourceBundle bundle = ResourceBundle.getBundle("keys");
+		ResourceBundle bundle = ResourceBundleHelper.getBundle("keys");
 		
 		// P1
 		String prefix = "VK_";
