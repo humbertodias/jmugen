@@ -3,14 +3,4 @@
 .vscode
 .settings
 
-# native libraries
-openal.dylib
-OpenAL32.dll
-OpenAL64.dll
-liblwjgl.dylib
-liblwjgl.so
-liblwjgl64.so
-libopenal.so
-libopenal64.so
-lwjgl.dll
-lwjgl64.dll
+natives
