@@ -1,0 +1,44 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>jogl-Java2-op</groupId>
+  <artifactId>joglUtils</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <build>
+  </build>
+
+  <dependencies>
+
+    <!-- https://mvnrepository.com/artifact/net.java.dev.jogl/jogl -->
+    <dependency>
+      <groupId>net.java.dev.jogl</groupId>
+      <artifactId>jogl</artifactId>
+      <version>1.1.1-rc6</version>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/org.jdesktop/swing-layout -->
+    <dependency>
+      <groupId>org.jdesktop</groupId>
+      <artifactId>swing-layout</artifactId>
+      <version>1.0.2</version>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/javax.vecmath/vecmath -->
+    <dependency>
+      <groupId>javax.vecmath</groupId>
+      <artifactId>vecmath</artifactId>
+      <version>1.5.2</version>
+    </dependency>
+
+
+  </dependencies>
+
+  <repositories>
+    <repository>
+      <id>swing-layout</id>
+      <url>https://repo.osgeo.org/repository/geotools-releases/</url>
+    </repository>
+  </repositories>
+
+</project>

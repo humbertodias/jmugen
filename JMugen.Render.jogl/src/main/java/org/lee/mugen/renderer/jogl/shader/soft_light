@@ -1,0 +1,14 @@
+uniform sampler2D BaseImage;
+uniform sampler2D BlendImage;
+uniform float Opacity;
+
+void main (void)
+{
+    vec4 base  = texture2D(BaseImage, gl_TexCoord[0].xy);
+    vec4 blend = texture2D(BlendImage, gl_TexCoord[0].xy);
+
+    vec4 result = 2.0 * base * blend + base * base - 2.0 * base * base * blend;
+         result = clamp(result, 0.0, 1.0);
+
+    gl_FragColor = mix(base, result, Opacity);
+}

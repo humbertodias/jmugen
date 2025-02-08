@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<classpath>
-	<classpathentry excluding="org/lee/mugen/core/renderer/java/PalfxFilter.java" kind="src" path="src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/JMugen.Common"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/JMugen.Properties"/>
-	<classpathentry kind="src" path="effectSrc"/>
-	<classpathentry kind="output" path="bin"/>
-</classpath>

@@ -1,0 +1,17 @@
+uniform sampler2D BaseImage;
+uniform sampler2D BlendImage;
+uniform float Opacity;
+
+void main (void)
+{
+    vec4 base  = texture2D(BaseImage, gl_TexCoord[0].xy);
+    vec4 blend = texture2D(BlendImage, gl_TexCoord[0].xy);
+
+	float noise = (noise1(vec2(gl_TexCoord[0] * noiseScale)) + 1.0) * 0.5;
+
+    vec4 result = (noise < Opacity) ? blend : base;
+    
+    result = clamp(result, 0.0, 1.0);
+
+    gl_FragColor = mix(base, result, Opacity);
+}

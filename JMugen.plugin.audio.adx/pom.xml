@@ -1,0 +1,33 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>JMugen.plugin.audio.adx</groupId>
+  <artifactId>JMugen.plugin.audio.adx</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <dependencies>
+
+    <!-- https://mvnrepository.com/artifact/javazoom/jlayer -->
+    <dependency>
+      <groupId>javazoom</groupId>
+      <artifactId>jlayer</artifactId>
+      <version>1.0.1</version>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/org.tritonus/tritonus-share -->
+    <dependency>
+      <groupId>org.tritonus</groupId>
+      <artifactId>tritonus-share</artifactId>
+      <version>0.3.6</version>
+    </dependency>
+
+  </dependencies>
+
+  <repositories>
+    <repository>
+      <id>tritonus-share</id>
+      <url>https://software.rescarta.org/nexus/content/repositories/thirdparty/</url>
+    </repository>
+  </repositories>
+
+</project>
