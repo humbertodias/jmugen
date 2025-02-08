@@ -12,4 +12,4 @@ clean:
 	mvn clean
 
 natives:
-	find $HOME/.m2 -name lwjgl-platform-2.9.3-natives-osx.jar
+	find ${HOME}/.m2 -name lwjgl-platform-2.9.3-natives-*.jar
