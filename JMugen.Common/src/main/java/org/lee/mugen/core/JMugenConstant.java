@@ -3,5 +3,7 @@ package org.lee.mugen.core;
 import java.util.ResourceBundle;
 
 public interface JMugenConstant {
-	String RESOURCE = ResourceBundle.getBundle("data").getString("resource");
+	// TODO: Review
+	//String RESOURCE = ResourceBundle.getBundle("data").getString("resource");
+	String RESOURCE = System.getProperty("data","resource/");
 }
