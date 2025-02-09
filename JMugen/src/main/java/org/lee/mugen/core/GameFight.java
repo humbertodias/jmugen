@@ -317,7 +317,7 @@ public class GameFight implements AbstractGameFight {
 	private void loadSprites() throws Exception {
 		if (!spriteLoader.isEmpty()) {
 			for (SpriteLoader sl: spriteLoader) {
-				log("Load Sprite " + sl.def);
+				log("Load Sprite " + sl.def.getParentPath());
 				loadingText += "\nloading Sprite " + sl.getSpriteId() + " : ";
 				loadSprite(sl);
 			}
