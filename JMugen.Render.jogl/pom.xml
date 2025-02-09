@@ -19,14 +19,6 @@
             <version>${jmugen.version}</version>
         </dependency>
 
-
-        <!-- https://mvnrepository.com/artifact/org.lwjgl/lwjgl-opengl -->
-        <dependency>
-            <groupId>org.lwjgl</groupId>
-            <artifactId>lwjgl-opengl</artifactId>
-            <version>3.3.6</version>
-        </dependency>
-
         <!-- https://mvnrepository.com/artifact/org.jogamp.gluegen/gluegen-rt -->
         <dependency>
             <groupId>org.jogamp.gluegen</groupId>
