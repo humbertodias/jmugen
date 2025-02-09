@@ -61,6 +61,10 @@ public class Characters implements Section {
 	
 	private void doSpriteInformation(String character) throws IOException {
 		File path = new File(JMugenConstant.RESOURCE + "chars/" + character + "/" + character + ".def");
+		if (!path.exists()) {
+			System.out.println("File " + path.getAbsolutePath() + " does not exist");
+			return;
+		}
 		BufferedReader br = new BufferedReader(new FileReader(path));
 		String line;
 		boolean findFiles = false;
