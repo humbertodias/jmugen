@@ -22,6 +22,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 
 import org.lee.mugen.audio.adx.sample.convert.Adx;
 import org.lee.mugen.audio.adx.sample.convert.AdxDecoder;
+import org.lee.mugen.core.JMugenConstant;
 
 /**
  * Play sound, and fx Sound
@@ -44,6 +45,7 @@ public final class SoundSystem {
 //                Class.forName("javazoom.spi.vorbis.sampled.convert.VorbisFormatConversionProvider");
 
             } catch (ClassNotFoundException e) {
+                System.out.println(e.getMessage());
                 e.printStackTrace();
             }
         }
@@ -286,8 +288,9 @@ public final class SoundSystem {
 //		IOUtils.copy(fis, baos);
 //		fis.close();
 //		Sfx.playSnd(baos.toByteArray());
-		SoundSystem.SoundBackGround.playMusic("sound/Ken stage.mp3");
-		
+//        SoundSystem.SoundBackGround.playMusic("sound/Ken stage.mp3");
+        SoundSystem.SoundBackGround.playMusic(JMugenConstant.RESOURCE + "sound/mvc2/ADX_S060.BIN");
+
 	}
     public static class Sfx {
     	public static void playSnd(final byte[] sound) {
