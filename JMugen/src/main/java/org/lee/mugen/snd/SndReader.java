@@ -6,6 +6,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.lee.mugen.core.JMugenConstant;
 import org.lee.mugen.core.sound.SoundSystem;
@@ -84,6 +85,6 @@ public class SndReader {
 		Snd snd = SndReader.parse(JMugenConstant.RESOURCE + "chars/xiangfei/files/xiangfei.snd");
 		for (GroupSnd grp: snd.getGroups())
 			for (byte[] bytes: grp.getSounds())
-				SoundSystem.Sfx.playSnd(bytes, false);
+				SoundSystem.Sfx.playSnd(bytes, new AtomicBoolean(false));
 	}
 }

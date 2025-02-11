@@ -11,18 +11,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.DataLine;
-import javax.sound.sampled.FloatControl;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.SourceDataLine;
-import javax.sound.sampled.UnsupportedAudioFileException;
+import javax.sound.sampled.*;
 
 import org.lee.mugen.audio.adx.sample.convert.Adx;
 import org.lee.mugen.audio.adx.sample.convert.AdxDecoder;
 import org.lee.mugen.core.JMugenConstant;
+import org.lee.mugen.util.Logger;
 
 /**
  * Play sound, and fx Sound
@@ -68,14 +62,18 @@ public final class SoundSystem {
         public static boolean isStop() {
             return soundsys.stop;
         }
-        
+
         /**
          * @param path
          */        
         public static void playMusic(final String path) {
-        	stopMusic();
-        	if (!new File(path).exists() || new File(path).isDirectory())
-        		return;
+            	stopMusic();
+
+        	if (!new File(path).exists() || new File(path).isDirectory()){
+                Logger.log("Music %s not exist", path);
+                return;
+            }
+
             soundsys = new SoundBackGround(path);
             soundsys.setloop(true);
 
@@ -103,7 +101,9 @@ public final class SoundSystem {
         public SoundBackGround(String name) {
             file = name;
         }
+
         public void stopPlay() {
+            Logger.log("Stop music %s", file);
             getSrcDataLine().stop();
             getSrcDataLine().close();
             try {
@@ -173,9 +173,10 @@ public final class SoundSystem {
         private void streamClose() throws IOException {
         	if (stream != null) {
         		stream.close();
-        	} else {
-        		adxDecoder.close();
         	}
+            if(adxDecoder != null) {
+                adxDecoder.close();
+            }
         }
         private void playSound() {
 
@@ -206,10 +207,15 @@ public final class SoundSystem {
          */  
         public void getSound(String fileName) {
         	try {
+                File soundFile = new File(fileName);
+                if (!soundFile.exists()){
+                    Logger.error("Sound file %s not found", fileName);
+                    return;
+                }
             	if (fileName.toLowerCase().endsWith(".adx") || fileName.toLowerCase().endsWith(".bin")) {
-            		getSoundAdx(fileName);
+            		getSoundAdx(soundFile);
             	} else {
-            		getSoundWavMp3(fileName);
+            		getSoundWavMp3(soundFile);
             	}
 				
 			} catch (Exception e) {
@@ -217,8 +223,8 @@ public final class SoundSystem {
 			}
         }
 
-        public void getSoundAdx(String fileName) throws Exception {
-        	adxDecoder = new AdxDecoder(new Adx(new File(fileName)));
+        public void getSoundAdx(File file) throws Exception {
+        	adxDecoder = new AdxDecoder(new Adx(file));
             AudioFormat decodedFormat =
                 new AudioFormat(
 	                AudioFormat.Encoding.PCM_SIGNED,
@@ -237,48 +243,60 @@ public final class SoundSystem {
             _srcDataLine.start();
         }
 
-        public void getSoundWavMp3(String fileName) throws Exception {
-//            AudioFileFormat aff = AudioSystem.getAudioFileFormat(new File(fileName));
-            AudioInputStream in = AudioSystem.getAudioInputStream(new File(fileName));
+        public void getSoundWavMp3(File mp3File) throws Exception {
+
+            // Get an AudioInputStream from the MP3 file using AudioSystem
+            AudioInputStream in = AudioSystem.getAudioInputStream(mp3File);
+
+            // Get the base format from the audio stream
             AudioFormat baseFormat = in.getFormat();
-            AudioFormat decodedFormat =
-			                new AudioFormat(
-			                AudioFormat.Encoding.PCM_SIGNED,
-			                baseFormat.getSampleRate(),
-			                16,
-			                baseFormat.getChannels(),
-			                baseFormat.getChannels() * 2,
-			                baseFormat.getSampleRate(),
-			                false);
-            stream = AudioSystem.getAudioInputStream(decodedFormat, in);
-            
-            if ((decodedFormat.getEncoding() == AudioFormat.Encoding.ULAW)
-            || (decodedFormat.getEncoding()
-            == AudioFormat.Encoding.ALAW)) {
-                AudioFormat tmpFormat =
-                new AudioFormat(
-                AudioFormat.Encoding.PCM_SIGNED,
-                decodedFormat.getSampleRate(),
-                decodedFormat.getSampleSizeInBits(),
-                decodedFormat.getChannels(),
-                decodedFormat.getFrameSize(),
-                decodedFormat.getFrameRate(),
-                true);
-                stream = AudioSystem.getAudioInputStream(tmpFormat, stream);
+
+            // Convert to PCM format for playback
+            AudioFormat decodedFormat = new AudioFormat(
+                    AudioFormat.Encoding.PCM_SIGNED,
+                    baseFormat.getSampleRate(),
+                    16,
+                    baseFormat.getChannels(),
+                    baseFormat.getChannels() * 2,
+                    baseFormat.getSampleRate(),
+                    false
+            );
+
+            // Create an AudioInputStream in the PCM format
+            AudioInputStream pcmStream = AudioSystem.getAudioInputStream(decodedFormat, in);
+
+            // If the format is ULAW or ALAW, we need to convert it further to PCM_SIGNED
+            if (decodedFormat.getEncoding() == AudioFormat.Encoding.ULAW || decodedFormat.getEncoding() == AudioFormat.Encoding.ALAW) {
+                AudioFormat tmpFormat = new AudioFormat(
+                        AudioFormat.Encoding.PCM_SIGNED,
+                        decodedFormat.getSampleRate(),
+                        decodedFormat.getSampleSizeInBits(),
+                        decodedFormat.getChannels(),
+                        decodedFormat.getFrameSize(),
+                        decodedFormat.getFrameRate(),
+                        true
+                );
+                pcmStream = AudioSystem.getAudioInputStream(tmpFormat, pcmStream);
                 decodedFormat = tmpFormat;
             }
-            
+
+            // Check if the audio line is already created, if not create it
             if (_srcDataLine == null) {
                 DataLine.Info outInfo = new DataLine.Info(SourceDataLine.class, decodedFormat);
                 if (!AudioSystem.isLineSupported(outInfo)) {
-                    throw new Exception("this format is not supported.");
+                    throw new Exception("This format is not supported.");
                 }
                 _srcDataLine = (SourceDataLine) AudioSystem.getLine(outInfo);
                 _srcDataLine.open(decodedFormat, _BUFFER);
                 _srcDataLine.start();
             }
-            int frameSizeInBytes = decodedFormat.getFrameSize();
-            _frameBufferSize -= _BUFFER % frameSizeInBytes;
+
+            // Play the sound by reading from the input stream and writing to the source data line
+            int bytesRead;
+            byte[] buffer = new byte[_BUFFER];
+            while ((bytesRead = pcmStream.read(buffer, 0, buffer.length)) != -1) {
+                _srcDataLine.write(buffer, 0, bytesRead);
+            }
         }
     }
     public static void main(String[] args) throws IOException, UnsupportedAudioFileException, InterruptedException {
@@ -289,7 +307,9 @@ public final class SoundSystem {
 //		fis.close();
 //		Sfx.playSnd(baos.toByteArray());
 //        SoundSystem.SoundBackGround.playMusic("sound/Ken stage.mp3");
-        SoundSystem.SoundBackGround.playMusic(JMugenConstant.RESOURCE + "sound/mvc2/ADX_S060.BIN");
+        SoundSystem.SoundBackGround.playMusic(JMugenConstant.RESOURCE + "sound/intro.mp3");
+        // wait
+        Thread.sleep(5000);
 
 	}
     public static class Sfx {

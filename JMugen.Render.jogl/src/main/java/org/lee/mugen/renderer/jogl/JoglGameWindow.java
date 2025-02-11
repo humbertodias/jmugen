@@ -12,14 +12,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-import javax.media.opengl.GL;
-import javax.media.opengl.GLAutoDrawable;
-import javax.media.opengl.GLCanvas;
-import javax.media.opengl.GLCapabilities;
-import javax.media.opengl.GLEventListener;
+import com.jogamp.opengl.*;
+
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
+import com.jogamp.opengl.awt.GLCanvas;
+import com.jogamp.opengl.util.Animator;
 import org.lee.framework.swing.WindowsUtils;
 import org.lee.mugen.ResourceBundleHelper;
 import org.lee.mugen.core.AbstractGameFight;
@@ -39,7 +38,9 @@ public class JoglGameWindow implements GameWindow, GLEventListener {
 	private Game callback;
 	private GL _gl;
 	private GLCanvas canvas;
-	
+	private final GLProfile glProfile = GLProfile.getDefault();
+
+
 	private final MouseCtrl mouse = new MouseCtrl();
 	private boolean isFinishInit = false;
 	public boolean isFinishInit() {
@@ -64,14 +65,15 @@ public class JoglGameWindow implements GameWindow, GLEventListener {
 	}
 
 	public JoglGameWindow() {
-		setTitle("JMugen");
+		setTitle("JMugen - JOGL2");
 		width = 640;
 		height = 480;
-//		GLPbuffer sharedPbuffer;
-//		sharedPbuffer = GLDrawableFactory.getFactory().createGLPbuffer(
-//				new GLCapabilities(), null, 1, 1, null);
-//		sharedPbuffer.display();
 
+		GLCapabilities glCapabilities = new GLCapabilities(glProfile);
+		GLDrawableFactory factory = GLDrawableFactory.getFactory(glProfile);
+		GLAutoDrawable sharedPbuffer = factory.createOffscreenAutoDrawable(
+				null, glCapabilities, null, 1, 1);
+		sharedPbuffer.display();
 	}
 
 	/* */
@@ -275,7 +277,7 @@ public class JoglGameWindow implements GameWindow, GLEventListener {
 	@Override
 	public void start() throws Exception {
         JFrame frame = new JFrame(title);
-        GLCapabilities caps = new GLCapabilities();
+        GLCapabilities caps = new GLCapabilities(glProfile);
         canvas = new GLCanvas(caps);
         canvas.addGLEventListener(this);
         frame.add(canvas);
@@ -283,8 +285,8 @@ public class JoglGameWindow implements GameWindow, GLEventListener {
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         
-        final com.sun.opengl.util.Animator animator =
-        	new com.sun.opengl.util.Animator(canvas);
+        final Animator animator =
+        	new Animator(canvas);
         frame.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
             	System.exit(0);
@@ -309,18 +311,22 @@ public class JoglGameWindow implements GameWindow, GLEventListener {
 	@Override
 	public void init(GLAutoDrawable drawable) {
 		_gl = drawable.getGL();
+
 		_gl.glEnable(GL.GL_TEXTURE_2D);
 
 		// disable the OpenGL depth test since we're rendering 2D graphics
 		_gl.glDisable(GL.GL_DEPTH_TEST);
 		_gl.glEnable(GL.GL_BLEND);
 
-		_gl.glMatrixMode(GL.GL_PROJECTION);
-		_gl.glLoadIdentity();
+		// Using GL1, set the projection matrix directly
+		_gl.getGL2ES1().glMatrixMode(GL2.GL_PROJECTION);
+		_gl.getGL2ES1().glLoadIdentity();
 
-		_gl.glOrtho(0, width, height, 0, -10000, 10000);
+		// Set up the orthographic projection matrix
+		_gl.getGL2ES1().glOrtho(0, width, height, 0, -10000, 10000);
 
-		_gl.glScaled((float) width / 320, (float) height / 240, 0);
+		// Use the scaling function directly in GL1
+		_gl.getGL2ES1().glScalef((float) width / 320, (float) height / 240, 0);
 		
 		try {
 			initKeys();
@@ -395,9 +401,15 @@ public class JoglGameWindow implements GameWindow, GLEventListener {
 			}});
 		
 	}
+
+	@Override
+	public void dispose(GLAutoDrawable glAutoDrawable) {
+		// TODO
+	}
+
 	@Override
 	public void display(GLAutoDrawable drawable) {
-		_gl = drawable.getGL();
+		_gl = drawable.getGL().getGL2();
 
 		if (!isFinishInit) {
 			if (callback instanceof AbstractGameFight) {
@@ -406,13 +418,13 @@ public class JoglGameWindow implements GameWindow, GLEventListener {
 			}
 		} else {
 			try {
-				_gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT
-						| GL.GL_ACCUM_BUFFER_BIT);
-				_gl.glMatrixMode(GL.GL_MODELVIEW);
-				_gl.glLoadIdentity();
+				_gl.getGL2().glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT
+						| GL2.GL_ACCUM_BUFFER_BIT);
+				_gl.getGL2().glMatrixMode(GL2.GL_MODELVIEW);
+				_gl.getGL2().glLoadIdentity();
 				callback.update(1);
 				
-				_gl.glPushMatrix();
+				_gl.getGL2().glPushMatrix();
 				Game another = callback.getNext();
 				if (another != callback) {
 					another.init(this);
@@ -423,9 +435,9 @@ public class JoglGameWindow implements GameWindow, GLEventListener {
 					if (isRender())
 						callback.render();
 				}
-		        _gl.glEnd();
-				_gl.glPopMatrix();
-				_gl.glPushMatrix();
+		        _gl.getGL2().glEnd();
+				_gl.getGL2().glPopMatrix();
+				_gl.getGL2().glPushMatrix();
 				if (isRender()) {
 					if (callback instanceof AbstractGameFight) {
 						AbstractGameFight game = (AbstractGameFight) callback;
@@ -434,13 +446,13 @@ public class JoglGameWindow implements GameWindow, GLEventListener {
 					
 				}
 
-				_gl.glPopMatrix();
+				_gl.getGL2().glPopMatrix();
 				mouse.setLeftPress(false);
 				mouse.setRightPress(false);
 				mouse.setLeftRelease(false);
 				mouse.setRightRelease(false);
 				
-				getTimer().listen();
+				getTimer().sleep();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -449,12 +461,12 @@ public class JoglGameWindow implements GameWindow, GLEventListener {
 
 	}
 	float rot = 0;
-	@Override
-	public void displayChanged(GLAutoDrawable drawable, boolean modeChanged,
-			boolean deviceChanged) {
-
-		
-	}
+//	@Override
+//	public void displayChanged(GLAutoDrawable drawable, boolean modeChanged,
+//			boolean deviceChanged) {
+//
+//
+//	}
 
 
 	@Override

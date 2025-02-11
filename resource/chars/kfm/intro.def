@@ -27,7 +27,7 @@ layer0.starttime = 0   ;Time to start display
 layer1.anim =  1
 layer1.offset = 0,176
 ; Music
-bgm = intro.mp3        ;Name of music file to play
+bgm = mvc2/ADX_S060.BIN        ;Name of music file to play
 bgm.loop = 0
 ; Total time
 end.time = 300

@@ -199,12 +199,12 @@ public class CnsParse {
 						precedentStateDefObj = spriteState.getStateDef(id);
 					}
 						
-					
-					if (precedentStateDefObj == null) {
-						precedentStateDef = id + "";
-						precedentStateDefObj.addGroup(grp);
-					} else {
-					}
+// TODO: NPE
+//					if (precedentStateDefObj == null) {
+//						precedentStateDef = id + "";
+//						precedentStateDefObj.addGroup(grp);
+//					} else {
+//					}
 				} else if (isMatch(P_STATE_CTRL_TITLE_REGEX, grp.getSectionRaw())) {
 					if (skip) {
 						continue;

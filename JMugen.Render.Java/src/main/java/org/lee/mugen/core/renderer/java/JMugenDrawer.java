@@ -12,7 +12,6 @@ import java.io.IOException;
 import org.lee.mugen.imageIO.PCXLoader;
 import org.lee.mugen.imageIO.RawPCXImage;
 import org.lee.mugen.imageIO.PCXLoader.PCXHeader;
-import org.lee.mugen.object.Rectangle;
 import org.lee.mugen.renderer.AngleDrawProperties;
 import org.lee.mugen.renderer.DrawProperties;
 import org.lee.mugen.renderer.GameWindow;
@@ -21,6 +20,7 @@ import org.lee.mugen.renderer.MugenDrawer;
 import org.lee.mugen.renderer.Trans;
 
 import composite.BlendComposite;
+import org.lee.mugen.util.Logger;
 
 public class JMugenDrawer extends MugenDrawer {
 
@@ -42,7 +42,7 @@ public class JMugenDrawer extends MugenDrawer {
 	@Override
 	public void draw(DrawProperties dp) {
 		JGameWindow window = (JGameWindow) getInstanceOfGameWindow();
-		Graphics2D g =  window.getDrawGraphics();
+		Graphics2D g = window.getDrawGraphics();
 		g.scale(xScale, yScale);
 		BufferedImage img = (BufferedImage) dp.getIc().getImg();
 
@@ -191,9 +191,37 @@ public class JMugenDrawer extends MugenDrawer {
 	}
 
 	@Override
-	public void setClip(Rectangle r) {
-		// TODO Auto-generated method stub
+	public void setClip(org.lee.mugen.object.Rectangle clipRect) {
+		JGameWindow window = (JGameWindow) getInstanceOfGameWindow();
+		Graphics2D g2d = window.getDrawGraphics();
+
+		if (clipRect != null) {
+			Logger.log("Setting clip area to: " + clipRect);
+
+			// Doubling the coordinates as per original logic
+			int left = clipRect.getX1() * 2;
+			int top = clipRect.getY1() * 2;
+			int right = clipRect.getX2() * 2;
+			int bottom = clipRect.getY2() * 2;
+
+			// Setting the clipping area
+			g2d.setClip(left, top, right - left, bottom - top);
+
+			// Applying scaling to double the drawing size
+			AffineTransform transform = new AffineTransform();
+			transform.scale(2.0, 2.0);
+			g2d.setTransform(transform);
+		} else {
+			// No clipping, draw on the entire screen
+			g2d.setClip(0, 0, window.getWidth(), window.getHeight());
+
+			// Applying default scaling based on window dimensions
+			AffineTransform transform = new AffineTransform();
+			transform.scale((double) window.getWidth() / 320, (double) window.getHeight() / 240);
+			g2d.setTransform(transform);
+		}
 	}
+
 
 	@Override
 	public float getAlpha() {

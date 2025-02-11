@@ -1,8 +1,8 @@
-package org.lee.mugen.renderer.jogl;
+package org.lee.mugen.core.renderer.java;
 
 import org.lee.mugen.renderer.MugenTimer;
 
-public class JoglMugenTimer implements MugenTimer {
+public class JMugenTimer implements MugenTimer {
 	private long lastTime;
 	private static final long FRAME_DURATION_NANOS = 1_000_000_000 / 60;  // 60 FPS
 	private long frameRate = FRAME_DURATION_NANOS;
@@ -12,7 +12,7 @@ public class JoglMugenTimer implements MugenTimer {
 
 	private long lastTimeForComputeFPS = 0;
 
-	public JoglMugenTimer() {
+	public JMugenTimer() {
 		lastTime = System.nanoTime();
 	}
 

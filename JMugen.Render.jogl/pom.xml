@@ -19,26 +19,126 @@
             <version>${jmugen.version}</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.jogamp.gluegen/gluegen-rt -->
+        <!-- JOGL -->
+        <dependency>
+            <groupId>org.jogamp.jogl</groupId>
+            <artifactId>jogl-all</artifactId>
+            <version>${jogl.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jogamp.jogl</groupId>
+            <artifactId>jogl-all-natives-linux-aarch64</artifactId>
+            <version>${jogl.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jogamp.jogl</groupId>
+            <artifactId>jogl-all-natives-linux-amd64</artifactId>
+            <version>${jogl.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jogamp.jogl</groupId>
+            <artifactId>jogl-all-natives-linux-armv6hf</artifactId>
+            <version>${jogl.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jogamp.jogl</groupId>
+            <artifactId>jogl-all-natives-linux-i586</artifactId>
+            <version>${jogl.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jogamp.jogl</groupId>
+            <artifactId>jogl-all-natives-macosx-universal</artifactId>
+            <version>${jogl.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jogamp.jogl</groupId>
+            <artifactId>jogl-all-natives-windows-amd64</artifactId>
+            <version>${jogl.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jogamp.jogl</groupId>
+            <artifactId>jogl-all-natives-windows-i586 </artifactId>
+            <version>${jogl.version}</version>
+        </dependency>
+
+        <!-- GLUEGEN -->
         <dependency>
             <groupId>org.jogamp.gluegen</groupId>
             <artifactId>gluegen-rt</artifactId>
-            <version>2.5.0</version>
+            <version>${jogl.version}</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/net.java.dev.jogl/jogl -->
         <dependency>
-            <groupId>net.java.dev.jogl</groupId>
-            <artifactId>jogl</artifactId>
-            <version>1.1.1-rc6</version>
+            <groupId>org.jogamp.gluegen</groupId>
+            <artifactId>gluegen-rt-natives-macosx-universal</artifactId>
+            <version>${jogl.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jogamp.gluegen</groupId>
+            <artifactId>gluegen-rt-natives-linux-aarch64</artifactId>
+            <version>${jogl.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jogamp.gluegen</groupId>
+            <artifactId>gluegen-rt-natives-linux-amd64</artifactId>
+            <version>${jogl.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jogamp.gluegen</groupId>
+            <artifactId>gluegen-rt-natives-linux-armv6hf</artifactId>
+            <version>${jogl.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jogamp.gluegen</groupId>
+            <artifactId>gluegen-rt-natives-linux-i586</artifactId>
+            <version>${jogl.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jogamp.gluegen</groupId>
+            <artifactId>gluegen-rt-natives-macosx-universal</artifactId>
+            <version>${jogl.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jogamp.gluegen</groupId>
+            <artifactId>gluegen-rt-natives-windows-amd64</artifactId>
+            <version>${jogl.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jogamp.gluegen</groupId>
+            <artifactId>gluegen-rt-natives-windows-i586</artifactId>
+            <version>${jogl.version}</version>
         </dependency>
 
     </dependencies>
 
+    <properties>
+        <jogl.version>v2.4.0-rc4</jogl.version>
+    </properties>
+
     <repositories>
         <repository>
-            <id>gluegen</id>
-            <url>https://jogamp.org/deployment/maven/</url>
+            <id>jzy3d-snapshots</id>
+            <name>Jzy3d Snapshots</name>
+            <url>https://maven.jzy3d.org/snapshots/</url>
+        </repository>
+        <repository>
+            <id>jzy3d-releases</id>
+            <name>Jzy3d Releases</name>
+            <url>https://maven.jzy3d.org/releases/</url>
         </repository>
     </repositories>
 

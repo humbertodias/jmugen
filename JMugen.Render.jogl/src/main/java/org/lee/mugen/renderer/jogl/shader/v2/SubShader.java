@@ -1,7 +1,8 @@
-package org.lee.mugen.renderer.jogl.shader;
+package org.lee.mugen.renderer.jogl.shader.v2;
 
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.texture.Texture;
+import org.lee.mugen.util.Logger;
 
 public class SubShader extends Shader {
 
@@ -18,7 +19,7 @@ public class SubShader extends Shader {
 		gl.glGetObjectParameterivARB(programID,
 				GL2.GL_OBJECT_LINK_STATUS_ARB, programBuffer);
 		if (programBuffer.get(0) == GL2.GL_FALSE)
-			System.err.println("A linking error occured in a shader program.");
+			Logger.error("A linking error occured in a shader program.");
 		opacityUniPos = getUniformLocation(gl, programID, "Opacity");
 		baseUniPos = getUniformLocation(gl, programID, "BaseImage");
 		blendUniPos = getUniformLocation(gl, programID, "BlendImage");
@@ -35,7 +36,7 @@ public class SubShader extends Shader {
 		gl.glActiveTexture(GL2.GL_TEXTURE0);
 		blend.bind(gl);
 		gl.glUniform1i(blendUniPos, 0);
-
 	
 	}
+
 }

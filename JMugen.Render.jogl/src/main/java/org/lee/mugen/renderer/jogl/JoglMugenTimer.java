@@ -3,13 +3,18 @@ package org.lee.mugen.renderer.jogl;
 import org.lee.mugen.renderer.MugenTimer;
 
 public class JoglMugenTimer implements MugenTimer {
-	long lastTime = 0;
+	private long lastTime;
+	private static final long FRAME_DURATION_NANOS = 1_000_000_000 / 60;  // 60 FPS
+	private long frameRate = FRAME_DURATION_NANOS;
+	private int frameCount = 0;
+	private int fps = 0;
+	private static final long TIME_TO_LISTEN_FPS = 500_000_000;  // 500 ms in nanoseconds
 
-	long ONE = 1000 / 60;
-	private long frameRate = ONE;
-	int frame = 0;
-	int fps = 0;
-	int TIME_TO_LISTEN_FPS = 500;
+	private long lastTimeForComputeFPS = 0;
+
+	public JoglMugenTimer() {
+		lastTime = System.nanoTime();
+	}
 
 	@Override
 	public int getFps() {
@@ -22,45 +27,45 @@ public class JoglMugenTimer implements MugenTimer {
 	}
 
 	@Override
-	public void setFramerate(long famerate) {
-		this.frameRate = famerate;
+	public void setFramerate(long framerate) {
+		this.frameRate = 1_000_000_000 / framerate;  // Convert FPS to nanoseconds per frame
 	}
 
-	private long lastTimeForComputeFPS = 0;
-
-	public void listen() {
-		frame++;
-		long currentTime = System.currentTimeMillis();
+	private void computeFPS() {
+		frameCount++;
+		long currentTime = System.nanoTime();
 		long diff = currentTime - lastTimeForComputeFPS;
-		if (diff > TIME_TO_LISTEN_FPS) {
-			fps = (int) (frame / (diff / 1000f));
-			frame = 0;
-			lastTimeForComputeFPS = System.currentTimeMillis();
 
+		if (diff >= TIME_TO_LISTEN_FPS) {
+			fps = (int) (frameCount * 1_000_000_000L / diff);
+			frameCount = 0;
+			lastTimeForComputeFPS = currentTime;
 		}
 	}
 
 	@Override
 	public int sleep() {
-		listen();
-		long currentTime = System.currentTimeMillis();
-		long diff = currentTime - lastTime;
-		int lack = 0;
-		if (diff < frameRate && (frameRate - diff) > 0) {
+		computeFPS();
+
+		long currentTime = System.nanoTime();
+		long elapsedTime = currentTime - lastTime;
+
+		int lag = 0;
+
+		if (elapsedTime < frameRate) {
+			long sleepTime = (frameRate - elapsedTime) / 1_000_000;  // Convert to milliseconds
 			try {
-				Thread.sleep((frameRate - diff));
-				// System.out.println("wait " + (frameRate - diff));
+				Thread.sleep(sleepTime);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				Thread.currentThread().interrupt();
 			}
 		} else {
-			lack = (int) ((diff - frameRate) / frameRate);
-			// System.out.println("lack " + (diff - frameRate));
-			lastTime = System.currentTimeMillis();
-
+			lag = (int) ((elapsedTime - frameRate) / frameRate);
 		}
-		return lack;
+
+		lastTime = System.nanoTime();  // Update the time after each cycle
+
+		return lag;
 	}
 
 	@Override
@@ -68,7 +73,7 @@ public class JoglMugenTimer implements MugenTimer {
 		try {
 			Thread.sleep(ms);
 		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
 		}
-
 	}
 }

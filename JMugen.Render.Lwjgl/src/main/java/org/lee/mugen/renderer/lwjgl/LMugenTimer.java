@@ -22,7 +22,7 @@ public final class LMugenTimer implements MugenTimer {
 	}
 
 	@Override
-	public void setFramerate(long famerate) {
+	public void setFramerate(long framerate) {
 		// TODO Auto-generated method stub
 
 	}

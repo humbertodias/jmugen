@@ -7,11 +7,11 @@ import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
+import com.jogamp.opengl.util.awt.TextureRenderer;
 import org.lee.mugen.renderer.AngleDrawProperties;
 import org.lee.mugen.renderer.DrawProperties;
 import org.lee.mugen.renderer.Trans;
 
-import com.sun.opengl.util.j2d.TextureRenderer;
 import composite.BlendComposite;
 
 public class JoglTextureDrawer {

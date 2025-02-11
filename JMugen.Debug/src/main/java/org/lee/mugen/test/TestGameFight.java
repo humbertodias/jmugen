@@ -181,9 +181,10 @@ public class TestGameFight  {
 		
 	}
 	public static void main(String[] args) throws Exception {
+		SoundSystem.SoundBackGround.playMusic(JMugenConstant.RESOURCE + "sound/intro.mp3");
 		launchDirect();
 //		launchUI();
-		
+
 //		SoundSystem.SoundBackGround.playMusic(JMugenConstant.RESOURCE + "sound/ADX_S060.adx");
 	}
 	
@@ -207,7 +208,7 @@ public class TestGameFight  {
 				"kfm", "0",
 //				"kenstageDG.def",
 				"stage0.def",
-//				"mvc2/ADX_S060.BIN"
+				"mvc2/ADX_S060.BIN"
 		};
 		
 		final GameFight statemachine = GameFight.getInstance();
@@ -222,8 +223,8 @@ public class TestGameFight  {
 		
 		GraphicsWrapper.init();
 		statemachine.setStage(JMugenConstant.RESOURCE + "stages/" + args[4]);
-//		if (args.length > 5)
-//			SoundSystem.SoundBackGround.playMusic(JMugenConstant.RESOURCE + "sound/" + args[5]);
+		if (args.length > 5)
+			SoundSystem.SoundBackGround.playMusic(JMugenConstant.RESOURCE + "sound/" + args[5]);
 		final GameWindow gameWindow = GraphicsWrapper.getInstance().getInstanceOfGameWindow();
 		gameWindow.setGameWindowCallback(statemachine);
 		SpriteDebugerUI debugerUI = new SpriteDebugerUI();

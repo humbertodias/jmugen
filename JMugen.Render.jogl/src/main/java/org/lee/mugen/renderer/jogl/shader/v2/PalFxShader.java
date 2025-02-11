@@ -1,4 +1,4 @@
-package org.lee.mugen.renderer.jogl.shader;
+package org.lee.mugen.renderer.jogl.shader.v2;
 
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
@@ -54,4 +54,5 @@ public class PalFxShader extends Shader {
 		// Optional: Deactivate the shader after use
 		gl.glUseProgram(0);
 	}
+
 }

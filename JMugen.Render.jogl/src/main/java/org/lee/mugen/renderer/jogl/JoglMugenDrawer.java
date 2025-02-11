@@ -26,8 +26,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.media.opengl.GL;
-
+import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GLProfile;
+import com.jogamp.opengl.util.awt.TextureRenderer;
 import org.lee.mugen.imageIO.PCXLoader;
 import org.lee.mugen.imageIO.RawPCXImage;
 import org.lee.mugen.imageIO.PCXLoader.PCXHeader;
@@ -41,16 +42,15 @@ import org.lee.mugen.renderer.ImageContainer;
 import org.lee.mugen.renderer.MugenDrawer;
 import org.lee.mugen.renderer.RGB;
 import org.lee.mugen.renderer.Trans;
-import org.lee.mugen.renderer.jogl.shader.AfterImageShader;
-import org.lee.mugen.renderer.jogl.shader.BlendShader;
-import org.lee.mugen.renderer.jogl.shader.PalFxShader;
+import org.lee.mugen.renderer.jogl.shader.v2.AfterImageShader;
+import org.lee.mugen.renderer.jogl.shader.v2.BlendShader;
+import org.lee.mugen.renderer.jogl.shader.v2.PalFxShader;
 import org.lee.mugen.util.Logger;
 
-import com.sun.opengl.util.j2d.TextureRenderer;
-import com.sun.opengl.util.texture.Texture;
-import com.sun.opengl.util.texture.TextureCoords;
-import com.sun.opengl.util.texture.TextureData;
-import com.sun.opengl.util.texture.TextureIO;
+import com.jogamp.opengl.util.texture.Texture;
+import com.jogamp.opengl.util.texture.TextureCoords;
+import com.jogamp.opengl.util.texture.TextureData;
+import com.jogamp.opengl.util.texture.TextureIO;
 
 public class JoglMugenDrawer extends MugenDrawer {
 
@@ -68,7 +68,7 @@ public class JoglMugenDrawer extends MugenDrawer {
 		if (blendShader == null) {
 			blendShader = new BlendShader(name);
 			blendShaderMap.put(name, blendShader);
-			blendShader.compileShader(gameWindow.getGl());
+			blendShader.compileShader(gameWindow.getGl().getGL2());
 		}
 		return blendShader;
 	}
@@ -76,7 +76,7 @@ public class JoglMugenDrawer extends MugenDrawer {
 	public PalFxShader getPalFxShader() {
 		if (palFxShader == null) {
 			palFxShader = new PalFxShader();
-			palFxShader.compileShader(gameWindow.getGl());
+			palFxShader.compileShader(gameWindow.getGl().getGL2());
 		}
 		return palFxShader;
 	}
@@ -84,7 +84,7 @@ public class JoglMugenDrawer extends MugenDrawer {
 	public AfterImageShader getAfterImageShader() {
 		if (afterImageShader == null) {
 			afterImageShader = new AfterImageShader();
-			afterImageShader.compileShader(gameWindow.getGl());
+			afterImageShader.compileShader(gameWindow.getGl().getGL2());
 		}
 		return afterImageShader;
 	}
@@ -102,7 +102,7 @@ public class JoglMugenDrawer extends MugenDrawer {
 	private void drawImage(float xlDst, float xrDst, float ytDst, float ybDst,
 			float xlSrc, float xrSrc, float ytSrc, float ybSrc,
 			DrawProperties dp) {
-		GL gl = getGl();
+		GL2 gl = getGl();
 		if (gl == null)
 			return;
 		float xScale = 1f;
@@ -114,8 +114,9 @@ public class JoglMugenDrawer extends MugenDrawer {
 		}
 		// draw a quad textured to match the sprite
 		Texture texture = (Texture) dp.getIc().getImg();
-		TextureCoords coords = texture.getImageTexCoords();
-		gl.glBegin(GL.GL_QUADS);
+
+//		TextureCoords coords = texture.getImageTexCoords();
+		gl.glBegin(GL2.GL_QUADS);
 		{
 
 			gl.glNormal3f(0.0f, 0.0f, 1.0f);
@@ -152,11 +153,12 @@ public class JoglMugenDrawer extends MugenDrawer {
 	}
 
 	private void drawWithPropertiesColor(DrawProperties dp) {
-		final GL gl = getGl();
+		final GL2 gl = getGl();
 		if (gl == null)
 			return;
 
 		final Texture texture = (Texture) dp.getIc().getImg();
+
 		final float xlDst = dp.getXLeftDst();
 		final float xrDst = dp.getXRightDst();
 		final float ytDst = dp.getYTopDst();
@@ -181,47 +183,47 @@ public class JoglMugenDrawer extends MugenDrawer {
 		}
 
 		if (trans == Trans.ADD || trans == Trans.ADDALPHA) {
-			gl.glTexEnvf(GL.GL_TEXTURE_ENV, GL.GL_TEXTURE_ENV_MODE,
-					GL.GL_MODULATE);
-			// gl.glTexEnvf(GL.GL_TEXTURE_ENV, GL.GL_COMBINE_RGB, GL.GL_ADD);
-			// gl.glTexEnvf(GL.GL_TEXTURE_ENV, GL.GL_COMBINE_ALPHA, GL.GL_ADD);
-			// gl.glTexEnvf(GL.GL_TEXTURE_ENV, GL.GL_SRC0_RGB, GL.GL_PREVIOUS);
-			// gl.glTexEnvf(GL.GL_TEXTURE_ENV, GL.GL_SRC1_RGB, GL.GL_TEXTURE);
-			gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_DST_ALPHA);
+			gl.glTexEnvf(GL2.GL_TEXTURE_ENV, GL2.GL_TEXTURE_ENV_MODE,
+					GL2.GL_MODULATE);
+			// gl.glTexEnvf(GL2.GL_TEXTURE_ENV, GL2.GL_COMBINE_RGB, GL2.GL_ADD);
+			// gl.glTexEnvf(GL2.GL_TEXTURE_ENV, GL2.GL_COMBINE_ALPHA, GL2.GL_ADD);
+			// gl.glTexEnvf(GL2.GL_TEXTURE_ENV, GL2.GL_SRC0_RGB, GL2.GL_PREVIOUS);
+			// gl.glTexEnvf(GL2.GL_TEXTURE_ENV, GL2.GL_SRC1_RGB, GL2.GL_TEXTURE);
+			gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_DST_ALPHA);
 			type = 1;
 		} else if (trans == Trans.ADDALPHA) {
-			gl.glTexEnvf(GL.GL_TEXTURE_ENV, GL.GL_TEXTURE_ENV_MODE,
-					GL.GL_ADD);
-			// gl.glTexEnvf(GL.GL_TEXTURE_ENV, GL.GL_COMBINE_RGB, GL.GL_ADD);
-			// gl.glTexEnvf(GL.GL_TEXTURE_ENV, GL.GL_COMBINE_ALPHA, GL.GL_ADD);
-			// gl.glTexEnvf(GL.GL_TEXTURE_ENV, GL.GL_SRC0_RGB, GL.GL_PREVIOUS);
-			// gl.glTexEnvf(GL.GL_TEXTURE_ENV, GL.GL_SRC1_RGB, GL.GL_TEXTURE);
-			gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_DST_ALPHA);
+			gl.glTexEnvf(GL2.GL_TEXTURE_ENV, GL2.GL_TEXTURE_ENV_MODE,
+					GL2.GL_ADD);
+			// gl.glTexEnvf(GL2.GL_TEXTURE_ENV, GL2.GL_COMBINE_RGB, GL2.GL_ADD);
+			// gl.glTexEnvf(GL2.GL_TEXTURE_ENV, GL2.GL_COMBINE_ALPHA, GL2.GL_ADD);
+			// gl.glTexEnvf(GL2.GL_TEXTURE_ENV, GL2.GL_SRC0_RGB, GL2.GL_PREVIOUS);
+			// gl.glTexEnvf(GL2.GL_TEXTURE_ENV, GL2.GL_SRC1_RGB, GL2.GL_TEXTURE);
+			gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_DST_ALPHA);
 			type = 1;
 		} else if (trans == Trans.ADD1) {
-			gl.glTexEnvf(GL.GL_TEXTURE_ENV, GL.GL_TEXTURE_ENV_MODE,
-					GL.GL_MODULATE);
-			// gl.glTexEnvf(GL.GL_TEXTURE_ENV, GL.GL_COMBINE_RGB, GL.GL_ADD);
-			// gl.glTexEnvf(GL.GL_TEXTURE_ENV, GL.GL_COMBINE_ALPHA, GL.GL_ADD);
-			// gl.glTexEnvf(GL.GL_TEXTURE_ENV, GL.GL_SRC0_RGB, GL.GL_PREVIOUS);
-			// gl.glTexEnvf(GL.GL_TEXTURE_ENV, GL.GL_SRC1_RGB, GL.GL_TEXTURE);
-			gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_DST_ALPHA);
+			gl.glTexEnvf(GL2.GL_TEXTURE_ENV, GL2.GL_TEXTURE_ENV_MODE,
+					GL2.GL_MODULATE);
+			// gl.glTexEnvf(GL2.GL_TEXTURE_ENV, GL2.GL_COMBINE_RGB, GL2.GL_ADD);
+			// gl.glTexEnvf(GL2.GL_TEXTURE_ENV, GL2.GL_COMBINE_ALPHA, GL2.GL_ADD);
+			// gl.glTexEnvf(GL2.GL_TEXTURE_ENV, GL2.GL_SRC0_RGB, GL2.GL_PREVIOUS);
+			// gl.glTexEnvf(GL2.GL_TEXTURE_ENV, GL2.GL_SRC1_RGB, GL2.GL_TEXTURE);
+			gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_DST_ALPHA);
 			type = 2;
 		} else if (trans == Trans.SUB) {
-			gl.glTexEnvf(GL.GL_TEXTURE_ENV, GL.GL_TEXTURE_ENV_MODE, GL.GL_COMBINE);
-			gl.glTexEnvf(GL.GL_TEXTURE_ENV, GL.GL_COMBINE_RGB, GL.GL_SUBTRACT);
-			gl.glTexEnvf(GL.GL_TEXTURE_ENV, GL.GL_COMBINE_ALPHA, GL.GL_SUBTRACT);
-			gl.glTexEnvf(GL.GL_TEXTURE_ENV, GL.GL_SRC0_RGB, GL.GL_PREVIOUS);
-			gl.glTexEnvf(GL.GL_TEXTURE_ENV, GL.GL_SRC1_RGB, GL.GL_TEXTURE);
-			gl.glBlendFunc(GL.GL_DST_COLOR, GL.GL_SRC_ALPHA);
+			gl.glTexEnvf(GL2.GL_TEXTURE_ENV, GL2.GL_TEXTURE_ENV_MODE, GL2.GL_COMBINE);
+			gl.glTexEnvf(GL2.GL_TEXTURE_ENV, GL2.GL_COMBINE_RGB, GL2.GL_SUBTRACT);
+			gl.glTexEnvf(GL2.GL_TEXTURE_ENV, GL2.GL_COMBINE_ALPHA, GL2.GL_SUBTRACT);
+			gl.glTexEnvf(GL2.GL_TEXTURE_ENV, GL2.GL_SRC0_RGB, GL2.GL_PREVIOUS);
+			gl.glTexEnvf(GL2.GL_TEXTURE_ENV, GL2.GL_SRC1_RGB, GL2.GL_TEXTURE);
+			gl.glBlendFunc(GL2.GL_DST_COLOR, GL2.GL_SRC_ALPHA);
 			drawImage(xlDst, xrDst, ytDst, ybDst, xlSrc, xrSrc, ytSrc, ybSrc, dp);
 			drawImage(xlDst, xrDst, ytDst, ybDst, xlSrc, xrSrc, ytSrc, ybSrc, dp);
 			drawImage(xlDst, xrDst, ytDst, ybDst, xlSrc, xrSrc, ytSrc, ybSrc, dp);
 
 			type = 3;
 		} else {
-			gl.glTexEnvi(GL.GL_TEXTURE_ENV, GL.GL_TEXTURE_ENV_MODE, GL.GL_REPLACE);
-			gl.glBlendFunc(GL.GL_ONE, GL.GL_ONE_MINUS_SRC_ALPHA);
+			gl.glTexEnvi(GL2.GL_TEXTURE_ENV, GL2.GL_TEXTURE_ENV_MODE, GL2.GL_REPLACE);
+			gl.glBlendFunc(GL2.GL_ONE, GL2.GL_ONE_MINUS_SRC_ALPHA);
 
 		}
 
@@ -260,11 +262,11 @@ public class JoglMugenDrawer extends MugenDrawer {
 			drawImage(xlDst, xrDst, ytDst, ybDst, xlSrc, xrSrc, ytSrc, ybSrc, dp);
 		}
 
-		gl.glDisable(GL.GL_ALPHA_TEST);
+		gl.glDisable(GL2.GL_ALPHA_TEST);
 	}
 
 	private void processRotationProperties(AngleDrawProperties dp) {
-		final GL gl = getGl();
+		final GL2 gl = getGl();
 		if (gl == null)
 			return;
 		if (dp != null) {
@@ -279,8 +281,8 @@ public class JoglMugenDrawer extends MugenDrawer {
 		return gameWindow;
 	}
 
-	private GL getGl() {
-		return gameWindow.getGl();
+	private GL2 getGl() {
+		return gameWindow.getGl().getGL2();
 	}
 
 	TextureRenderer animRenderer = null;
@@ -293,7 +295,7 @@ public class JoglMugenDrawer extends MugenDrawer {
 
 	// need for movie
 	public void drawBufferedImage(DrawProperties dp) {
-		GL gl = getGl();
+		GL2 gl = getGl();
 		if (gl == null)
 			return;
 		Graphics2D g = ((JoglMugenDrawer) GraphicsWrapper.getInstance())
@@ -335,22 +337,22 @@ public class JoglMugenDrawer extends MugenDrawer {
 		final float ty2 = tc.bottom();
 
 		// Enable blending, using the SrcOver rule
-		gl.glEnable(GL.GL_BLEND);
-		gl.glBlendFunc(GL.GL_ONE, GL.GL_ONE_MINUS_SRC_ALPHA);
+		gl.glEnable(GL2.GL_BLEND);
+		gl.glBlendFunc(GL2.GL_ONE, GL2.GL_ONE_MINUS_SRC_ALPHA);
 
 		// Use the GL_MODULATE texture function to effectively multiply
 		// each pixel in the texture by the current alpha value
-		gl.glTexEnvi(GL.GL_TEXTURE_ENV, GL.GL_TEXTURE_ENV_MODE,
-				GL.GL_MODULATE);
+		gl.glTexEnvi(GL2.GL_TEXTURE_ENV, GL2.GL_TEXTURE_ENV_MODE,
+				GL2.GL_MODULATE);
 
 		final float x = 0;
 		final float y = 0;
 		final float w = 640;
 		final float h = 480;
 
-		tex.bind();
-		tex.enable();
-		gl.glBegin(GL.GL_QUADS);
+		tex.bind(gl);
+		tex.enable(gl);
+		gl.glBegin(GL2.GL_QUADS);
 		// Render image right-side up
 		final float a = 1f;
 		gl.glColor4f(a, a, a, a);
@@ -365,11 +367,10 @@ public class JoglMugenDrawer extends MugenDrawer {
 		gl.glEnd();
 	
 	}
-		
-	
+
 	@Override
 	public void draw(DrawProperties dp) {
-		GL gl = getGl();
+		GL2 gl = getGl();
 		if (gl == null)
 			return;
 		if (dp.getIc().getImg() instanceof BufferedImage) {
@@ -383,21 +384,21 @@ public class JoglMugenDrawer extends MugenDrawer {
 
 		// bind to the appropriate texture for this sprite
 
-		texture.bind();
+		texture.bind(gl);
 
-		gl.glEnable(GL.GL_TEXTURE_2D);
+		gl.glEnable(GL2.GL_TEXTURE_2D);
 
 		gl.glColorMask(true, true, true, true);
-		gl.glDisable(GL.GL_COLOR_LOGIC_OP);
-		gl.glDisable(GL.GL_BLEND);
-		// gl.glDisable(GL.GL_ALPHA_TEST);
+		gl.glDisable(GL2.GL_COLOR_LOGIC_OP);
+		gl.glDisable(GL2.GL_BLEND);
+		// gl.glDisable(GL2.GL_ALPHA_TEST);
 
-		gl.glTexEnvi(GL.GL_TEXTURE_ENV, GL.GL_TEXTURE_ENV_MODE, GL.GL_MODULATE);
-		// gl.glTexEnvi(GL.GL_TEXTURE_ENV, GL.GL_TEXTURE_ENV_MODE,
-		// GL.GL_REPLACE);
+		gl.glTexEnvi(GL2.GL_TEXTURE_ENV, GL2.GL_TEXTURE_ENV_MODE, GL2.GL_MODULATE);
+		// gl.glTexEnvi(GL2.GL_TEXTURE_ENV, GL2.GL_TEXTURE_ENV_MODE,
+		// GL2.GL_REPLACE);
 
-		gl.glEnable(GL.GL_BLEND);
-		gl.glBlendFunc(GL.GL_SRC_COLOR, GL.GL_ONE_MINUS_SRC_ALPHA);
+		gl.glEnable(GL2.GL_BLEND);
+		gl.glBlendFunc(GL2.GL_SRC_COLOR, GL2.GL_ONE_MINUS_SRC_ALPHA);
 		gl.glColor4f(1f, 1f, 1f, 1f);
 
 		if (isScaleByForMeDebug()) {
@@ -419,24 +420,24 @@ public class JoglMugenDrawer extends MugenDrawer {
 
 	@Override
 	public void drawLine(int x1, int y1, int x2, int y2) {
-		final GL gl = getGl();
+		final GL2 gl = getGl();
 		if (gl == null)
 			return;
 		if (isScaleByForMeDebug()) {
 			scale(0.5f, 0.5f); // This scale help me to see out of screen
 			gl.glTranslated(160, 240, 0);
 		}
-		gl.glDisable(GL.GL_TEXTURE_2D);
+		gl.glDisable(GL2.GL_TEXTURE_2D);
 		gl.glColor4f(rgba.getR(), rgba.getG(), rgba.getB(), rgba.getA());
-		gl.glBegin(GL.GL_POINTS);
+		gl.glBegin(GL2.GL_POINTS);
 		gl.glVertex2f(x1, y1);
 		gl.glVertex2f(x2, y2);
 		gl.glEnd();
-		gl.glBegin(GL.GL_LINES);
+		gl.glBegin(GL2.GL_LINES);
 		gl.glVertex2f(x1, y1);
 		gl.glVertex2f(x2, y2);
 		gl.glEnd();
-		gl.glEnable(GL.GL_TEXTURE_2D);
+		gl.glEnable(GL2.GL_TEXTURE_2D);
 
 		if (isScaleByForMeDebug()) {
 			gl.glTranslated(-160, -240, 0);
@@ -446,44 +447,44 @@ public class JoglMugenDrawer extends MugenDrawer {
 
 	@Override
 	public void drawRect(float x, float y, float width, float height) {
-		final GL gl = getGl();
+		final GL2 gl = getGl();
 		if (gl == null)
 			return;
 		gl.glColor4f(rgba.getR(), rgba.getG(), rgba.getB(), rgba.getA());
-		gl.glDisable(GL.GL_TEXTURE_2D);
-		gl.glBegin(GL.GL_LINE_STRIP);
+		gl.glDisable(GL2.GL_TEXTURE_2D);
+		gl.glBegin(GL2.GL_LINE_STRIP);
 		gl.glVertex2f(x, y);
 		gl.glVertex2f(x + width, y);
 		gl.glVertex2f(x + width, y + height);
 		gl.glVertex2f(x, y + height);
 		gl.glVertex2f(x, y);
 		gl.glEnd();
-		gl.glEnable(GL.GL_TEXTURE_2D);
+		gl.glEnable(GL2.GL_TEXTURE_2D);
 	}
 
 	@Override
 	public void fillRect(float x1, float y1, float width, float height) {
-		final GL gl = getGl();
+		final GL2 gl = getGl();
 		if (gl == null)
 			return;
-		gl.glTexEnvi(GL.GL_TEXTURE_ENV, GL.GL_TEXTURE_ENV_MODE, GL.GL_REPLACE);
-		gl.glBlendFunc(GL.GL_ONE, GL.GL_ONE_MINUS_SRC_ALPHA);
+		gl.glTexEnvi(GL2.GL_TEXTURE_ENV, GL2.GL_TEXTURE_ENV_MODE, GL2.GL_REPLACE);
+		gl.glBlendFunc(GL2.GL_ONE, GL2.GL_ONE_MINUS_SRC_ALPHA);
 
-		gl.glDisable(GL.GL_TEXTURE_2D);
+		gl.glDisable(GL2.GL_TEXTURE_2D);
 		gl.glColor4f(rgba.getR(), rgba.getG(), rgba.getB(), rgba.getA());
 
-		gl.glBegin(GL.GL_QUADS);
+		gl.glBegin(GL2.GL_QUADS);
 		gl.glVertex2f(x1, y1);
 		gl.glVertex2f(x1 + width, y1);
 		gl.glVertex2f(x1 + width, y1 + height);
 		gl.glVertex2f(x1, y1 + height);
 		gl.glEnd();
-		gl.glEnable(GL.GL_TEXTURE_2D);
+		gl.glEnable(GL2.GL_TEXTURE_2D);
 	}
 
 	@Override
 	public void scale(float x, float y) {
-		final GL gl = getGl();
+		final GL2 gl = getGl();
 		if (gl == null)
 			return;
 		gl.glScaled(x, y, 0);
@@ -491,7 +492,7 @@ public class JoglMugenDrawer extends MugenDrawer {
 
 	@Override
 	public void setColor(float r, float g, float b, float a) {
-		final GL gl = getGl();
+		final GL2 gl = getGl();
 		if (gl == null)
 			return;
 		gl.glColor4f(r / 255f, g / 255f, b / 255f, a / 255f);
@@ -505,7 +506,7 @@ public class JoglMugenDrawer extends MugenDrawer {
 
 	@Override
 	public void setColor(float r, float g, float b) {
-		final GL gl = getGl();
+		final GL2 gl = getGl();
 		if (gl == null)
 			return;
 		gl.glColor3f(r / 255f, g / 255f, b / 255f);
@@ -568,8 +569,12 @@ public class JoglMugenDrawer extends MugenDrawer {
 
 		public void free() {
 			synchronized (this) {
-				if (imageStatus.get() == TEXTURE && img != null)
-					((Texture) img).dispose();
+				if (imageStatus.get() == TEXTURE && img != null){
+					// TODO: Review
+ //					((Texture) img).dispose();
+					final GL2 gl = getGl();
+					((Texture) img).destroy(gl);
+				}
 			}
 		}
 		
@@ -633,7 +638,7 @@ public class JoglMugenDrawer extends MugenDrawer {
 	}
 	@Override
 	public void setClip(Rectangle r) {
-		final GL gl = getGl();
+		final GL2 gl = getGl();
 		if (gl == null)
 			return;
 		if (r != null) {
@@ -643,7 +648,7 @@ public class JoglMugenDrawer extends MugenDrawer {
 			final int xr = r.getX2() * 2;
 			final int yb = r.getY2() * 2;
 
-			gl.glMatrixMode(GL.GL_PROJECTION);
+			gl.glMatrixMode(GL2.GL_PROJECTION);
 			gl.glLoadIdentity();
 			gl.glOrtho(0, xr - xl, (yb - yt), 0, -10000, 10000);
 			gl.glViewport(xl, 480 - yb, xr - xl, (yb - yt));
@@ -651,7 +656,7 @@ public class JoglMugenDrawer extends MugenDrawer {
 			gl.glScaled(2f, 2f, 0);
 
 		} else {
-			gl.glMatrixMode(GL.GL_PROJECTION);
+			gl.glMatrixMode(GL2.GL_PROJECTION);
 			gl.glLoadIdentity();
 			gl.glViewport(0, 0, 640, 480);
 			gl.glOrtho(0, 640, 640, 0, -10000, 10000);
@@ -701,15 +706,18 @@ public class JoglMugenDrawer extends MugenDrawer {
 		return getDefaultTextureData(buffer, image.getWidth(), image.getHeight());
 	}
 	private static TextureData getDefaultTextureData(Buffer buffer, int width, int height) {
+		// TODO: review
+		final GLProfile gp = GLProfile.get(GLProfile.GL2);
+
 		final TextureData data;
 		if (width * height < 200 * 100) {
 			data = 
-				new TextureData(GL.GL_RGBA,//GL.GL_COMPRESSED_RGBA_S3TC_DXT3_EXT,
+				new TextureData(gp, GL2.GL_RGBA,//GL2.GL_COMPRESSED_RGBA_S3TC_DXT3_EXT,
 					width,
 					height,
 	                0,
-	                GL.GL_BGRA,
-	                GL.GL_UNSIGNED_BYTE,
+	                GL2.GL_BGRA,
+	                GL2.GL_UNSIGNED_BYTE,
 	                false,
 	                false,
 	                false,
@@ -717,12 +725,12 @@ public class JoglMugenDrawer extends MugenDrawer {
 	                null);
 		} else {
 			data = 
-				new TextureData(GL.GL_COMPRESSED_RGBA_S3TC_DXT3_EXT,
+				new TextureData(gp, GL2.GL_COMPRESSED_RGBA_S3TC_DXT3_EXT,
 					width,
 					height,
 	                0,
-	                GL.GL_BGRA,
-	                GL.GL_UNSIGNED_BYTE,
+	                GL2.GL_BGRA,
+	                GL2.GL_UNSIGNED_BYTE,
 	                false,
 	                false,
 	                false,
@@ -731,33 +739,35 @@ public class JoglMugenDrawer extends MugenDrawer {
 		}
 		return data;
 	}
-	private static Texture getNewEmptyTexture(int width, int height) {
+	private  Texture getNewEmptyTexture(int width, int height) {
 		final TextureData data = getDefaultTextureData(getDefaultImageType(width, height));
 		final Texture texture = getInitializedTexture(data);
 		data.setBuffer(null);
 		return texture;
 	}
-	private static Texture getInitializedTexture(BufferedImage image) {
+	private Texture getInitializedTexture(BufferedImage image) {
 		final TextureData data = getDefaultTextureData(image);
 		final Texture texture = getInitializedTexture(data);
 		data.setBuffer(null);
 		return texture;
 	}
-	private static Texture getInitializedTexture(RawPCXImage pcx) {
+	private Texture getInitializedTexture(RawPCXImage pcx) {
 		return getInitializedTexture(pcx, 0);
 	}
-	private static Texture getInitializedTexture(RawPCXImage pcx, int color) {
+	private Texture getInitializedTexture(RawPCXImage pcx, int color) {
 		final BufferedImage image = getDefaultImageType(pcx, color);
 		final TextureData data = getDefaultTextureData(image);
 		return getInitializedTexture(data);
 	}
-	private static Texture getInitializedTexture(TextureData data) {
+	private Texture getInitializedTexture(TextureData data) {
 		final Texture texture = TextureIO.newTexture(data);
 		data.setBuffer(null);
-		texture.setTexParameteri(GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP_TO_EDGE);
-		texture.setTexParameteri(GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP_TO_EDGE);
-		texture.setTexParameteri(GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
-		texture.setTexParameteri(GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
+		final GL2 gl = getGl();
+
+		texture.setTexParameteri(gl, GL2.GL_TEXTURE_WRAP_S, GL2.GL_CLAMP_TO_EDGE);
+		texture.setTexParameteri(gl, GL2.GL_TEXTURE_WRAP_T, GL2.GL_CLAMP_TO_EDGE);
+		texture.setTexParameteri(gl, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_NEAREST);
+		texture.setTexParameteri(gl, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_NEAREST);
 		return texture;
 	}
 	// ////////////////////

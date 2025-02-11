@@ -147,7 +147,7 @@ intensity = 0
  ;0 will play a random audio track. For example, to play
  ;track 3 from a music CD, use:
  ;  bgmusic = 3.da
-bgmusic = 
+bgmusic = sound/mvc2/ADX_S060.BIN
 
  ;Adjust the volume. 0 is normal, negative for softer, and
  ;positive for louder (only for mp3, mods and CDA)

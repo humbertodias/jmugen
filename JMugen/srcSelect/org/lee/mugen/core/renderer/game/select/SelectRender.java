@@ -168,7 +168,7 @@ public class SelectRender extends BaseRender {
 		////////////
 		// Stage
 		StageDisplay stageDisplay = selectInfo.getStagedisplay();
-		if (stageDisplay != null && gs.getStageBackgroundRender() != null && stageDisplay != null && stageDisplay.isEnable()) {
+		if (false && stageDisplay != null && gs.getStageBackgroundRender() != null &&  stageDisplay.isEnable()) {
 			
 			int width = stageDisplay.getRectangle().width;
 			int height = stageDisplay.getRectangle().height;
@@ -178,7 +178,7 @@ public class SelectRender extends BaseRender {
 			int x = stageDisplay.getPos().x;
 			int y = stageDisplay.getPos().y;
 			Rectangle r = new Rectangle(x, y, x + (int) (width * xCoef), y + (int) (height * yCoef));
-			
+
 			md.setClip(r);
 			md.scale(xCoef, yCoef);
 			gs.getStageBackgroundRender().render();
