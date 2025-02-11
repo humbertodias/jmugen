@@ -12,11 +12,10 @@
 
   <dependencies>
 
-    <!-- https://mvnrepository.com/artifact/net.java.dev.jogl/jogl -->
     <dependency>
-      <groupId>net.java.dev.jogl</groupId>
-      <artifactId>jogl</artifactId>
-      <version>1.1.1-rc6</version>
+      <groupId>JMugen.Render.jogl</groupId>
+      <artifactId>JMugen.Render.jogl</artifactId>
+      <version>${jmugen.version}</version>
     </dependency>
 
     <!-- https://mvnrepository.com/artifact/org.jdesktop/swing-layout -->
@@ -32,6 +31,7 @@
       <artifactId>vecmath</artifactId>
       <version>1.5.2</version>
     </dependency>
+
 
   </dependencies>
 

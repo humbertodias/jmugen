@@ -36,11 +36,14 @@
 
 package net.java.joglutils;
 
-import javax.media.opengl.*;
+import com.jogamp.opengl.*;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import com.sun.opengl.util.Animator;
+
+import com.jogamp.opengl.awt.GLCanvas;
+import com.jogamp.opengl.util.Animator;
 
 /**
  * A JFrame containing a heavyweight {@link GLCanvas} with a single attached {@link GLEventListener}. 
@@ -49,11 +52,11 @@ import com.sun.opengl.util.Animator;
  */
 public class GLJFrame extends JFrame {
     private GLEventListener listener;
-    private GLCapabilities caps;
+    private GLCapabilitiesImmutable caps;
     private GLCapabilitiesChooser chooser;
     private Animator animator;
     private GLContext contextToShareWith;
-    
+
     /**
      * Creates new form GLJFrame
      * @param listener the GLEventListener to attach to the GLCanvas
@@ -69,7 +72,9 @@ public class GLJFrame extends JFrame {
     public GLJFrame(String title, GLEventListener listener) {
         super(title);
         this.listener = listener;
-        this.caps = new GLCapabilities();
+        GLProfile glProfile = GLProfile.getDefault();
+
+        this.caps = new GLCapabilities(glProfile);
         this.chooser = null; //can be null because that will choose the default
         initComponents();
         ((GLCanvas)mainCanvas).addGLEventListener(listener);
@@ -120,7 +125,6 @@ public class GLJFrame extends JFrame {
      * Creates new form GLJFrame
      * @param listener the GLEventListener to attach to the GLCanvas
      * @param contextToShareWith the context to share with
-     * @see javax.media.opengl.GLCanvas#javax.media.opengl.GLCanvas(javax.media.opengl.GLCapabilities,javax.media.opengl.GLCapabilitiesChooser,javax.media.opengl.GLContext,javax.media.opengl.GraphicsDevice)
      */
     public GLJFrame(GLEventListener listener, GLContext contextToShareWith) {
         this(listener);
@@ -185,7 +189,9 @@ public class GLJFrame extends JFrame {
      */
     // <editor-fold defaultstate="collapsed" desc=" Generated Code ">//GEN-BEGIN:initComponents
     private void initComponents() {
-        mainCanvas = new GLCanvas(caps,chooser,contextToShareWith,null);
+//        mainCanvas = new GLCanvas(caps,chooser,contextToShareWith, null);
+        GraphicsDevice graphicsDevice = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+        mainCanvas = new GLCanvas(caps,chooser,graphicsDevice);
 
         addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentResized(java.awt.event.ComponentEvent evt) {
@@ -291,7 +297,7 @@ public class GLJFrame extends JFrame {
      * @return a copy of the capabilities used to generate the attached GLCanvas
      */
     public GLCapabilities getGLCapabilities() {
-        return (GLCapabilities)this.caps.clone();
+        return (GLCapabilities)this.caps.cloneMutable();
     }
     /**
      * Rebuilds the GLCanvas with the specified capbilities. Will dispose and re-create the JFrame and GLCanvas with the new capabilities.

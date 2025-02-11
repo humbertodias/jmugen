@@ -5,7 +5,7 @@ public interface MugenTimer {
 
 	public abstract long getFramerate();
 
-	public abstract void setFramerate(long famerate);
+	public abstract void setFramerate(long framerate);
 
 	public abstract int sleep();
 	public abstract void sleep(long ms);

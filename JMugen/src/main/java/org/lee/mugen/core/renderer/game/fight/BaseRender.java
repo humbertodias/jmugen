@@ -13,6 +13,7 @@ import org.lee.mugen.renderer.MugenDrawer;
 import org.lee.mugen.renderer.Renderable;
 import org.lee.mugen.sprite.base.AbstractAnimManager.SpriteDrawProperties;
 import org.lee.mugen.sprite.baseForParse.ImageSpriteSFF;
+import org.lee.mugen.util.Logger;
 
 public class BaseRender implements Renderable {
 	protected int layer = 0;
@@ -98,8 +99,11 @@ public class BaseRender implements Renderable {
 			ImageSpriteSFF sff = getImageSFF(type);
 			SpriteDrawProperties dp = getSpriteDrawProperties(type);
 
-			if (sff == null)
+			if (sff == null){
+				Logger.log("sff type %s is null", type.getType().getClass().getSimpleName());
 				return;
+			}
+
 			if (type.getFacing() == -1) {
 				DrawProperties drawProperties = new DrawProperties(
 						pos.x - sff.getWidth() + sff.getXAxis() + type.getOffset().x, 

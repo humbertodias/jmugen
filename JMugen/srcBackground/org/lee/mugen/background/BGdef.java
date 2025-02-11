@@ -9,6 +9,7 @@ import org.lee.mugen.renderer.RGB;
 import org.lee.mugen.sff.SffReader;
 import org.lee.mugen.sprite.baseForParse.SpriteSFF;
 import org.lee.mugen.util.BeanTools;
+import org.lee.mugen.util.Logger;
 
 public class BGdef implements Serializable {
 
@@ -66,6 +67,7 @@ public class BGdef implements Serializable {
 	}
 
 	public void free() {
+		if(spr == null) { Logger.log("spr is null"); return; }
 		spr.free();
 		
 	}
