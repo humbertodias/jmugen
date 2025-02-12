@@ -32,13 +32,6 @@
       <version>1.0.3.3</version>
     </dependency>
 
-    <!-- https://mvnrepository.com/artifact/javazoom/jlayer -->
-    <dependency>
-      <groupId>javazoom</groupId>
-      <artifactId>jlayer</artifactId>
-      <version>1.0.1</version>
-    </dependency>
-
     <!-- https://mvnrepository.com/artifact/com.googlecode.soundlibs/mp3spi -->
     <dependency>
       <groupId>com.googlecode.soundlibs</groupId>
@@ -79,34 +72,6 @@
                 <source>srcStage</source>
               </sources>
             </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <version>3.2.1</version>
-        <configuration>
-          <createDependencyReducedPom>false</createDependencyReducedPom>
-          <filters>
-            <filter>
-              <artifact>*:*</artifact>
-            </filter>
-          </filters>
-          <transformers>
-            <transformer
-                    implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-              <mainClass>org.lee.mugen.test.TestGameFight</mainClass>
-            </transformer>
-          </transformers>
-        </configuration>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
           </execution>
         </executions>
       </plugin>

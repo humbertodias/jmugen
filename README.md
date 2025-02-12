@@ -23,9 +23,16 @@ sdk use maven 3.6.3
 
 ## Run
 
+
 ```sh
-mvn exec:java -Dexec.mainClass=org.lee.mugen.test.TestGameFight
-make package run
+mvn package
+java $JAVA_OPTS -jar JMugen.Debug/target/JMugen.Debug-0.0.1-SNAPSHOT.jar
+```
+
+## Debug
+```properties
+JAVA_OPTS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=0.0.0.0:5005"
+
 ```
 
 ## References

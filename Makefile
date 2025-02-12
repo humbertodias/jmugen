@@ -1,7 +1,7 @@
 package:
 	mvn clean package
 
-DEBUG_SUSPEND=n
+DEBUG_SUSPEND=y
 JAVA_OPTS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=${DEBUG_SUSPEND},address=0.0.0.0:5005"
 
 JAVA='arch -x86_64 java'

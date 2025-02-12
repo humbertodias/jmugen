@@ -13,6 +13,12 @@
   <dependencies>
 
     <dependency>
+      <groupId>JMugen</groupId>
+      <artifactId>JMugen</artifactId>
+      <version>${jmugen.version}</version>
+    </dependency>
+
+    <dependency>
       <groupId>JMugen.Common</groupId>
       <artifactId>JMugen.Common</artifactId>
       <version>${jmugen.version}</version>
@@ -21,12 +27,6 @@
     <dependency>
       <groupId>JMugen.Properties</groupId>
       <artifactId>JMugen.Properties</artifactId>
-      <version>${jmugen.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>JMugen</groupId>
-      <artifactId>JMugen</artifactId>
       <version>${jmugen.version}</version>
     </dependency>
 
