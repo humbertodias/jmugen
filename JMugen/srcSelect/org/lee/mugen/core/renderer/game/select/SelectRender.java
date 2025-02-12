@@ -168,7 +168,7 @@ public class SelectRender extends BaseRender {
 		////////////
 		// Stage
 		StageDisplay stageDisplay = selectInfo.getStagedisplay();
-		if (false && stageDisplay != null && gs.getStageBackgroundRender() != null &&  stageDisplay.isEnable()) {
+		if (stageDisplay != null && gs.getStageBackgroundRender() != null &&  stageDisplay.isEnable()) {
 			
 			int width = stageDisplay.getRectangle().width;
 			int height = stageDisplay.getRectangle().height;
@@ -207,7 +207,7 @@ public class SelectRender extends BaseRender {
 		try {
 			return PropertyUtils.getNestedProperty(o, path);
 		} catch (Exception e) {
-			throw new IllegalArgumentException("Unknow path " + path + " for " + o.getClass());
+			throw new IllegalArgumentException("Unknown path " + path + " for " + o.getClass());
 		} 
 	}
 
