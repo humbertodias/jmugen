@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.nio.charset.Charset;
 
 
 public class Shader {
@@ -24,7 +25,6 @@ public class Shader {
     public Shader(String name) {
         shaderPrg = getShaderText(name);
         this.name = name;
-
     }
 
     protected static String getShaderText(String file) {
@@ -33,12 +33,11 @@ public class Shader {
 
         String shaderText;
         try {
-            shaderText = IOUtils.toString(inputStream);
+            shaderText = IOUtils.toString(inputStream, Charset.defaultCharset());
             return shaderText;
         } catch (IOException e) {
             throw new IllegalArgumentException();
         }
-
 
     }
 
@@ -57,19 +56,16 @@ public class Shader {
 
     public void render(GL2 gl) {
         gl.glUseProgramObjectARB(fshID);
-
     }
 
     public void endRender(GL2 gl) {
         gl.glUseProgramObjectARB(0);
-
     }
 
     public void clean(GL2 gl) {
         gl.glDetachObjectARB(programID, fshID);
         gl.glDeleteObjectARB(fshID);
         gl.glDeleteObjectARB(programID);
-
     }
 
     protected static int getUniformLocation(GL2 gl, int id, String name) {
@@ -81,6 +77,5 @@ public class Shader {
 
         return location;
     }
-
 
 }

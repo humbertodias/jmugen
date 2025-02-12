@@ -115,7 +115,7 @@ public class JoglMugenDrawer extends MugenDrawer {
 		// draw a quad textured to match the sprite
 		Texture texture = (Texture) dp.getIc().getImg();
 
-//		TextureCoords coords = texture.getImageTexCoords();
+		TextureCoords coords = texture.getImageTexCoords();
 		gl.glBegin(GL2.GL_QUADS);
 		{
 
@@ -707,7 +707,7 @@ public class JoglMugenDrawer extends MugenDrawer {
 	}
 	private static TextureData getDefaultTextureData(Buffer buffer, int width, int height) {
 		// TODO: review
-		final GLProfile gp = GLProfile.get(GLProfile.GL2);
+		final GLProfile gp = GLProfile.getDefault();
 
 		final TextureData data;
 		if (width * height < 200 * 100) {
