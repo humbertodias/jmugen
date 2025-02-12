@@ -13,6 +13,7 @@ import org.lee.mugen.fight.system.elem.Menu;
 import org.lee.mugen.input.CmdProcDispatcher;
 import org.lee.mugen.renderer.GameWindow;
 import org.lee.mugen.renderer.Renderable;
+import org.lee.mugen.util.Logger;
 
 public class GameMenu implements Game {
 
@@ -133,7 +134,9 @@ public class GameMenu implements Game {
 	public void render() throws Exception {
 		render.render();
 	}
-
+	private void notImplemented() {
+		Logger.log("not implemented");
+	}
 	private void selectNext() {
 		if (fire) {
 			int index = getMenu().getItemname().getCurrentIndex();
@@ -143,35 +146,44 @@ public class GameMenu implements Game {
 				GameSelect.getInstance().setTilte("arcade");
 				break;
 			case ItemName.versus:
-				
+				notImplemented();
 				break;
 			
 			case ItemName.teamarcade:
-				
+				notImplemented();
+
 				break;
 			case ItemName.teamversus:
-				
+				notImplemented();
+
 				break;
 			case ItemName.teamcoop:
-				
+				notImplemented();
+
 				break;
 			case ItemName.survival:
-				
+				notImplemented();
+
 				break;
 			case ItemName.survivalcoop:
-				
+				notImplemented();
+
 				break;
 			case ItemName.training:
-				
+				notImplemented();
+
 				break;
 			case ItemName.watch:
-				
+				notImplemented();
+
 				break;
 			case ItemName.options:
-				
+				notImplemented();
+
 				break;
 			case ItemName.exit:
-				
+				notImplemented();
+
 				break;
 			default:
 				break;

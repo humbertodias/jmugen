@@ -90,7 +90,7 @@ public class GameSelect implements Game {
 	}
 	@Override
 	public Game getNext() throws Exception {
-		return next == null? this: next;
+		return next == null ? this: next;
 	}
 	public String getNextMode() {
 		return nextMode;

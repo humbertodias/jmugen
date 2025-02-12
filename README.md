@@ -26,13 +26,12 @@ sdk use maven 3.6.3
 
 ```sh
 mvn package
-java $JAVA_OPTS -jar JMugen.Debug/target/JMugen.Debug-0.0.1-SNAPSHOT.jar
+java $JAVA_OPTS -cp JMugen.Debug/target/JMugen.Debug-0.0.1-SNAPSHOT.jar org.lee.mugen.test.TestMenu
 ```
 
 ## Debug
 ```properties
 JAVA_OPTS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=0.0.0.0:5005"
-
 ```
 
 ## References
