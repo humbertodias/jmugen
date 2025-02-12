@@ -4,21 +4,18 @@ uniform sampler2D BlendImage;
 uniform vec4 add;
 uniform vec4 mul;
 uniform vec4 ampl;
-//uniform int invertall;
 uniform vec4 color;
 uniform float alpha;
 
-
-void main (void)
+void main(void)
 {
     vec4 sprColor = texture2D(BlendImage, gl_TexCoord[0].xy);
-    //sprColor = sprColor +  (vec4(0.035, 0.035, 0.035, 0));
-    vec4 result = (sprColor + add + ampl) * mul;
-    result = clamp(result, 0.0, 1.0);
+    // Calculate the result only for the RGB channels
+    vec3 adjustedRGB = (sprColor.rgb + add.rgb + ampl.rgb) * mul.rgb;
+    adjustedRGB = clamp(adjustedRGB, 0.0, 1.0);
 
-    result.a = result.a * alpha;
-	if (sprColor.a > 0.0)
-	    gl_FragColor = result;
+    // Keep the original alpha multiplied by the uniform alpha
+    float finalAlpha = sprColor.a * alpha;
 
-	
+    gl_FragColor = vec4(adjustedRGB, finalAlpha);
 }
