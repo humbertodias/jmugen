@@ -36,7 +36,7 @@ public class JoglGameWindow implements GameWindow, GLEventListener {
 	private String title;
 
 	private Game callback;
-	private GL _gl;
+	private GL2 _gl;
 	private GLCanvas canvas;
 	private final GLProfile glProfile = GLProfile.getDefault();
 
@@ -310,7 +310,7 @@ public class JoglGameWindow implements GameWindow, GLEventListener {
 	 */
 	@Override
 	public void init(GLAutoDrawable drawable) {
-		_gl = drawable.getGL();
+		_gl = drawable.getGL().getGL2();
 
 		_gl.glEnable(GL.GL_TEXTURE_2D);
 
@@ -418,13 +418,13 @@ public class JoglGameWindow implements GameWindow, GLEventListener {
 			}
 		} else {
 			try {
-				_gl.getGL2().glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT
+				_gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT
 						| GL2.GL_ACCUM_BUFFER_BIT);
-				_gl.getGL2().glMatrixMode(GL2.GL_MODELVIEW);
-				_gl.getGL2().glLoadIdentity();
+				_gl.glMatrixMode(GL2.GL_MODELVIEW);
+				_gl.glLoadIdentity();
 				callback.update(1);
 				
-				_gl.getGL2().glPushMatrix();
+				_gl.glPushMatrix();
 				Game another = callback.getNext();
 				if (another != callback) {
 					another.init(this);
@@ -435,9 +435,9 @@ public class JoglGameWindow implements GameWindow, GLEventListener {
 					if (isRender())
 						callback.render();
 				}
-		        _gl.getGL2().glEnd();
-				_gl.getGL2().glPopMatrix();
-				_gl.getGL2().glPushMatrix();
+		        _gl.glEnd();
+				_gl.glPopMatrix();
+				_gl.glPushMatrix();
 				if (isRender()) {
 					if (callback instanceof AbstractGameFight) {
 						AbstractGameFight game = (AbstractGameFight) callback;
@@ -446,7 +446,7 @@ public class JoglGameWindow implements GameWindow, GLEventListener {
 					
 				}
 
-				_gl.getGL2().glPopMatrix();
+				_gl.glPopMatrix();
 				mouse.setLeftPress(false);
 				mouse.setRightPress(false);
 				mouse.setLeftRelease(false);
