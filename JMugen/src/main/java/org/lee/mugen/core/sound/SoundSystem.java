@@ -104,6 +104,10 @@ public final class SoundSystem {
 
         public void stopPlay() {
             Logger.log("Stop music %s", file);
+            if(_srcDataLine == null) {
+                stop = true;
+                return;
+            }
             getSrcDataLine().stop();
             getSrcDataLine().close();
             try {
