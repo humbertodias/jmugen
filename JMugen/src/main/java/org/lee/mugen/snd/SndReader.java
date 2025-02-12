@@ -81,8 +81,8 @@ public class SndReader {
 	}
 	
 	public static void main(String[] args) throws IOException {
-		SoundSystem.SoundBackGround.playMusic(JMugenConstant.RESOURCE + "sound/LeeKyungwon_WayOfRebirth.mp3");
-		Snd snd = SndReader.parse(JMugenConstant.RESOURCE + "chars/xiangfei/files/xiangfei.snd");
+		SoundSystem.SoundBackGround.playMusic(JMugenConstant.RESOURCE + "sound/intro.mp3");
+		Snd snd = SndReader.parse(JMugenConstant.RESOURCE + "chars/kfm/kfm.snd");
 		for (GroupSnd grp: snd.getGroups())
 			for (byte[] bytes: grp.getSounds())
 				SoundSystem.Sfx.playSnd(bytes, new AtomicBoolean(false));
