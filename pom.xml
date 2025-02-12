@@ -22,7 +22,7 @@
         <module>JMugen.Render.Java</module>
         <module>JMugen.Render.jogl</module>
         <module>JMugen.Render.Lwjgl</module>
-        <module>joglUtils</module>
+<!--        <module>joglUtils</module>-->
         <module>Syntax</module>
     </modules>
 
