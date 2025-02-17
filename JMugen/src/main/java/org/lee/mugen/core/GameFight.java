@@ -1125,7 +1125,7 @@ public class GameFight implements AbstractGameFight {
 	}
 	public void onDebugAction(DebugAction action) {
 		switch (action) {
-		case SWICTH_PLAYER_DEBUG_INFO:
+		case SWITCH_PLAYER_DEBUG_INFO:
 			DebugRender.debugRender.nextSprite();
 			break;
 		case INIT_PLAYER:

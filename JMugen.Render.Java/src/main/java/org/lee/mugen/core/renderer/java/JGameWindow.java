@@ -299,7 +299,7 @@ public class JGameWindow extends Canvas implements GameWindow {
 		private Map<DebugAction, Boolean> actionCtrl = new HashMap<DebugAction, Boolean>();
 		
 		public DebugEventManager() {
-			addAction(DebugAction.SWICTH_PLAYER_DEBUG_INFO, new int[] {KeyEvent.VK_D}, true);
+			addAction(DebugAction.SWITCH_PLAYER_DEBUG_INFO, new int[] {KeyEvent.VK_D}, true);
 			addAction(DebugAction.EXPLOD_DEBUG_INFO, new int[] {KeyEvent.VK_E}, true);
 			addAction(DebugAction.INIT_PLAYER, new int[] {KeyEvent.VK_SPACE});
 			addAction(DebugAction.SHOW_HIDE_CNS, new int[] {KeyEvent.VK_C}, true);

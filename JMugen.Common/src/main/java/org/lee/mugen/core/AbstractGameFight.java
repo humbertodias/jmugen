@@ -13,7 +13,7 @@ public interface AbstractGameFight extends Game {
 	public void renderDebugInfo();
 	
 	public static enum DebugAction {
-		SWICTH_PLAYER_DEBUG_INFO, 
+		SWITCH_PLAYER_DEBUG_INFO,
 		SHOW_HIDE_CNS, SHOW_HIDE_ATTACK_CNS, 
 		INCREASE_FPS, DECREASE_FPS, RESET_FPS,
 		DEBUG_PAUSE, PAUSE_PLUS_ONE_FRAME,
