@@ -16,7 +16,7 @@ Check out the current [features](./FEATURES.md) of this project.
 | P1     | wasd     | UPI   | ;JK  |  F1   |
 | P2     | arrows   | 745   | 802  |  --   |
 
-You can configure the controls in the file [keys.properties](src/main/resources/keys.properties)
+You can configure the controls in the file [keys.properties](JMugen.Properties/src/main/resources/keys.properties)
 
 ## Colaborate
 
