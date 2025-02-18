@@ -25,7 +25,10 @@ jobs:
 
       - name: Compress the directory
         run: |
-          zip -r jmugen.zip /home/runner/work/jmugen/jmugen/resource /home/runner/work/jmugen/jmugen/JMugen.Debug/target/JMugen.Debug-0.0.1-SNAPSHOT.jar
+          cd `mktemp -d` && \
+          mv /home/runner/work/jmugen/jmugen/resource . && \
+          mv /home/runner/work/jmugen/jmugen/JMugen.Debug/target/JMugen.Debug-0.0.1-SNAPSHOT.jar . && \
+          zip -r jmugen.zip .
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
