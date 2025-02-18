@@ -9,3 +9,4 @@
 - [ ] **JLint package**: Static analysis tool for Java code quality.
 - [ ] **AI CPU**: Implement AI for CPU-controlled characters.
 - [ ] **Multiplayer**: Multiplayer support for online play.
+- [ ] **Joystick**: Joystick detection and mapping.
