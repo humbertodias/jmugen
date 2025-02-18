@@ -10,7 +10,8 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <jmugen.version>0.0.1-SNAPSHOT</jmugen.version>
-        <main.class>org.lee.mugen.test.TestMenu</main.class>
+        <!--<main.class>org.lee.mugen.test.TestMenu</main.class>-->
+        <main.class>org.lee.mugen.test.TestGameFight</main.class>
     </properties>
 
     <modules>
@@ -25,7 +26,7 @@
         <module>JMugen</module>
         <module>Syntax</module>
         <!-- joglUtils module still using openGl1. so, let's skip for while -->
-        <!--        <module>joglUtils</module>-->
+        <!--<module>joglUtils</module>-->
     </modules>
 
     <build>
