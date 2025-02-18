@@ -28,6 +28,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
-          asset_paths: |
-            /home/runner/work/jmugen/jmugen/JMugen.Debug/target/JMugen.Debug-0.0.1-SNAPSHOT.jar
-            /home/runner/work/jmugen/jmugen/resource
+          asset_paths: [
+            '/home/runner/work/jmugen/jmugen/JMugen.Debug/target/JMugen.Debug-0.0.1-SNAPSHOT.jar',
+            '/home/runner/work/jmugen/jmugen/resource'
+          ]
+
+
