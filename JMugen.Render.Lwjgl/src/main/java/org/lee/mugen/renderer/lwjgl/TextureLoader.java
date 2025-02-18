@@ -1,10 +1,7 @@
 package org.lee.mugen.renderer.lwjgl;
 
 import java.awt.Graphics;
-import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.awt.image.ComponentColorModel;
 import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferByte;
 import java.awt.image.DataBufferDouble;
@@ -24,7 +21,11 @@ import org.lee.mugen.util.Logger;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
-import org.lwjgl.util.glu.GLU;
+import org.lwjgl.system.MemoryStack;
+
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
+import static org.lwjgl.opengl.GL30.glGenerateMipmap;
 
 /**
  * A utility class to load textures for JOGL. This source is based on a texture
@@ -62,7 +63,7 @@ public class TextureLoader {
 	 */
 	private int createTextureID() {
 		IntBuffer tmp = createIntBuffer(1);
-		GL11.glGenTextures(tmp);
+		glGenTextures(tmp);
 		return tmp.get(0);
 	}
 
@@ -84,7 +85,7 @@ public class TextureLoader {
 	public Texture getTexture(Buffer img, int width, int height)
 			throws IOException {
 		Texture tex = getTexture(img, width, height, GL12.GL_BGRA,
-				GL11.GL_TEXTURE_2D, // target
+				GL_TEXTURE_2D, // target
 				GL11.GL_RGBA, // dst pixel format
 				GL11.GL_NEAREST, // min filter (unused)
 				GL11.GL_NEAREST);
@@ -94,7 +95,7 @@ public class TextureLoader {
 	/**
 	 * Load a texture into OpenGL from a image reference on disk.
 	 * 
-	 * @param resourceName
+//	 * @param resourceName
 	 *            The location of the resource to load
 	 * @param target
 	 *            The GL target to load the texture against
@@ -116,7 +117,7 @@ public class TextureLoader {
 		Texture texture = new Texture(target, textureID);
 
 		// bind this texture
-		GL11.glBindTexture(target, textureID);
+		glBindTexture(target, textureID);
 
 		int texWidth = get2Fold(width);
 		int texHeight = get2Fold(height);
@@ -129,17 +130,18 @@ public class TextureLoader {
 		texture.setHeight(height);
 
 		// Logger.log("End Transform to ByteBuffer");
-		if (target == GL11.GL_TEXTURE_2D) {
+		if (target == GL_TEXTURE_2D) {
 			GL11.glTexParameteri(target, GL11.GL_TEXTURE_MIN_FILTER, minFilter);
 			GL11.glTexParameteri(target, GL11.GL_TEXTURE_MAG_FILTER, magFilter);
 			GL11.glTexParameteri(target, GL11.GL_TEXTURE_WRAP_S,
-					GL12.GL_CLAMP_TO_EDGE);
+					GL_CLAMP_TO_EDGE);
 			GL11.glTexParameteri(target, GL11.GL_TEXTURE_WRAP_T,
-					GL12.GL_CLAMP_TO_EDGE);
+					GL_CLAMP_TO_EDGE);
 		}
-		
+
+		IntBuffer intBuffer = (IntBuffer) data;
 		GL11.glTexImage2D(target, 0, dstPixelFormat, width, height, 0,
-				srcPixelFormat, GL11.GL_UNSIGNED_BYTE, (IntBuffer)data);
+				srcPixelFormat, GL11.GL_UNSIGNED_BYTE, intBuffer);
 		// Logger.log("end glTexImage2D to ByteBuffer");
 		return texture;
 	}
@@ -183,7 +185,7 @@ public class TextureLoader {
 	 * 
 	 * @param bufferedImage
 	 *            The image to convert to a texture
-	 * @param texture
+//	 * @param texture
 	 *            The texture to store the data into
 	 * @return A buffer containing the data
 	 */
@@ -230,7 +232,7 @@ public class TextureLoader {
 	public Texture getTexture(int detpth, int width, int height, int texWidth,
 			int texHeight, ByteBuffer byteBuffer, int filter, int dstPixelFormat)
 			throws IOException {
-		int target = GL11.GL_TEXTURE_2D;
+		int target = GL_TEXTURE_2D;
 
 		// create the texture ID for this texture
 		int textureID = createTextureID();
@@ -241,7 +243,7 @@ public class TextureLoader {
 		boolean flipped = false;
 
 		// bind this texture
-		GL11.glBindTexture(target, textureID);
+		glBindTexture(target, textureID);
 
 		ByteBuffer textureBuffer;
 
@@ -260,9 +262,21 @@ public class TextureLoader {
 		texture.setHeight(height);
 		// texture.setAlpha(hasAlpha);
 
-		IntBuffer temp = BufferUtils.createIntBuffer(16);
-		GL11.glGetInteger(GL11.GL_MAX_TEXTURE_SIZE, temp);
+//		IntBuffer temp = BufferUtils.createIntBuffer(16);
+//		GL11.glGetInteger(GL11.GL_MAX_TEXTURE_SIZE, temp);
+//		int max = temp.get(0);
+
+		MemoryStack stack = MemoryStack.stackPush();
+		// Alocar memória para o valor de max texture size
+		IntBuffer temp = stack.mallocInt(1);
+
+		// Obter o tamanho máximo de textura
+		GL11.glGetIntegerv(GL11.GL_MAX_TEXTURE_SIZE, temp);
+
+		// Obter o valor
 		int max = temp.get(0);
+		System.out.println("Max Texture Size: " + max);
+
 		if ((texWidth > max) || (texHeight > max)) {
 			throw new IOException(
 					"Attempt to allocate a texture to big for the current hardware");
@@ -273,9 +287,11 @@ public class TextureLoader {
 
 		if (minFilter == GL11.GL_LINEAR_MIPMAP_NEAREST) {
 			// generate a mip map textur
-			GLU.gluBuild2DMipmaps(GL11.GL_TEXTURE_2D, componentCount, texWidth,
-					texHeight, srcPixelFormat, GL11.GL_UNSIGNED_BYTE,
-					textureBuffer);
+			// GLU removed on v3
+//			GLU.gluBuild2DMipmaps(GL11.GL_TEXTURE_2D, componentCount, texWidth,
+//					texHeight, srcPixelFormat, GL11.GL_UNSIGNED_BYTE,
+//					textureBuffer);
+			generateTextureWithMipmaps(textureBuffer, texWidth, texHeight, componentCount, srcPixelFormat);
 		} else {
 			// produce a texture from the byte buffer
 			GL11.glTexImage2D(target, 0, dstPixelFormat, get2Fold(width),
@@ -284,6 +300,30 @@ public class TextureLoader {
 		}
 
 		return texture;
+	}
+
+	public static void generateTextureWithMipmaps(ByteBuffer textureBuffer, int texWidth, int texHeight, int componentCount, int srcPixelFormat) {
+		// Cria uma textura OpenGL
+		int textureID = glGenTextures();
+		glBindTexture(GL_TEXTURE_2D, textureID);
+
+		// Define o nível base (sem mipmaps)
+		glTexImage2D(GL_TEXTURE_2D, 0, componentCount, texWidth, texHeight, 0, srcPixelFormat, GL_UNSIGNED_BYTE, textureBuffer);
+
+		// Gera mipmaps para a textura
+		glGenerateMipmap(GL_TEXTURE_2D);
+
+		// Define parâmetros da textura (opcional)
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+		// Desvincula a textura
+		glBindTexture(GL_TEXTURE_2D, 0);
+
+		// Você pode retornar ou usar o ID da textura criada
+		System.out.println("Texture ID: " + textureID);
 	}
 
 	public void free(Texture texture) {

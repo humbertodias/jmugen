@@ -44,9 +44,14 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
 import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.ARBProgram;
 import org.lwjgl.opengl.ARBShaderObjects;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.system.MemoryStack;
+
+import static org.lwjgl.opengl.ARBVertexProgram.GL_PROGRAM_ERROR_POSITION_ARB;
+import static org.lwjgl.opengl.ARBVertexProgram.GL_PROGRAM_ERROR_STRING_ARB;
+import static org.lwjgl.opengl.GL11C.glGetIntegerv;
+import static org.lwjgl.opengl.GL20.*;
 
 abstract class Shader {
 
@@ -64,24 +69,37 @@ abstract class Shader {
 	/**
 	 * Obtain a GL integer value from the driver
 	 *
-	 * @param gl_enum The GL value you want
+	 * @param glEnum The GL value you want
 	 *
 	 * @return the integer value
 	 */
-	public static int glGetInteger(int gl_enum) {
-		GL11.glGetInteger(gl_enum, int_buffer);
-		return int_buffer.get(0);
+//	public static int glGetInteger(int gl_enum) {
+//		GL11.glGetInteger(gl_enum, int_buffer);
+//		return int_buffer.get(0);
+//	}
+
+	public static int glGetInteger(int glEnum) {
+		try (MemoryStack stack = MemoryStack.stackPush()) {
+			// Aloca um buffer de inteiros na pilha de memória
+			java.nio.IntBuffer intBuffer = stack.mallocInt(1);
+
+			// Acessa o valor do OpenGL
+			glGetIntegerv(glEnum, intBuffer);
+
+			// Retorna o valor do buffer
+			return intBuffer.get(0);
+		}
 	}
 
 	protected static ByteBuffer getShaderText(String file) {
 		ByteBuffer shader = null;
 
 		try {
-			ClassLoader loader = ShadersTest.class.getClassLoader();
+			ClassLoader loader = Shader.class.getClassLoader();
 			InputStream inputStream = loader.getResourceAsStream("org/lwjgl/test/opengl/shaders/" + file);
 
 			if ( inputStream == null )
-				ShadersTest.kill("A shader source file could not be found: " + file);
+				kill("A shader source file could not be found: " + file);
 
 			BufferedInputStream stream = new BufferedInputStream(inputStream);
 
@@ -99,7 +117,7 @@ abstract class Shader {
 			shader.clear();
 			fileBuffer.clear();
 		} catch (IOException e) {
-			ShadersTest.kill("Failed to read the shader source file: " + file, e);
+			kill("Failed to read the shader source file: " + file, e);
 		}
 
 		return shader;
@@ -111,7 +129,9 @@ abstract class Shader {
 			final byte[] bytes = new byte[programSource.capacity()];
 			programSource.get(bytes);
 
-			final int errorPos = glGetInteger(ARBProgram.GL_PROGRAM_ERROR_POSITION_ARB);
+//			final int errorPos = glGetInteger(ARBProgram.GL_PROGRAM_ERROR_POSITION_ARB);
+			final int errorPos = glGetInteger(GL_PROGRAM_ERROR_POSITION_ARB);
+
 			int lineStart = 0;
 			int lineEnd = -1;
 			for ( int i = 0; i < bytes.length; i++ ) {
@@ -128,9 +148,10 @@ abstract class Shader {
 			if ( lineEnd == -1 )
 				lineEnd = bytes.length;
 
-			ShadersTest.kill("Low-level program error in file: " + programFile
+			kill("Low-level program error in file: " + programFile
 			                 + "\n\tError line: " + new String(bytes, lineStart, lineEnd - lineStart)
-			                 + "\n\tError message: " + GL11.glGetString(ARBProgram.GL_PROGRAM_ERROR_STRING_ARB));
+//					+ "\n\tError message: " + GL11.glGetString(ARBProgram.GL_PROGRAM_ERROR_STRING_ARB));
+						+ "\n\tError message: " + GL11.glGetString(GL_PROGRAM_ERROR_STRING_ARB));
 		}
 	}
 
@@ -155,46 +176,127 @@ abstract class Shader {
 		return location;
 	}
 
-	protected static void printShaderObjectInfoLog(String file, int ID) {
-		ARBShaderObjects.glGetObjectParameterARB(ID, ARBShaderObjects.GL_OBJECT_INFO_LOG_LENGTH_ARB, programBuffer);
+//	protected static void printShaderObjectInfoLog(String file, int ID) {
+//		ARBShaderObjects.glGetObjectParameterARB(ID, ARBShaderObjects.GL_OBJECT_INFO_LOG_LENGTH_ARB, programBuffer);
+//
+//		final int logLength = programBuffer.get(0);
+//
+//		if ( logLength <= 1 )
+//			return;
+//
+//		final ByteBuffer log = BufferUtils.createByteBuffer(logLength);
+//
+//		ARBShaderObjects.glGetInfoLogARB(ID, null, log);
+//
+//		final char[] charArray = new char[logLength];
+//		for ( int i = 0; i < logLength; i++ )
+//			charArray[i] = (char)log.get();
+//
+//		System.out.println("\nInfo Log of Shader Object: " + file);
+//		System.out.println("--------------------------");
+//		System.out.println(new String(charArray, 0, logLength));
+//	}
 
-		final int logLength = programBuffer.get(0);
+	protected static void printShaderObjectInfoLog(String file, int shaderID) {
+		// Usar MemoryStack para alocar buffers temporários
+		try (MemoryStack stack = MemoryStack.stackPush()) {
+			// Aloca o buffer para armazenar o comprimento do log
+			IntBuffer infoLogLengthBuffer = stack.mallocInt(1);
 
-		if ( logLength <= 1 )
-			return;
+			// Obter o comprimento do log de informações do shader
+			glGetShaderiv(shaderID, GL_INFO_LOG_LENGTH, infoLogLengthBuffer);
 
-		final ByteBuffer log = BufferUtils.createByteBuffer(logLength);
+			int logLength = infoLogLengthBuffer.get(0);
 
-		ARBShaderObjects.glGetInfoLogARB(ID, null, log);
+			// Se o log de informações não tiver dados, não fazer nada
+			if (logLength <= 1) {
+				return;
+			}
 
-		final char[] charArray = new char[logLength];
-		for ( int i = 0; i < logLength; i++ )
-			charArray[i] = (char)log.get();
+			// Aloca o buffer para armazenar o log
+//			ByteBuffer logBuffer = stack.malloc(logLength);
 
-		System.out.println("\nInfo Log of Shader Object: " + file);
-		System.out.println("--------------------------");
-		System.out.println(new String(charArray, 0, logLength));
+			// Obter o log de informações do shader
+			glGetShaderInfoLog(shaderID, logLength);
+
+			// Converte o log para string
+			String log = org.lwjgl.system.MemoryUtil.memUTF8(logLength);
+
+			// Imprime o log de informações
+			System.out.println("\nInfo Log of Shader Object: " + file);
+			System.out.println("--------------------------");
+			System.out.println(log);
+		}
 	}
 
-	protected static void printShaderProgramInfoLog(int ID) {
-		ARBShaderObjects.glGetObjectParameterARB(ID, ARBShaderObjects.GL_OBJECT_INFO_LOG_LENGTH_ARB, programBuffer);
+//	protected static void printShaderProgramInfoLog(int ID) {
+//		ARBShaderObjects.glGetObjectParameterARB(ID, ARBShaderObjects.GL_OBJECT_INFO_LOG_LENGTH_ARB, programBuffer);
+//
+//		final int logLength = programBuffer.get(0);
+//
+//		if ( logLength <= 1 )
+//			return;
+//
+//		final ByteBuffer log = BufferUtils.createByteBuffer(logLength);
+//
+//		ARBShaderObjects.glGetInfoLogARB(ID, null, log);
+//
+//		final char[] charArray = new char[logLength];
+//		for ( int i = 0; i < logLength; i++ )
+//			charArray[i] = (char)log.get();
+//
+//		System.out.println("\nShader Program Info Log: ");
+//		System.out.println("--------------------------");
+//		System.out.println(new String(charArray, 0, logLength));
+//	}
 
-		final int logLength = programBuffer.get(0);
+	protected static void printShaderProgramInfoLog(int programID) {
+		// Usar MemoryStack para alocar buffers temporários
+		try (MemoryStack stack = MemoryStack.stackPush()) {
+			// Aloca o buffer para armazenar o comprimento do log
+			IntBuffer infoLogLengthBuffer = stack.mallocInt(1);
 
-		if ( logLength <= 1 )
-			return;
+			// Obter o comprimento do log de informações do programa
+			glGetProgramiv(programID, GL_INFO_LOG_LENGTH, infoLogLengthBuffer);
 
-		final ByteBuffer log = BufferUtils.createByteBuffer(logLength);
+			int logLength = infoLogLengthBuffer.get(0);
 
-		ARBShaderObjects.glGetInfoLogARB(ID, null, log);
+			// Se o log de informações não tiver dados, não fazer nada
+			if (logLength <= 1) {
+				return;
+			}
 
-		final char[] charArray = new char[logLength];
-		for ( int i = 0; i < logLength; i++ )
-			charArray[i] = (char)log.get();
 
-		System.out.println("\nShader Program Info Log: ");
-		System.out.println("--------------------------");
-		System.out.println(new String(charArray, 0, logLength));
+			// Obter o log de informações do programa
+			glGetProgramInfoLog(programID, logLength);
+
+			// Converte o log para string
+			String log = org.lwjgl.system.MemoryUtil.memUTF8(logLength);
+
+			// Imprime o log de informações
+			System.out.println("\nShader Program Info Log: ");
+			System.out.println("--------------------------");
+			System.out.println(log);
+		}
+	}
+
+
+		static void kill(String reason) {
+		System.out.println("The ShaderTest program was terminated because an error occured.\n");
+		System.out.println("Reason: " + (reason == null ? "Unknown" : reason));
+
+//		cleanup();
+		System.exit(-1);
+	}
+
+	static void kill(String reason, Throwable t) {
+		System.out.println("The ShaderTest program was terminated because an exception occured.\n");
+		System.out.println("Reason: " + reason == null ? "Unknown" : reason);
+
+		System.out.println("Exception message: " + t.getMessage());
+
+//		cleanup();
+		System.exit(-1);
 	}
 
 }

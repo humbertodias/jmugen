@@ -6,10 +6,13 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
 import org.apache.commons.io.IOUtils;
+import org.lee.mugen.util.Logger;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.ARBFragmentShader;
 import org.lwjgl.opengl.ARBShaderObjects;
 import org.lwjgl.opengl.GL11;
+
+import static org.lwjgl.opengl.GL20.*;
 
 
 public class Shader {
@@ -29,7 +32,9 @@ public class Shader {
 	}
 	protected static String getShaderText(String file) {
 		ClassLoader loader = Shader.class.getClassLoader();
-		InputStream inputStream = loader.getResourceAsStream("org/lee/mugen/renderer/lwjgl/shader/" + file);
+		String shaderPath = "org/lee/mugen/renderer/lwjgl/shader/" + file;
+		Logger.log("Loading shader file: %s", shaderPath);
+		InputStream inputStream = loader.getResourceAsStream(shaderPath);
 
 		String shaderText;
 		try {
@@ -42,22 +47,65 @@ public class Shader {
 
 	}
 	
+//	public void compileShader() {
+//		fshID = ARBShaderObjects.glCreateShaderObjectARB(ARBFragmentShader.GL_FRAGMENT_SHADER_ARB);
+//		ByteBuffer b = ByteBuffer.wrap(shaderPrg.getBytes());
+//		b.rewind();
+//		ARBShaderObjects.glShaderSourceARB(fshID, b);
+//		ARBShaderObjects.glCompileShaderARB(fshID);
+//		programID = ARBShaderObjects.glCreateProgramObjectARB();
+//		ARBShaderObjects.glAttachObjectARB(programID, fshID);
+//		ARBShaderObjects.glLinkProgramARB(programID);
+//		ARBShaderObjects.glValidateProgramARB(programID);
+//	}
+//
+
 	public void compileShader() {
-		fshID = ARBShaderObjects.glCreateShaderObjectARB(ARBFragmentShader.GL_FRAGMENT_SHADER_ARB);
-		ByteBuffer b = ByteBuffer.wrap(shaderPrg.getBytes());
-		b.rewind();
-		ARBShaderObjects.glShaderSourceARB(fshID, b);
-		ARBShaderObjects.glCompileShaderARB(fshID);
-		programID = ARBShaderObjects.glCreateProgramObjectARB();
-		ARBShaderObjects.glAttachObjectARB(programID, fshID);
-		ARBShaderObjects.glLinkProgramARB(programID);
-		ARBShaderObjects.glValidateProgramARB(programID);
-		
+		// Criar o ID do Fragment Shader
+		fshID = glCreateShader(GL_FRAGMENT_SHADER);
 
+		// Carregar o código-fonte do shader
+		glShaderSource(fshID, shaderPrg); // Usar o código-fonte diretamente como String
 
+		// Compilar o shader
+		glCompileShader(fshID);
+
+		// Verificar erros de compilação
+		if (glGetShaderi(fshID, GL_COMPILE_STATUS) == GL_FALSE) {
+			String errorLog = glGetShaderInfoLog(fshID);
+			System.out.println("Shader compilation failed: " + errorLog);
+			return;
+		}
+
+		// Criar o programa de shader
+		programID = glCreateProgram();
+
+		// Anexar o fragment shader ao programa
+		glAttachShader(programID, fshID);
+
+		// Linkar o programa
+		glLinkProgram(programID);
+
+		// Verificar erros de linkagem
+		if (glGetProgrami(programID, GL_LINK_STATUS) == GL_FALSE) {
+			String errorLog = glGetProgramInfoLog(programID);
+			System.out.println("Program linking failed: " + errorLog);
+			return;
+		}
+
+		// Validar o programa
+		glValidateProgram(programID);
+		if (glGetProgrami(programID, GL_VALIDATE_STATUS) == GL_FALSE) {
+			String errorLog = glGetProgramInfoLog(programID);
+			System.out.println("Program validation failed: " + errorLog);
+			return;
+		}
+
+		// Shader compilado e programa vinculado com sucesso
+		System.out.println("Shader compiled and program linked successfully!");
 	}
-	
-	
+
+
 	public void render() {
 		ARBShaderObjects.glUseProgramObjectARB(fshID);
 		

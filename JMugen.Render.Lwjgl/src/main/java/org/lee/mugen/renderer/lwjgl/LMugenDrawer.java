@@ -38,7 +38,6 @@ public class LMugenDrawer extends MugenDrawer {
 			GL11.glTranslatef(dp.getXAnchor(), dp.getYAnchor(), 0);
 			GL11.glRotatef(dp.getAngleset(), 0, 0, 1);
 			GL11.glTranslatef(-dp.getXAnchor(), -dp.getYAnchor(), 0);
-
 		}
 
 	}
@@ -250,7 +249,6 @@ public class LMugenDrawer extends MugenDrawer {
 
 	public void draw(DrawProperties dp) {
 
-		
 		Texture text = (Texture) dp.getIc().getImg();
 		
 		GL11.glColor4f(1f, 1f, 1f, 1f);
@@ -259,9 +257,8 @@ public class LMugenDrawer extends MugenDrawer {
 		GL11.glBlendFunc(GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		text.bind();
 		drawChild(dp);
-
-		
 	}
+
 	public void drawChild(DrawProperties dp) {
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 
@@ -367,7 +364,7 @@ public class LMugenDrawer extends MugenDrawer {
 						imageStatus.set(TEXTURE);
 						return img;
 					} catch (Exception e) {
-						throw new IllegalStateException("Ca ne devrait pas arrive", e);
+						throw new IllegalStateException("It shouldn't arrive", e);
 					}
 				} else if (imageStatus.get() == RAW_PCX) {
 					RawPCXImage pcx = (RawPCXImage) img;
@@ -377,7 +374,7 @@ public class LMugenDrawer extends MugenDrawer {
 						imageStatus.set(TEXTURE);
 						return img;
 					} catch (IOException e) {
-						throw new IllegalStateException("Ca ne devrait pas arrive");
+						throw new IllegalStateException("It shouldn't arrive");
 					}
 				}
 			}
@@ -408,13 +405,9 @@ public class LMugenDrawer extends MugenDrawer {
 					RawPCXImage pcx = (RawPCXImage) img;
 					
 					img = getDefaultImageType(pcx, color);
-					img =TextureLoader.getTextureLoader().convertImageData((BufferedImage) img);
+					img = TextureLoader.getTextureLoader().convertImageData((BufferedImage) img);
 					
 					imageStatus.set(BYTE);
-					
-					
-					
-
 				}
 			}
 		}
@@ -514,7 +507,7 @@ public class LMugenDrawer extends MugenDrawer {
 
 
 	
-	private LwjgGameWindow gameWindow = new LwjgGameWindow();
+	private LwjglGameWindow gameWindow = new LwjglGameWindow();
 
 	@Override
 	public GameWindow getInstanceOfGameWindow() {
@@ -580,9 +573,5 @@ public class LMugenDrawer extends MugenDrawer {
 		}
 
 	}	
-	
-	
-   
-    
 
 }
