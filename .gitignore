@@ -6,4 +6,5 @@
 
 natives
 *.log
+*.iml
 resource/cache
