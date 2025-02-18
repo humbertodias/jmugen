@@ -1,0 +1,29 @@
+name: CD
+
+on:
+  push:
+    branches: [maven]
+  pull_request:
+    branches: [maven]
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  jar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: curl -s "https://get.sdkman.io" | bash
+      - run: |
+          sdk install java 8.0.432-amzn
+          sdk install maven 3.6.3
+      - run: mvn package
+
+      - name: Upload Release Asset
+        uses: alexellis/upload-assets@0.4.1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          asset_paths: '["JMugen.Debug/target/JMugen.Debug-0.0.1-SNAPSHOT.jar"]'
