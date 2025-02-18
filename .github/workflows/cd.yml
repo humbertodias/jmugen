@@ -23,12 +23,13 @@ jobs:
           sdk install maven 3.6.3
           mvn package
 
+      - name: Compress the directory
+        run: |
+          zip -r jmugen.zip /home/runner/work/jmugen/jmugen/resource /home/runner/work/jmugen/jmugen/JMugen.Debug/target/JMugen.Debug-0.0.1-SNAPSHOT.jar
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          files: |
-            /home/runner/work/jmugen/jmugen/JMugen.Debug/target/JMugen.Debug-0.0.1-SNAPSHOT.jar
-            /home/runner/work/jmugen/jmugen/resource
-
+          files: jmugen.zip
