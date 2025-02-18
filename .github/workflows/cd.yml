@@ -23,11 +23,12 @@ jobs:
           sdk install maven 3.6.3
           mvn package
 
-      - name: Upload Release Asset
-        uses: alexellis/upload-assets@0.4.1
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
         env:
-          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          asset_paths: '[ "/home/runner/work/jmugen/jmugen/JMugen.Debug/target/JMugen.Debug-0.0.1-SNAPSHOT.jar", "/home/runner/work/jmugen/jmugen/resource" ]'
-
+          files: |
+            /home/runner/work/jmugen/jmugen/JMugen.Debug/target/JMugen.Debug-0.0.1-SNAPSHOT.jar
+            /home/runner/work/jmugen/jmugen/resource
 
