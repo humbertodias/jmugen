@@ -1,4 +1,4 @@
-package org.lee.mugen.renderer.lwjgl;
+package org.lee.mugen.renderer.lwjgl.samples;
 
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL;
@@ -149,9 +149,11 @@ public class OpenGLExample {
             ByteBuffer buffer = MemoryUtil.memAlloc(bytes.length);
             buffer.put(bytes);
             buffer.flip();
-            return buffer;
+
+            return (ByteBuffer) buffer;
         }
     }
+
 
     private byte[] toByteArray(InputStream is) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

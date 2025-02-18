@@ -1,4 +1,4 @@
-package org.lee.mugen.renderer.lwjgl;
+package org.lee.mugen.renderer.lwjgl.samples;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFW;
@@ -13,8 +13,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 import static org.lwjgl.system.MemoryUtil.*;
 
@@ -60,7 +58,8 @@ public class FontRenderer {
             ByteBuffer buffer = MemoryUtil.memAlloc(bytes.length);
             buffer.put(bytes);
             buffer.flip();
-            return buffer;
+
+            return (ByteBuffer) buffer;
         }
     }
 

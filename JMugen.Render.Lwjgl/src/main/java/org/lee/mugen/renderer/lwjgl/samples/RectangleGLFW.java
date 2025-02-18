@@ -1,4 +1,4 @@
-package org.lee.mugen.renderer.lwjgl;
+package org.lee.mugen.renderer.lwjgl.samples;
 
 import org.lwjgl.opengl.*;
 

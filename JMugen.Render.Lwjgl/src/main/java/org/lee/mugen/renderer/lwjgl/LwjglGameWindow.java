@@ -145,10 +145,7 @@ public class LwjglGameWindow implements GameWindow {
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		GraphicsDevice gd = ge.getDefaultScreenDevice();
 		DisplayMode dm = gd.getDisplayMode();
-
-		int width = dm.getWidth();
-		int height = dm.getHeight();
-		setResolution(width, height);
+		setResolution(dm.getWidth(), dm.getHeight());
 	}
 	
 	private Game callback;
