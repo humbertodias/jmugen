@@ -14,17 +14,14 @@ MAIN_CLASS = org.lee.mugen.test.TestGameFight
 # MAIN_CLASS = org.lee.mugen.test.ExpressionTester
 
 run-lwjgl:
-	java \
-	${JAVA_OPTS} \
+	java ${JAVA_OPTS} \
 	-Djava.library.path=natives \
 	-XstartOnFirstThread \
 	-cp JMugen.Properties/target/JMugen.Properties-0.0.1-SNAPSHOT.jar:JMugen.Debug/target/JMugen.Debug-0.0.1-SNAPSHOT.jar:${HOME}/.m2/repository/com/googlecode/soundlibs/mp3spi/1.9.5.4/mp3spi-1.9.5.4.jar \
 	${MAIN_CLASS}
 
 run-jogl:
-	java \
-	${JAVA_OPTS} \
-	-DrenderClass=org.lee.mugen.renderer.jogl.JoglMugenDrawer \
+	java ${JAVA_OPTS} \
 	-cp JMugen.Properties/target/JMugen.Properties-0.0.1-SNAPSHOT.jar:JMugen.Debug/target/JMugen.Debug-0.0.1-SNAPSHOT.jar:${HOME}/.m2/repository/com/googlecode/soundlibs/mp3spi/1.9.5.4/mp3spi-1.9.5.4.jar \
 	${MAIN_CLASS}
 
