@@ -3,9 +3,9 @@
 
 ## Description
 
-A Java-based replica of the classic 2D fighting engine [Mugen](https://en.wikipedia.org/wiki/Mugen_(game_engine))
+A Java-based recreation of the classic 2D fighting engine [Mugen](https://en.wikipedia.org/wiki/Mugen_(game_engine))
 
-Check out the current [features](./FEATURES.md) of this project
+Explore the current [features](./FEATURES.md) of this project and contribute to implementing the missing ones
 
 ![jmugen-readme](https://github.com/user-attachments/assets/1b7c5e84-4abc-4200-9580-c0d00d7397b8)
 
