@@ -25,12 +25,13 @@ jobs:
 
       - name: Compress the directory
         run: |
-          mv JMugen.Debug/target/JMugen.Debug-0.0.1-SNAPSHOT.jar jmugen.jar
-          zip -r jmugen.zip resource jmugen.jar
+          TAG_NAME=${GITHUB_REF_NAME} >> $GITHUB_ENV
+          mv JMugen.Debug/target/JMugen.Debug-0.0.1-SNAPSHOT.jar "jmugen-${TAG_NAME}.jar"
+          zip -r "jmugen-${TAG_NAME}.zip" resource "jmugen-${TAG_NAME}.jar"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          files: jmugen.zip
+          files: jmugen-${{ TAG_NAME }}.zip

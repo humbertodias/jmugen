@@ -44,7 +44,6 @@
                 </plugin>
             </plugins>
         </pluginManagement>
-        <!-- local -->
     </build>
 
 </project>
