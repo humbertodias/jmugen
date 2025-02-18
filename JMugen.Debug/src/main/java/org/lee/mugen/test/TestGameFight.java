@@ -45,7 +45,7 @@ public class TestGameFight  {
 				"JMugen : This version is an alpha version" + "\n" + 
 				"* Memory is not optimized but now it is better with jogl" + "\n" + 
 				"* There are two version of this JMugen (Default is Opengl)" + "\n" + 
-				"    - OpenGL (For now Shader 2 is requiered)" + "\n" + 
+				"    - OpenGL (For now Shader 2 is required)" + "\n" +
 				"    - Software (no support for now palFx,proper rotation, ...)" + "\n" + 
 				"* Key Mapping => edit The file keys.properties" + "\n" + 
 				"* To change Renderer edit the file render.properties" + "\n" + 
@@ -53,7 +53,7 @@ public class TestGameFight  {
 				"For Hi Res Stage support you have to add in the " + "\n" + 
 				"    file Stage.def in [Scaling] section theses 2 new element xscale = 0.5 and yscale = 0.5" + "\n" + 
 				"" + "\n" + 
-				"*- No Implemted Yet and very need by Mugen " + "\n" + 
+				"*- No Implemented Yet and very need by Mugen " + "\n" +
 				"    - Reversedef " + "\n" +
 				"*- WIP : " + "\n" + 
 				"    1 - Parser Speed Optimisation " + "\n" + 
@@ -62,7 +62,7 @@ public class TestGameFight  {
 				"    2 - ReversalDef (it might be a complicate part)" + "\n" + 
 				"    3 - I'll see" + "\n" + 
 				"" + "\n" + 
-				"* Note : - you have to keep this directory stucture and you will need this file : resource\\data\\common.cmd" + "\n" + 
+				"* Note : - you have to keep this directory structure and you will need this file : resource\\data\\common.cmd" + "\n" +
 				"           This File is a list of controller that append the statedef -1 and it is use for controlling the sprite " +  "\n" +
 				"         - There is a Debugger windows, you can change on the fly the state, to use it , once the Two sprite appears click on 'click here'" + "\n" +
 				"\n" + 
