@@ -1,6 +1,3 @@
-package:
-	mvn clean package
-
 DEBUG_SUSPEND=n
 JAVA_OPTS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=${DEBUG_SUSPEND},address=0.0.0.0:5005"
 
@@ -17,6 +14,9 @@ MAIN_CLASS = org.lee.mugen.test.TestGameFight
 # MAIN_CLASS = org.lee.mugen.core.renderer.game.fight.RoundRender
 # MAIN_CLASS = org.lee.mugen.test.ExpressionTester
 # MAIN_CLASS = org.lee.mugen.test.TestScene
+
+package:
+	mvn clean package
 
 run-lwjgl:
 	${JAVA} \
