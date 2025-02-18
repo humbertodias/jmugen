@@ -18,6 +18,6 @@ jobs:
       - run: |
           curl -s "https://get.sdkman.io" | bash
           source "$HOME/.sdkman/bin/sdkman-init.sh"
-          sdk install java 11.0.26-amzn
+          sdk install java 17.0.14-amzn
           sdk install maven 3.6.3
           mvn package
