@@ -1,10 +1,8 @@
 name: CD
 
 on:
-  push:
-    branches: [maven]
-  pull_request:
-    branches: [maven]
+  release:
+    types: [created]
 
 defaults:
   run:
