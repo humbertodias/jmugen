@@ -8,6 +8,12 @@ A Java-based replica of the classic 2D fighting engine [Mugen](https://en.wikipe
 
 ![jmugen-readme](https://github.com/user-attachments/assets/1b7c5e84-4abc-4200-9580-c0d00d7397b8)
 
+| Player | Movement | Punch | Kick | Help  |
+|:------:|:--------:|:-----:|:----:|:-----:|
+| P1     | wasd     | UPI   | ;JK  |  F1   |
+| P2     | arrows   | 745   | 802  |  --   |
+
+Configurable at [keys.properties](src/main/resources/keys.properties)
 
 Colaborate
 ==========
