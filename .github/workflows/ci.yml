@@ -11,7 +11,7 @@ defaults:
     shell: bash
 
 jobs:
-  jar:
+  package:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
