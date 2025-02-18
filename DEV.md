@@ -6,7 +6,7 @@
 Before starting, make sure you have the following installed:
 
 - [SDKMAN](https://sdkman.io/install)
-- Java 8 or higher
+- Java 11 or higher
 - Maven 3.6.3 or higher
 
 ### Installation Steps
@@ -14,14 +14,14 @@ Before starting, make sure you have the following installed:
 1. Install Java and Maven using SDKMAN:
 
 ```sh
-sdk install java 8.0.432-amzn
+sdk install java 11.0.26-amzn
 sdk install maven 3.6.3
 ```
 
 2. Switch to the correct Java and Maven versions:
 
 ```sh
-sdk use java 8.0.432-amzn
+sdk use java 11.0.26-amzn
 sdk use maven 3.6.3
 ```
 
