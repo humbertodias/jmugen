@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [maven]
+    branches: [ main ]
   pull_request:
-    branches: [maven]
+    branches: [ main ]
 
 defaults:
   run:
