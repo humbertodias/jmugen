@@ -1,14 +1,6 @@
 
 # JMugen Development Guide
 
-## Features
-- [x] AWT Rendering
-- [x] JOGLv2 Integration
-- [x] LWJGLv3 Support
-- [x] SFFv1 Format
-- [ ] SFFv2 Format
-- [ ] Web Version
-
 ## Requirements
 
 Before starting, make sure you have the following installed:
