@@ -67,8 +67,8 @@ jobs:
           # resource
           zip -r resource.zip resource
 
-          # jar
-          mv JMugen.Debug/target/JMugen.Debug-0.0.1-SNAPSHOT.jar jmugen-${TAG_NAME}.jar
+          # jar - max compression
+          zip -9 -r jmugen-${TAG_NAME}.jar JMugen.Debug/target/JMugen.Debug-0.0.1-SNAPSHOT.jar
 
           ls -lha
 
