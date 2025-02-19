@@ -124,10 +124,6 @@ jobs:
       - name: Package jar
         run: mvn package
 
-      - name: Set Variables
-        run: |
-          echo "TAG_NAME=${GITHUB_REF_NAME}" >> $GITHUB_ENV
-
       - name: jpackage app-image
         run: |
           jpackage --version
@@ -136,7 +132,7 @@ jobs:
           copy JMugen.Debug\target\JMugen.Debug-0.0.1-SNAPSHOT.jar tmp\jmugen.jar
           
           jpackage --input tmp ^
-          --name jmugen-%TAG_NAME% ^
+          --name jmugen-%GITHUB_REF_NAME% ^
           --main-jar jmugen.jar ^
           --type exe ^
           --dest dist/
@@ -147,7 +143,11 @@ jobs:
         run: |
           pwd
 
-          ls -lha
+          ls -lha dist
+
+      - name: Compress files into a ZIP archive
+        run: |
+          Compress-Archive -Path "dist/jmugen-%GITHUB_REF_NAME%" -DestinationPath "jmugen-%GITHUB_REF_NAME%-${{ runner.arch }}.zip"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -155,4 +155,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           files: |
-            jmugen-*.exe
+            jmugen-*.zip
