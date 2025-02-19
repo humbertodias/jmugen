@@ -152,7 +152,7 @@ jobs:
           jpackage --input tmp ^
           --name jmugen-%GITHUB_REF_NAME% ^
           --main-jar jmugen.jar ^
-          --type exe ^
+          --type app-image ^
           --dest dist/
           
           rmdir /s /q tmp
