@@ -44,6 +44,8 @@ jobs:
 
       - name: Prepare release
         run: |
+          pwd
+          
           # resource
           zip -r resource.zip resource
 
@@ -52,10 +54,15 @@ jobs:
 
           # tar.gz of app-image
           (cd dist && tar cfzv ../jmugen-${TAG_NAME}.tar.gz jmugen-${TAG_NAME}*)
+          
+          ls -lha
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          files: resource.zip jmugen-${{ env.TAG_NAME }}.jar jmugen-${{ env.TAG_NAME }}.tar.gz
+          files: |
+            resource.zip
+            jmugen-*.jar
+            jmugen-*.tar.gz
