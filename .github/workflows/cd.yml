@@ -65,7 +65,7 @@ jobs:
           pwd
           
           # resource
-          zip -r resource.zip resource
+          zip -9 -r resource.zip resource
 
           # jar - max compression
           zip -9 -r jmugen-${TAG_NAME}.jar JMugen.Debug/target/JMugen.Debug-0.0.1-SNAPSHOT.jar
