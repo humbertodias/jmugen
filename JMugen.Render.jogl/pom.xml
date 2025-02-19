@@ -64,7 +64,7 @@
 
         <dependency>
             <groupId>org.jogamp.jogl</groupId>
-            <artifactId>jogl-all-natives-windows-i586 </artifactId>
+            <artifactId>jogl-all-natives-windows-i586</artifactId>
             <version>${jogl.version}</version>
         </dependency>
 
