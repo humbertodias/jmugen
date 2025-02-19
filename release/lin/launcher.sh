@@ -27,7 +27,7 @@ if [ -n "$app_path" ]; then
     echo "Application found at: $app_path"
     
     # Find the main executable file inside the MacOS directory
-    main_path=$(find "$app_path/bin" -type f -name "jmugen-*" -print -quit)
+    main_path=$(find "$app_path" -type f -name "jmugen-*" -print -quit)
 
     if [ -n "$main_path" ]; then
         # Launch the application with the resource directory argument
