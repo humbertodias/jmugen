@@ -181,7 +181,7 @@ public class TestGameFight  {
 		
 	}
 	public static void main(String[] args) throws Exception {
-		SoundSystem.SoundBackGround.playMusic(JMugenConstant.RESOURCE + "sound/intro.mp3");
+//		SoundSystem.SoundBackGround.playMusic(JMugenConstant.RESOURCE + "sound/intro.mp3");
 		launchDirect();
 //		launchUI();
 
