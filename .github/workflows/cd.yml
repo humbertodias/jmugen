@@ -20,14 +20,6 @@ jobs:
           sdk install maven 3.6.3
           mvn package
 
-      - name: Set TAG_NAME
-        run: echo "TAG_NAME=${GITHUB_REF_NAME}" >> $GITHUB_ENV
-
-      - name: Compress
-        run: |
-          mv JMugen.Debug/target/JMugen.Debug-0.0.1-SNAPSHOT.jar jmugen-${TAG_NAME}.jar
-          zip -r resource.zip resource
-
       - name: Set up dependencies
         run: |
           sudo apt update
@@ -40,13 +32,26 @@ jobs:
           chmod +x "appimagetool-$ARCH.AppImage"
           sudo mv "appimagetool-$ARCH.AppImage" /usr/local/bin/appimagetool          
 
+      - name: Set TAG_NAME
+        run: echo "TAG_NAME=${GITHUB_REF_NAME}" >> $GITHUB_ENV
+
       - name: AppImage
         run: |
           make app-image
-          (cd dist && tar cfzv ../jmugen-${{ env.TAG_NAME }}.tar.gz jmugen-${{ env.TAG_NAME}}*)
 
 #          appimagetool dist/jmugen*
 #          mv dist/*.AppImage jmugen-${{ env.TAG_NAME }}.AppImage
+
+      - name: Prepare release
+        run: |
+          # resource
+          zip -r resource.zip resource
+
+          # jar
+          mv JMugen.Debug/target/JMugen.Debug-0.0.1-SNAPSHOT.jar jmugen-${TAG_NAME}.jar
+
+          # tar.gz of app-image
+          (cd dist && tar cfzv ../jmugen-${TAG_NAME}.tar.gz jmugen-${TAG_NAME}*)
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
