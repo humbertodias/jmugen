@@ -109,6 +109,9 @@ jobs:
     strategy:
       matrix:
         runner: [ windows-latest ]
+    defaults:
+      run:
+        shell: cmd
     steps:
       - uses: actions/checkout@v4
 
