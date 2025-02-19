@@ -8,13 +8,17 @@ defaults:
   run:
     shell: bash
 
-# required for softprops/action-gh-release@v2
+# required for upload
 permissions:
   contents: write
 
 jobs:
-  release:
-    runs-on: ubuntu-latest
+
+  Linux:
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      matrix:
+        runner: [ ubuntu-22.04, ubuntu-24.04-arm ]
     steps:
       - uses: actions/checkout@v4
       - run: |
@@ -22,27 +26,30 @@ jobs:
           source "$HOME/.sdkman/bin/sdkman-init.sh"
           sdk install java 17.0.14-amzn
           sdk install maven 3.6.3
-          mvn package
+          sudo apt update && 
+          sudo apt install -y tar gzip build-essential wget libfuse-dev
 
-      - name: Set up dependencies
-        run: |
-          sudo apt update
-          sudo apt install -y tree tar gzip build-essential wget libfuse-dev
+      - name: Package jar
+        run: mvn package
 
-      - name: Download and install AppImageTool
+      - name: Set Variables
         run: |
+          echo "TAG_NAME=${GITHUB_REF_NAME}" >> $GITHUB_ENV
           ARCH=`uname -m`
-          wget "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-$ARCH.AppImage"
-          chmod +x "appimagetool-$ARCH.AppImage"
-          sudo mv "appimagetool-$ARCH.AppImage" /usr/local/bin/appimagetool          
+          echo "ARCH=${ARCH}" >> $GITHUB_ENV
 
-      - name: Set TAG_NAME
-        run: echo "TAG_NAME=${GITHUB_REF_NAME}" >> $GITHUB_ENV
-
-      - name: AppImage
+      - name: jpackage app-image
         run: |
           make app-image-tar-gz
 
+#      - name: Download and install AppImageTool
+#        run: |
+#          wget "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-$ARCH.AppImage"
+#          chmod +x "appimagetool-$ARCH.AppImage"
+#          sudo mv "appimagetool-$ARCH.AppImage" /usr/local/bin/appimagetool
+
+#      - name: AppImage
+#        run: |
 #          appimagetool dist/jmugen*
 #          mv dist/*.AppImage jmugen-${{ env.TAG_NAME }}.AppImage
 
@@ -66,4 +73,45 @@ jobs:
           files: |
             resource.zip
             jmugen-*.jar
+            jmugen-*.tar.gz
+
+  macOS:
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      matrix:
+        runner: [ macos-latest ]
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          curl -s "https://get.sdkman.io" | bash
+          source "$HOME/.sdkman/bin/sdkman-init.sh"
+          sdk install java 17.0.14-amzn
+          sdk install maven 3.6.3
+
+      - name: Package jar
+        run: mvn package
+
+      - name: Set Variables
+        run: |
+          echo "TAG_NAME=${GITHUB_REF_NAME}" >> $GITHUB_ENV
+
+      - name: jpackage app-image
+        run: |
+          make app-image-tar-gz
+
+      - name: Prepare release
+        run: |
+          pwd
+
+          # jar
+          mv JMugen.Debug/target/JMugen.Debug-0.0.1-SNAPSHOT.jar jmugen-${TAG_NAME}.jar
+
+          ls -lha
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: |
             jmugen-*.tar.gz
