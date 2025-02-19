@@ -138,16 +138,11 @@ jobs:
           --dest dist/
           
           rmdir /s /q tmp
+          dir dist/
 
       - name: Prepare release
         run: |
-          pwd
-
-          ls -lha dist
-
-      - name: Compress files into a ZIP archive
-        run: |
-          Compress-Archive -Path "dist/jmugen-%GITHUB_REF_NAME%" -DestinationPath "jmugen-%GITHUB_REF_NAME%-${{ runner.arch }}.zip"
+          xcopy dist\*.exe "jmugen-%GITHUB_REF_NAME%-${{ runner.arch }}.zip" /S /Y
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -155,4 +150,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           files: |
-            jmugen-*.zip
+            jmugen-*.exe
