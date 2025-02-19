@@ -27,10 +27,21 @@ jobs:
         run: |
           mv JMugen.Debug/target/JMugen.Debug-0.0.1-SNAPSHOT.jar jmugen.jar
           zip -r "jmugen-${TAG_NAME}.zip" resource jmugen.jar
+
+      - name: Set up dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y build-essential wget libfuse-dev
+
+      - name: Download and install AppImageTool
+        run: |
+          ARCH=`uname -m`
+          wget "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-$ARCH.AppImage"
+          chmod +x "AppImageTool-$ARCH.AppImage"
+          sudo mv "AppImageTool-$ARCH.AppImage" /usr/local/bin/appimagetool          
           
       - name: AppImage
         run: |
-          sudo apt install appimagetool -y
           DTMP=`mktemp -d`
           cp jmugen.jar $DTMP/jmugen.jar
           jpackage --input $DTMP \
