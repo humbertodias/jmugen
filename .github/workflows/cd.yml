@@ -39,26 +39,20 @@ jobs:
       - name: Package jar
         run: mvn package
 
-      - name: Set Variables
-        run: |
-          echo "TAG_NAME=${GITHUB_REF_NAME}" >> $GITHUB_ENV
-          ARCH=`uname -m`
-          echo "ARCH=${ARCH}" >> $GITHUB_ENV
-
       - name: jpackage app-image
         run: |
           make app-image-tar-gz-lin
 
 #      - name: Download and install AppImageTool
 #        run: |
-#          curl -LO "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-$ARCH.AppImage"
-#          chmod +x "appimagetool-$ARCH.AppImage"
-#          sudo mv "appimagetool-$ARCH.AppImage" /usr/local/bin/appimagetool
+#          curl -LO "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-${{ runner.arch }}.AppImage"
+#          chmod +x "appimagetool-${{ runner.arch }}.AppImage"
+#          sudo mv "appimagetool-${{ runner.arch }}.AppImage" /usr/local/bin/appimagetool
 
 #      - name: AppImage
 #        run: |
 #          appimagetool dist/jmugen*
-#          mv dist/*.AppImage jmugen-${{ env.TAG_NAME }}.AppImage
+#          mv dist/*.AppImage jmugen-${{ env.GITHUB_REF_NAME }}.AppImage
 
       - name: Prepare release
         run: |
@@ -68,7 +62,7 @@ jobs:
           zip -9 -r resource.zip resource
 
           # jar - max compression
-          zip -9 -r jmugen-${TAG_NAME}.jar JMugen.Debug/target/JMugen.Debug-0.0.1-SNAPSHOT.jar
+          zip -9 -r jmugen-${GITHUB_REF_NAME}.jar JMugen.Debug/target/JMugen.Debug-0.0.1-SNAPSHOT.jar
 
           ls -lha
 
