@@ -37,8 +37,8 @@ jobs:
         run: |
           ARCH=`uname -m`
           wget "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-$ARCH.AppImage"
-          chmod +x "AppImageTool-$ARCH.AppImage"
-          sudo mv "AppImageTool-$ARCH.AppImage" /usr/local/bin/appimagetool          
+          chmod +x "appimagetool-$ARCH.AppImage"
+          sudo mv "appimagetool-$ARCH.AppImage" /usr/local/bin/appimagetool          
           
       - name: AppImage
         run: |
