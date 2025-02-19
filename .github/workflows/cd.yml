@@ -47,7 +47,7 @@ jobs:
 
       - name: jpackage app-image
         run: |
-          make app-image-tar-gz
+          make app-image-tar-gz-lin
 
 #      - name: Download and install AppImageTool
 #        run: |
@@ -109,7 +109,7 @@ jobs:
 
       - name: jpackage app-image
         run: |
-          make app-image-tar-gz
+          make app-image-tar-gz-mac
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -165,6 +165,7 @@ jobs:
 
       - name: Prepare release
         run: |
+          powershell Copy-Item -Path release/win/* -Destination dist/ -Recurse
           powershell Compress-Archive -Path "dist/jmugen-*" -DestinationPath "jmugen-%GITHUB_REF_NAME%-${{ runner.os }}-${{ runner.arch }}.zip"
 
       - name: Create GitHub Release
