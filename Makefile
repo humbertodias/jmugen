@@ -49,8 +49,7 @@ app-image:
 SO := $(shell uname -s)
 ARCH := $(shell uname -m)
 app-image-tar-gz:	app-image
-	(cd dist && tar cfzv ../jmugen-${TAG_NAME}-${SO}-${ARCH}.tar.gz jmugen-${TAG_NAME}*)
-
+	(cd dist && tar cfzv - jmugen-${TAG_NAME}* | gzip -9 > ../jmugen-${TAG_NAME}-${SO}-${ARCH}.tar.gz)
 
 natives:
 	mkdir -p natives
