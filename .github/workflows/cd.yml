@@ -61,8 +61,8 @@ jobs:
           # resource
           zip -9 -r resource.zip resource
 
-          # jar - max compression
-          zip -9 -r jmugen-${GITHUB_REF_NAME}.jar JMugen.Debug/target/JMugen.Debug-0.0.1-SNAPSHOT.jar
+          # jar
+          cp JMugen.Debug/target/JMugen.Debug-0.0.1-SNAPSHOT.jar jmugen-${GITHUB_REF_NAME}.jar 
 
           ls -lha
 
