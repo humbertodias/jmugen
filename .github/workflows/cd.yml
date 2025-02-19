@@ -138,7 +138,6 @@ jobs:
           --dest dist/
           
           rmdir /s /q tmp
-          dir dist/
 
       - name: Prepare release
         run: |
