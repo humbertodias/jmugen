@@ -43,12 +43,15 @@ jobs:
       - name: AppImage
         run: |
           jpackage --version
-          jpackage --input . \
+          mkdir pkg
+          cp jmugen.jar pkg
+          jpackage --input pkg \
           --name app \
           --main-jar jmugen.jar \
           --type app-image
+          
           tree
-          appimagetool package app
+          appimagetool pkg/app
           mv app*.AppImage jmugen-${{ env.TAG_NAME }}.AppImage
 
       - name: Create GitHub Release
