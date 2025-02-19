@@ -20,6 +20,10 @@ Explore the available [features](./FEATURES.md) and contribute to implementing t
 
 You can configure the controls in the [keys.properties](JMugen.Properties/src/main/resources/keys.properties) file.
 
+## 🐞 Debug Mode
+![jmuge-statecontroller-debugger](https://github.com/user-attachments/assets/63908d34-83b8-462b-aecc-21ba9c237a5b)
+
+
 ## 💻 Supported Platforms
 
 - ✅ Any runtime - JAR
