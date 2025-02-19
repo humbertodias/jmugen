@@ -21,13 +21,12 @@ jobs:
         runner: [ ubuntu-24.04, ubuntu-24.04-arm ]
     steps:
       - uses: actions/checkout@v4
-      - run: |
-          curl -s "https://get.sdkman.io" | bash
-          source "$HOME/.sdkman/bin/sdkman-init.sh"
-          sdk install java 17.0.14-amzn
-          sdk install maven 3.6.3
-          sudo apt update && 
-          sudo apt install -y tar gzip build-essential wget libfuse-dev
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'corretto'
+          java-version: '17'
 
       - name: Package jar
         run: mvn package
@@ -44,7 +43,7 @@ jobs:
 
 #      - name: Download and install AppImageTool
 #        run: |
-#          wget "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-$ARCH.AppImage"
+#          curl -LO "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-$ARCH.AppImage"
 #          chmod +x "appimagetool-$ARCH.AppImage"
 #          sudo mv "appimagetool-$ARCH.AppImage" /usr/local/bin/appimagetool
 
@@ -82,11 +81,42 @@ jobs:
         runner: [ macos-latest ]
     steps:
       - uses: actions/checkout@v4
-      - run: |
-          curl -s "https://get.sdkman.io" | bash
-          source "$HOME/.sdkman/bin/sdkman-init.sh"
-          sdk install java 17.0.14-amzn
-          sdk install maven 3.6.3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'corretto'
+          java-version: '17'
+
+      - name: Package jar
+        run: mvn package
+
+      - name: jpackage app-image
+        run: |
+          make app-image-tar-gz
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: |
+            jmugen-*.tar.gz
+
+
+  Windows:
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      matrix:
+        runner: [ windows-latest ]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'corretto'
+          java-version: '17'
 
       - name: Package jar
         run: mvn package
@@ -97,14 +127,24 @@ jobs:
 
       - name: jpackage app-image
         run: |
-          make app-image-tar-gz
+          jpackage --version
+          
+          rmdir /s /q tmp
+          rmdir /s /q dist
+          mkdir tmp
+          copy JMugen.Debug\target\JMugen.Debug-0.0.1-SNAPSHOT.jar tmp\jmugen.jar
+          
+          jpackage --input tmp ^
+          --name jmugen-%TAG_NAME% ^
+          --main-jar jmugen.jar ^
+          --type exe ^
+          --dest dist/
+          
+          rmdir /s /q tmp
 
       - name: Prepare release
         run: |
           pwd
-
-          # jar
-          mv JMugen.Debug/target/JMugen.Debug-0.0.1-SNAPSHOT.jar jmugen-${TAG_NAME}.jar
 
           ls -lha
 
@@ -114,4 +154,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           files: |
-            jmugen-*.tar.gz
+            jmugen-*.exe
