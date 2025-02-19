@@ -41,7 +41,7 @@ jobs:
 
       - name: AppImage
         run: |
-          make app-image
+          make app-image-tar-gz
 
 #          appimagetool dist/jmugen*
 #          mv dist/*.AppImage jmugen-${{ env.TAG_NAME }}.AppImage
@@ -56,9 +56,6 @@ jobs:
           # jar
           mv JMugen.Debug/target/JMugen.Debug-0.0.1-SNAPSHOT.jar jmugen-${TAG_NAME}.jar
 
-          # tar.gz of app-image
-          (cd dist && tar cfzv ../jmugen-${TAG_NAME}.tar.gz jmugen-${TAG_NAME}*)
-          
           ls -lha
 
       - name: Create GitHub Release

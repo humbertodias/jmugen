@@ -44,6 +44,13 @@ app-image:
 	--main-jar jmugen.jar \
 	--type app-image \
 	--dest dist/
+	rm -rf tmp
+
+SO := $(shell uname -s)
+ARCH := $(shell uname -m)
+app-image-tar-gz:	app-image
+	(cd dist && tar cfzv ../jmugen-${TAG_NAME}-${SO}-${ARCH}.tar.gz jmugen-${TAG_NAME}*)
+
 
 natives:
 	mkdir -p natives
