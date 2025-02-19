@@ -47,17 +47,19 @@ jobs:
           mkdir pkg
           cp jmugen.jar pkg
           jpackage --input pkg \
-          --name app \
+          --name jmugen-${{ env.TAG_NAME }} \
           --main-jar jmugen.jar \
           --type app-image
           
-          appimagetool app
-          ls -lha app*
-          mv app*.AppImage jmugen-${{ env.TAG_NAME }}.AppImage
+          tar cvfz jmugen-${{ env.TAG_NAME }}.tar.gz jmugen-${{ env.TAG_NAME }} resource
+
+#          appimagetool app
+#          ls -lha app*
+#          mv app*.AppImage jmugen-${{ env.TAG_NAME }}.AppImage
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          files: jmugen-${{ env.TAG_NAME }}.zip jmugen-${{ env.TAG_NAME }}.AppImage
+          files: jmugen-${{ env.TAG_NAME }}.zip jmugen-${{ env.TAG_NAME }}.tar.gz
