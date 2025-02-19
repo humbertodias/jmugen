@@ -30,7 +30,7 @@ jobs:
           
       - name: AppImage
         run: |
-          apt install appimagetool -y
+          sudo apt install appimagetool -y
           DTMP=`mktemp -d`
           cp jmugen.jar $DTMP/jmugen.jar
           jpackage --input $DTMP \
