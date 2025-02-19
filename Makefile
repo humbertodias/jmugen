@@ -1,4 +1,4 @@
-SO       := $(shell uname -s)
+OS       := $(shell uname -s)
 ARCH     := $(shell uname -m)
 # if there is no current tag use the git commit hash
 TAG_NAME := $(shell git describe --tags --exact-match 2>/dev/null || git rev-parse --short HEAD)
@@ -50,13 +50,18 @@ app-image:
 	--dest dist/
 	rm -rf tmp
 
-app-image-tar-gz-lin:	app-image
+copy-release-files:
+	echo "OS: ${OS}"
+ifeq ($(OS),Linux)
 	cp release/lin/* dist/
-	(cd dist && tar cfzv - * | gzip -9 > ../jmugen-${TAG_NAME}-${SO}-${ARCH}.tar.gz)
-
-app-image-tar-gz-mac:	app-image
+else ifeq ($(OS),Darwin)
 	cp release/mac/* dist/
-	(cd dist && tar cfzv - * | gzip -9 > ../jmugen-${TAG_NAME}-${SO}-${ARCH}.tar.gz)
+else
+	echo "unknown"
+endif
+
+app-image-tar-gz:	app-image	copy-release-files
+	(cd dist && tar cfzv ../jmugen-${TAG_NAME}-${OS}-${ARCH}.tar.gz *)
 
 natives:
 	mkdir -p natives

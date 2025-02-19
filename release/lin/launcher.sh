@@ -20,14 +20,14 @@ if [ ! -d "$script_dir/resource" ]; then
 fi
 
 # Find the jmugen application directory
-app_path=$(find "$script_dir" -type d -name "jmugen-*.app" -print -quit)
+app_path=$(find "$script_dir" -type d -name "jmugen-*" -print -quit)
 
 # Check if the application directory was found
 if [ -n "$app_path" ]; then
     echo "Application found at: $app_path"
     
     # Find the main executable file inside the MacOS directory
-    main_path=$(find "$app_path/Contents/MacOS" -type f -name "jmugen-*" -print -quit)
+    main_path=$(find "$app_path/bin" -type f -name "jmugen-*" -print -quit)
 
     if [ -n "$main_path" ]; then
         # Launch the application with the resource directory argument

@@ -20,16 +20,11 @@ if (-not (Test-Path "$scriptDir\resource")) {
 }
 
 # Find the jmugen application directory
-$appPath = Get-ChildItem -Path $scriptDir -Recurse -Directory -Filter "jmugen-*.app" | Select-Object -First 1
+$mainPath = Get-ChildItem -Path $scriptDir -Recurse -Directory -Filter "jmugen-*.exe" | Select-Object -First 1
 
 # Check if the application directory was found
-if ($appPath) {
-    Write-Host "Application found at: $appPath"
-    
-    # Find the main executable file inside the MacOS directory
-    $mainPath = Get-ChildItem -Path "$appPath\Contents\MacOS" -Recurse -File -Filter "jmugen-*" | Select-Object -First 1
-
-    if ($mainPath) {
+if ($mainPath) {
+        Write-Host "Application found at: $appPath"
         # Launch the application with the resource directory argument
         Write-Host "Launching application..."
         Start-Process -FilePath $mainPath.FullName -ArgumentList "-d $scriptDir\resource"
@@ -37,7 +32,4 @@ if ($appPath) {
         Write-Host "Error: Main application executable not found!"
         Exit 1
     }
-} else {
-    Write-Host "Error: Application not found!"
-    Exit 1
 }

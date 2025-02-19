@@ -41,7 +41,7 @@ jobs:
 
       - name: jpackage app-image
         run: |
-          make app-image-tar-gz-lin
+          make app-image-tar-gz
 
 #      - name: Download and install AppImageTool
 #        run: |
@@ -103,7 +103,7 @@ jobs:
 
       - name: jpackage app-image
         run: |
-          make app-image-tar-gz-mac
+          make app-image-tar-gz
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
