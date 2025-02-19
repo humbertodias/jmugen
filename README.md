@@ -20,7 +20,7 @@ You can configure the controls in the file [keys.properties](JMugen.Properties/s
 
 ### Supported platforms
 
-* [x] Jar - any
+* [x] Any runtime - jar
 * [x] Linux - x86_64
 * [x] Linux - arm64
 * [x] macOS - x64
