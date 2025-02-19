@@ -42,16 +42,14 @@ jobs:
           
       - name: AppImage
         run: |
-          DTMP=`mktemp -d`
-          cp jmugen.jar $DTMP/jmugen.jar
-          jpackage --input $DTMP \
+          jpackage --version
+          jpackage --input . \
           --name app \
           --main-jar jmugen.jar \
-          --type app-image \
-          --jlink-options "--strip-native-commands --strip-debug --no-man-pages --no-header-files"
-          tree $DTMP
-          appimagetool package $DTMP/app
-          mv $DTMP/app*.AppImage jmugen-${{ env.TAG_NAME }}.AppImage
+          --type app-image
+          tree
+          appimagetool package app
+          mv app*.AppImage jmugen-${{ env.TAG_NAME }}.AppImage
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
