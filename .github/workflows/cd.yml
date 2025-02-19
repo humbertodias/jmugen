@@ -45,7 +45,7 @@ jobs:
           jpackage --version
 
           mkdir pkg
-          cp jmugen.jar pkg
+          cp jmugen*.jar pkg
           jpackage --input pkg \
           --name jmugen-${{ env.TAG_NAME }} \
           --main-jar jmugen.jar \
