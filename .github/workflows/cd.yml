@@ -31,7 +31,7 @@ jobs:
       - name: Set up dependencies
         run: |
           sudo apt update
-          sudo apt install -y tree build-essential wget libfuse-dev
+          sudo apt install -y tree tar gzip build-essential wget libfuse-dev
 
       - name: Download and install AppImageTool
         run: |
@@ -54,7 +54,7 @@ jobs:
           
           ls -lha jmugen*
           
-          tar cvfz jmugen-${{ env.TAG_NAME }}.tar.gz jmugen-${{ env.TAG_NAME }}
+          tar -cvfz jmugen-${{ env.TAG_NAME }}.tar.gz jmugen-${{ env.TAG_NAME }}
 
 #          appimagetool app
 #          ls -lha app*
