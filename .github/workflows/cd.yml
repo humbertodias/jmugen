@@ -27,10 +27,45 @@ jobs:
         run: |
           mv JMugen.Debug/target/JMugen.Debug-0.0.1-SNAPSHOT.jar jmugen.jar
           zip -r "jmugen-${TAG_NAME}.zip" resource jmugen.jar
+          
+      - name: DMG
+        run: |
+          DTMP=`mktemp -d`
+          cp JMugen.Debug/target/JMugen.Debug-0.0.1-SNAPSHOT.jar $DTMP/jmugen.jar
+          jpackage --input $DTMP \
+          --name JMugen \
+          --main-jar jmugen.jar \
+          --type dmg \
+          --jlink-options "--strip-native-commands --strip-debug --no-man-pages --no-header-files"
+          mv $DTMP/JMugen*.dmg jmugen-${{ env.TAG_NAME }}.dmg
+
+      - name: AppImage
+        run: |
+          apt install appimagetool -y
+          DTMP=`mktemp -d`
+          cp JMugen.Debug/target/JMugen.Debug-0.0.1-SNAPSHOT.jar $DTMP/jmugen.jar
+          jpackage --input $DTMP \
+          --name JMugen \
+          --main-jar jmugen.jar \
+          --type app-image \
+          --jlink-options "--strip-native-commands --strip-debug --no-man-pages --no-header-files"
+          appimagetool $DTMP/JMugen
+          mv $DTMP/JMugen*.AppImage jmugen-${{ env.TAG_NAME }}.AppImage
+
+      - name: Exe
+        run: |
+          DTMP=`mktemp -d`
+          cp JMugen.Debug/target/JMugen.Debug-0.0.1-SNAPSHOT.jar $DTMP/jmugen.jar
+          jpackage --input $DTMP \
+          --name JMugen \
+          --main-jar jmugen.jar \
+          --type exe \
+          --jlink-options "--strip-native-commands --strip-debug --no-man-pages --no-header-files"
+          mv $DTMP/JMugen*.exe jmugen-${{ env.TAG_NAME }}.exe
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          files: jmugen-${{ env.TAG_NAME }}.zip
+          files: jmugen-${{ env.TAG_NAME }}.zip jmugen-${{ env.TAG_NAME }}.dmg jmugen-${{ env.TAG_NAME }}.AppImage jmugen-${{ env.TAG_NAME }}.AppImage
