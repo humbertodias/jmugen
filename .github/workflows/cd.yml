@@ -45,10 +45,10 @@ jobs:
           jpackage --version
 
           mkdir pkg
-          cp jmugen*.jar pkg
+          cp jmugen-${TAG_NAME}.jar pkg
           jpackage --input pkg \
           --name jmugen-${{ env.TAG_NAME }} \
-          --main-jar jmugen.jar \
+          --main-jar jmugen-${TAG_NAME}.jar \
           --type app-image
           rm -rf pkg
           
