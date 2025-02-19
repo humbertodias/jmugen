@@ -3,10 +3,6 @@ name: CD
 on:
   release:
     types: [ created ]
-  workflow_dispatch:
-
-permissions:
-  contents: write
 
 defaults:
   run:
