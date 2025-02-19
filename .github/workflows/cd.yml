@@ -129,8 +129,6 @@ jobs:
         run: |
           jpackage --version
           
-          rmdir /s /q tmp
-          rmdir /s /q dist
           mkdir tmp
           copy JMugen.Debug\target\JMugen.Debug-0.0.1-SNAPSHOT.jar tmp\jmugen.jar
           
