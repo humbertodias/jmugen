@@ -141,7 +141,7 @@ jobs:
 
       - name: Prepare release
         run: |
-          xcopy dist\*.exe "jmugen-%GITHUB_REF_NAME%-${{ runner.arch }}.zip" /S /Y
+          powershell Compress-Archive -Path "dist" -DestinationPath "jmugen-%GITHUB_REF_NAME%-${{ runner.arch }}.zip"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -149,4 +149,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           files: |
-            jmugen-*.exe
+            jmugen-*.zip
