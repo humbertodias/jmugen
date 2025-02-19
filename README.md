@@ -18,9 +18,20 @@ Explore the current [features](./FEATURES.md) of this project and contribute to 
 
 You can configure the controls in the file [keys.properties](JMugen.Properties/src/main/resources/keys.properties)
 
+### Supported platforms
+
+* [x] Linux - x86_64
+* [x] Linux - arm64
+* [x] macOS - x64
+* [x] macOS - arm64
+* [x] Windows - x86_64
+* [ ] Windows - arm64
+
+Checkout the [releases](https://github.com/humbertodias/jmugen/releases)
+
 ## Colaborate
 
 You are welcome to clone this project from [the repository](https://github.com/humbertodias/jmugen) or contribute by reporting issues/feature requests on [the issues page](https://github.com/humbertodias/jmugen/issues)
 
 ## Resources
-[Development Guide](./DEV.md) | [License Information](./LICENSE) | [Releases](https://github.com/humbertodias/jmugen/releases)
+[Development Guide](./DEV.md) | [License Information](./LICENSE)
