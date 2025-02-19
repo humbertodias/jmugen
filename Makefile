@@ -26,11 +26,24 @@ run-jogl:
 	${MAIN_CLASS}
 
 clean:
-	rm -rf natives
+	rm -rf natives dist tmp
 	mvn clean
 
 package:
 	mvn clean package
+
+TAG_NAME := $(shell git describe --tags --exact-match 2>/dev/null)
+app-image:
+	jpackage --version
+
+	rm -rf tmp dist
+	mkdir tmp
+	cp JMugen.Debug/target/JMugen.Debug-0.0.1-SNAPSHOT.jar tmp/jmugen.jar
+	jpackage --input tmp \
+	--name jmugen-${TAG_NAME} \
+	--main-jar jmugen.jar \
+	--type app-image \
+	--dest dist/
 
 natives:
 	mkdir -p natives

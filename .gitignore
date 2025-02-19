@@ -3,8 +3,11 @@
 .vscode
 .settings
 /bin/
+/dist/
+/tmp/
 
 natives
 *.log
 *.iml
+*.tar.gz
 resource/cache

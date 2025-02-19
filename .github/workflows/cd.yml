@@ -42,23 +42,11 @@ jobs:
 
       - name: AppImage
         run: |
-          jpackage --version
+          make app-image
+          (cd dist && tar cfzv ../jmugen-${{ env.TAG_NAME }}.tar.gz jmugen-${{ env.TAG_NAME}}*)
 
-          mkdir pkg
-          cp jmugen-${TAG_NAME}.jar pkg
-          jpackage --input pkg \
-          --name jmugen-${{ env.TAG_NAME }} \
-          --main-jar jmugen-${TAG_NAME}.jar \
-          --type app-image
-          rm -rf pkg
-          
-          ls -lha jmugen*
-          
-          tar -cvfz jmugen-${{ env.TAG_NAME }}.tar.gz jmugen-${{ env.TAG_NAME }}
-
-#          appimagetool app
-#          ls -lha app*
-#          mv app*.AppImage jmugen-${{ env.TAG_NAME }}.AppImage
+#          appimagetool dist/jmugen*
+#          mv dist/*.AppImage jmugen-${{ env.TAG_NAME }}.AppImage
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
