@@ -1,3 +1,8 @@
+SO       := $(shell uname -s)
+ARCH     := $(shell uname -m)
+# if there is no current tag use the git commit hash
+TAG_NAME := $(shell git describe --tags --exact-match 2>/dev/null || git rev-parse --short HEAD)
+
 # Debugging Configuration
 DEBUG_SUSPEND=n
 JAVA_OPTS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=${DEBUG_SUSPEND},address=0.0.0.0:5005"
@@ -32,8 +37,6 @@ clean:
 package:
 	mvn clean package
 
-# if there is no current tag use the git commit hash
-TAG_NAME := $(shell git describe --tags --exact-match 2>/dev/null || git rev-parse --short HEAD)
 app-image:
 	jpackage --version
 
@@ -47,11 +50,9 @@ app-image:
 	--dest dist/
 	rm -rf tmp
 
-SO := $(shell uname -s)
-ARCH := $(shell uname -m)
 app-image-tar-gz-lin:	app-image
 	cp release/lin/* dist/
-	(cd dist && tar cfzv - | gzip -9 > ../jmugen-${TAG_NAME}-${SO}-${ARCH}.tar.gz)
+	(cd dist && tar cfzv - * | gzip -9 > ../jmugen-${TAG_NAME}-${SO}-${ARCH}.tar.gz)
 
 app-image-tar-gz-mac:	app-image
 	cp release/mac/* dist/
