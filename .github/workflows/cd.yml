@@ -153,6 +153,7 @@ jobs:
           --name jmugen-%GITHUB_REF_NAME% ^
           --main-jar jmugen.jar ^
           --type app-image ^
+          --java-options "--add-opens java.desktop/sun.awt=ALL-UNNAMED" ^
           --dest dist/
           
           rmdir /s /q tmp

@@ -50,6 +50,7 @@ app-image:
 	--name jmugen-${TAG_NAME} \
 	--main-jar jmugen.jar \
 	--type app-image \
+	--java-options "--add-opens java.desktop/sun.awt=ALL-UNNAMED" \
 	--dest dist/
 	rm -rf tmp
 
