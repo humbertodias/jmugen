@@ -5,29 +5,32 @@ TAG_NAME := $(shell git describe --tags --exact-match 2>/dev/null || git rev-par
 
 # Debugging Configuration
 DEBUG_SUSPEND=n
-JAVA_OPTS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=${DEBUG_SUSPEND},address=0.0.0.0:5005"
+JAVA_OPTS= -agentlib:jdwp=transport=dt_socket,server=y,suspend=${DEBUG_SUSPEND},address=0.0.0.0:5005
+# Caught AppContextInfo(Bug 1004) IllegalAccessException: class com.jogamp.nativewindow.awt.AppContextInfo cannot access class sun.awt.AppContext (in module java.desktop) because module java.desktop does not export sun.awt to unnamed module @300ffa5d on thread AppKit Thread
+JAVA_OPTS+= --add-opens java.desktop/sun.awt=ALL-UNNAMED
 
-MAIN_CLASS = org.lee.mugen.test.TestGameFight
 # Uncomment to switch the MAIN_CLASS:
+# MAIN_CLASS = org.mugen.launch.Launch
+MAIN_CLASS = org.lee.mugen.test.TestMenu
+# MAIN_CLASS = org.lee.mugen.test.TestGameFight
 # MAIN_CLASS = org.lee.mugen.test.TestScene
 # MAIN_CLASS = org.lee.mugen.test.TestSelect
 # MAIN_CLASS = org.lee.mugen.core.sound.SoundSystem
-# MAIN_CLASS = org.lee.mugen.test.TestMenu
 # MAIN_CLASS = org.lee.mugen.snd.SndReader
-# MAIN_CLASS = com.Ostermiller.Syntax.ProgrammerEditorDemo
 # MAIN_CLASS = org.lee.mugen.core.renderer.game.fight.RoundRender
 # MAIN_CLASS = org.lee.mugen.test.ExpressionTester
+# MAIN_CLASS = com.Ostermiller.Syntax.ProgrammerEditorDemo
 
 run-lwjgl:
 	java ${JAVA_OPTS} \
 	-Djava.library.path=natives \
 	-XstartOnFirstThread \
-	-cp JMugen.Properties/target/JMugen.Properties-0.0.1-SNAPSHOT.jar:JMugen.Debug/target/JMugen.Debug-0.0.1-SNAPSHOT.jar:${HOME}/.m2/repository/com/googlecode/soundlibs/mp3spi/1.9.5.4/mp3spi-1.9.5.4.jar \
+	-cp JMugen.Properties/target/JMugen.Properties-0.0.1-SNAPSHOT.jar:JMugen.Launch/target/JMugen.Debug-0.0.1-SNAPSHOT.jar:JMugen.Launcher/target/JMugen.Launcher-0.0.1-SNAPSHOT.jar:${HOME}/.m2/repository/com/googlecode/soundlibs/mp3spi/1.9.5.4/mp3spi-1.9.5.4.jar \
 	${MAIN_CLASS}
 
 run-jogl:
 	java ${JAVA_OPTS} \
-	-cp JMugen.Properties/target/JMugen.Properties-0.0.1-SNAPSHOT.jar:JMugen.Debug/target/JMugen.Debug-0.0.1-SNAPSHOT.jar:${HOME}/.m2/repository/com/googlecode/soundlibs/mp3spi/1.9.5.4/mp3spi-1.9.5.4.jar \
+	-cp JMugen.Properties/target/JMugen.Properties-0.0.1-SNAPSHOT.jar:JMugen.Debug/target/JMugen.Debug-0.0.1-SNAPSHOT.jar:JMugen.Launcher/target/JMugen.Launcher-0.0.1-SNAPSHOT.jar:${HOME}/.m2/repository/com/googlecode/soundlibs/mp3spi/1.9.5.4/mp3spi-1.9.5.4.jar \
 	${MAIN_CLASS}
 
 clean:
