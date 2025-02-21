@@ -7,6 +7,8 @@
 
 **JMugen** is a Java-based recreation of the classic 2D fighting engine [M.U.G.E.N](https://www.elecbyte.com/mugendocs-11b1/mugen.html).
 
+Forked from [code.google/jmugen](https://code.google.com/archive/p/jmugen/)
+
 Explore the available [features](./FEATURES.md) and contribute to implementing the missing ones.
 
 ![JMugen Gameplay](https://github.com/user-attachments/assets/1b7c5e84-4abc-4200-9580-c0d00d7397b8)
