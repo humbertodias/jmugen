@@ -13,10 +13,10 @@ Explore the available [features](./FEATURES.md) and contribute to implementing t
 
 ## 🎮 Controls
 
-| Player | Movement | Punch | Kick | Help  |
-|:------:|:--------:|:-----:|:----:|:-----:|
-| **P1** | `WASD`   | `U P I` | `; J K` | `F1`  |
-| **P2** | `Arrows` | `7 4 5` | `8 0 2` | `--`  |
+| Player | Movement |  Punch  |  Kick   | Help |
+|:------:|:--------:|:-------:|:-------:|:----:|
+| **P1** |  `WASD`  | `U P I` | `; J K` | `F1` |
+| **P2** | `Arrows` | `7 4 5` | `8 0 2` | `--` |
 
 You can configure the controls in the [keys.properties](JMugen.Properties/src/main/resources/keys.properties) file.
 
