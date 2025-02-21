@@ -11,9 +11,9 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <jmugen.version>0.0.1-SNAPSHOT</jmugen.version>
-<!--        <main.class>org.lee.mugen.test.TestMenu</main.class>-->
+        <main.class>org.lee.mugen.test.TestMenu</main.class>
 <!--        <main.class>org.mugen.launch.Launch</main.class>-->
-        <main.class>org.lee.mugen.test.TestGameFight</main.class>
+<!--        <main.class>org.lee.mugen.test.TestGameFight</main.class> -->
     </properties>
 
     <modules>
