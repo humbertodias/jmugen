@@ -18,7 +18,7 @@ public final class LMugenTimer implements MugenTimer {
 
 	@Override
 	public long getFramerate() {
-		return 100;
+		return 60;
 	}
 
 	@Override
