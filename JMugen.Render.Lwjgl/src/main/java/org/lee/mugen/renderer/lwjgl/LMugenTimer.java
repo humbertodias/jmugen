@@ -1,27 +1,15 @@
 package org.lee.mugen.renderer.lwjgl;
 
 import org.lee.mugen.renderer.MugenTimer;
+import org.lwjgl.util.Timer;
 
-import static org.lwjgl.glfw.GLFW.*;
-
+/**
+ * Timer class Wrapper
+ * 
+ * @author Dr Wong
+ * 
+ */
 public final class LMugenTimer implements MugenTimer {
-
-	private float lastTime;
-	private float tick;
-	private float deltas;
-	private int frames;
-	private int fps;
-	private boolean nextTimeReset;
-
-	public LMugenTimer() {
-		// Initialize GLFW, necessary for using glfwGetTime()
-		if (!glfwInit()) {
-			throw new IllegalStateException("Unable to initialize GLFW.");
-		}
-
-		// Start the timer
-		lastTime = (float) glfwGetTime();
-	}
 
 	@Override
 	public int getFps() {
@@ -30,12 +18,13 @@ public final class LMugenTimer implements MugenTimer {
 
 	@Override
 	public long getFramerate() {
-		return 100;  // Returns a fixed framerate value
+		return 100;
 	}
 
 	@Override
 	public void setFramerate(long framerate) {
-		// You can add logic here to adjust the framerate
+		// TODO Auto-generated method stub
+
 	}
 
 	public float getDeltas() {
@@ -46,48 +35,51 @@ public final class LMugenTimer implements MugenTimer {
 		return frames;
 	}
 
+	Timer timer = new Timer();
+	float lastTime = timer.getTime();
+	float tick;
+	float deltas;
+	int frames;
+	int fps;
 	public void reset() {
 		fps = (int) (frames / deltas);
 		frames = 0;
 		deltas = 0;
 	}
-
+	boolean nextTimeReset;
 	public void listen() {
 		if (nextTimeReset) {
 			nextTimeReset = false;
 			reset();
 		}
-
-		// Get current time using glfwGetTime()
-		float currentTime = (float) glfwGetTime();
-		tick = currentTime - lastTime;
+		Timer.tick();
+		tick = timer.getTime() - lastTime;
 		deltas += tick;
-		lastTime = currentTime;
+		lastTime = timer.getTime();
 
 		frames++;
-
-		// Adjust the FPS if necessary
 		if (frames == 50000) {
-			// fps = (int) (frames / deltas);
-			// frames = 0;
-			// deltas = 0;
-		}
+//			fps = (int) (frames / deltas);
+//			frames = 0;
+//			deltas = 0;
 
-		// Reset when the time exceeds the desired framerate
-		if (1f / getFramerate() <= getDeltas()) {
+		}
+		if (1f/getFramerate() <= getDeltas()) {
 			nextTimeReset = true;
 		}
+
 	}
 
 	@Override
 	public int sleep() {
-		glfwPollEvents();  // Necessary to keep GLFW active
+		Timer.tick();
 		return 0;
 	}
 
 	@Override
 	public void sleep(long ms) {
-		// Use glfwWaitEventsTimeout to wait for a specific amount of time
-		glfwWaitEventsTimeout(ms / 1000.0);  // Convert milliseconds to seconds
+		Timer.tick();
+
 	}
+
 }

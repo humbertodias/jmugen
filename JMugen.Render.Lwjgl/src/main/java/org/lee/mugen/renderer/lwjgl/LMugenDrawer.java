@@ -38,6 +38,7 @@ public class LMugenDrawer extends MugenDrawer {
 			GL11.glTranslatef(dp.getXAnchor(), dp.getYAnchor(), 0);
 			GL11.glRotatef(dp.getAngleset(), 0, 0, 1);
 			GL11.glTranslatef(-dp.getXAnchor(), -dp.getYAnchor(), 0);
+
 		}
 
 	}
@@ -72,8 +73,8 @@ public class LMugenDrawer extends MugenDrawer {
 	}
 
 	private void drawImage(float xlDst, float xrDst, float ytDst, float ybDst,
-			float xlSrc, float xrSrc, float ytSrc, float ybSrc,
-			DrawProperties dp) {
+						   float xlSrc, float xrSrc, float ytSrc, float ybSrc,
+						   DrawProperties dp) {
 		float xScale = 1f;
 		float yScale = 1f;
 
@@ -124,8 +125,8 @@ public class LMugenDrawer extends MugenDrawer {
 		}
 		return palFxShader;
 	}
-	
-	
+
+
 	static AfterImageShader afterImageShader = null;
 
 	private AfterImageShader getAfterImageShader() {
@@ -198,13 +199,13 @@ public class LMugenDrawer extends MugenDrawer {
 			GL11.glColor4f(1, 1, 1, 1f);
 			drawImage(xlDst, xrDst, ytDst, ybDst, xlSrc, xrSrc, ytSrc, ybSrc, dp);
 			drawImage(xlDst, xrDst, ytDst, ybDst, xlSrc, xrSrc, ytSrc, ybSrc, dp);
-			
+
 			drawImage(xlDst, xrDst, ytDst, ybDst, xlSrc, xrSrc, ytSrc, ybSrc, dp);
 
 			type = 3;
 		} else {
-//			GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_MODE, GL11.GL_MODULATE);
-//			GL11.glBlendFunc(GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
+			GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_MODE, GL11.GL_MODULATE);
+			GL11.glBlendFunc(GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
 		}
 
@@ -230,7 +231,7 @@ public class LMugenDrawer extends MugenDrawer {
 
 		} else if (dp.getImageProperties() != null) {
 			final RGB bits = new RGB(1f / 255f, 1f / 255f, 1f / 255f, 1f);
-			
+
 			getAfterImageShader().render(
 					dp.getImageProperties().getPalbright().mul(bits),
 					dp.getImageProperties().getPalcontrast().mul(bits),
@@ -249,20 +250,22 @@ public class LMugenDrawer extends MugenDrawer {
 
 	public void draw(DrawProperties dp) {
 
+
 		Texture text = (Texture) dp.getIc().getImg();
-		
+
 		GL11.glColor4f(1f, 1f, 1f, 1f);
 		GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_MODE,
 				GL11.GL_MODULATE);
 		GL11.glBlendFunc(GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		text.bind();
 		drawChild(dp);
-	}
 
+
+	}
 	public void drawChild(DrawProperties dp) {
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 
-		GL11.glColorMask(true, true, true, true);
+		//GL11.glColorMask(true, true, true, true);
 		GL11.glDisable(GL11.GL_COLOR_LOGIC_OP);
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_ALPHA_TEST);
@@ -274,13 +277,13 @@ public class LMugenDrawer extends MugenDrawer {
 		GL11.glPushMatrix();
 
 		// bind to the appropriate texture for this sprite
-		
+
 		if (isScaleByForMeDebug()) {
 			scale(0.5f, 0.5f); // This scale help me to see out of screen
 			GL11.glTranslated(160, 240, 0);
 		}
 
-		
+
 		processRotationProperties(dp.getAngleDrawProperties());
 
 		drawWithPropertiesColor(dp);
@@ -293,12 +296,12 @@ public class LMugenDrawer extends MugenDrawer {
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		// make sure the start and end points are drawn - GL implementations
 		// seem a bit flakey on this
-		
+
 		if (isScaleByForMeDebug()) {
 			scale(0.5f, 0.5f); // This scale help me to see out of screen
 			GL11.glTranslated(160, 240, 0);
 		}
-		
+
 		GL11.glBegin(GL11.GL_POINTS);
 		GL11.glVertex2f(x1, y1);
 		GL11.glVertex2f(x2, y2);
@@ -308,13 +311,13 @@ public class LMugenDrawer extends MugenDrawer {
 		GL11.glVertex2f(x2, y2);
 		GL11.glEnd();
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		
+
 		if (isScaleByForMeDebug()) {
 			GL11.glTranslated(-160, -240, 0);
 			scale(2f, 2f);
 		}
 
-		
+
 	}
 
 	@Override
@@ -346,12 +349,12 @@ public class LMugenDrawer extends MugenDrawer {
 			super(img, width, height);
 			this.color = color;
 		}
-		
-		
+
+
 		private static final int RAW_PCX = 0;
 		private static final int BYTE = 1;
 		private static final int TEXTURE = 2;
-		
+
 		AtomicInteger imageStatus = new AtomicInteger(0);
 		@Override
 		public Object getImg() {
@@ -364,7 +367,7 @@ public class LMugenDrawer extends MugenDrawer {
 						imageStatus.set(TEXTURE);
 						return img;
 					} catch (Exception e) {
-						throw new IllegalStateException("It shouldn't arrive", e);
+						throw new IllegalStateException("This shouldn't happen", e);
 					}
 				} else if (imageStatus.get() == RAW_PCX) {
 					RawPCXImage pcx = (RawPCXImage) img;
@@ -374,7 +377,7 @@ public class LMugenDrawer extends MugenDrawer {
 						imageStatus.set(TEXTURE);
 						return img;
 					} catch (IOException e) {
-						throw new IllegalStateException("It shouldn't arrive");
+						throw new IllegalStateException("This shouldn't happen");
 					}
 				}
 			}
@@ -387,7 +390,7 @@ public class LMugenDrawer extends MugenDrawer {
 					TextureLoader.getTextureLoader().free((Texture) img);
 			}
 		}
-		
+
 		@Override
 		public void reload(ImageContainer img) {
 			synchronized (this) {
@@ -403,15 +406,19 @@ public class LMugenDrawer extends MugenDrawer {
 			synchronized (this) {
 				if (imageStatus.get() == RAW_PCX) {
 					RawPCXImage pcx = (RawPCXImage) img;
-					
+
 					img = getDefaultImageType(pcx, color);
-					img = TextureLoader.getTextureLoader().convertImageData((BufferedImage) img);
-					
+					img =TextureLoader.getTextureLoader().convertImageData((BufferedImage) img);
+
 					imageStatus.set(BYTE);
+
+
+
+
 				}
 			}
 		}
-		
+
 	}
 	private BufferedImage getDefaultImageType(RawPCXImage pcx, int color) {
 		try {
@@ -426,15 +433,15 @@ public class LMugenDrawer extends MugenDrawer {
 		}
 		throw new IllegalStateException();
 	}
-	
-	
+
+
 	private static final int LIST_IMG_TO_PROCESS_COUNT = 0;
 	private static final int LIST_IMG_TO_PROCESS_THREAD_YELD_TIME = 10;
 	private static List<ImageContainerText>[] IMAGE_TO_PROCESS_LIST = null;
 	private static boolean[] jobFinish = new boolean[LIST_IMG_TO_PROCESS_COUNT];
 	private static int currentListToAdd = 0;
-	
-	
+
+
 	private static void addToImageToProcess(ImageContainerText img) {
 		if (LIST_IMG_TO_PROCESS_COUNT <= 0)
 			return;
@@ -450,7 +457,7 @@ public class LMugenDrawer extends MugenDrawer {
 		IMAGE_TO_PROCESS_LIST[currentListToAdd].add(img);
 		currentListToAdd++;
 	}
-	
+
 
 	private static void prepareImageToProcess(List<ImageContainerText> list) {
 		Collections.sort(list, IMAGE_CONTAINER_COMPARATOR);
@@ -472,7 +479,7 @@ public class LMugenDrawer extends MugenDrawer {
 			return -(o1.getWidth() * o1.getHeight()) + (o2.getWidth() * o2.getHeight());
 		}};
 	public static void createImageToTextPreparer() {
-		
+
 		for (int i = 0; i < IMAGE_TO_PROCESS_LIST.length; ++i) {
 			final int pos = i;
 			new Thread() {
@@ -482,14 +489,14 @@ public class LMugenDrawer extends MugenDrawer {
 					jobFinish[pos] = true;
 				}
 			}.start();
-			
+
 		}
 	}
-	
+
 	public static void newThreadJob() {
 		jobFinish = new boolean[LIST_IMG_TO_PROCESS_COUNT];
 	}
-	
+
 	public static boolean isConverImageToBufferFinish() {
 		boolean result = true;
 		for (boolean b: jobFinish) {
@@ -506,7 +513,7 @@ public class LMugenDrawer extends MugenDrawer {
 	}
 
 
-	
+
 	private LwjglGameWindow gameWindow = new LwjglGameWindow();
 
 	@Override
@@ -524,29 +531,29 @@ public class LMugenDrawer extends MugenDrawer {
 	@Override
 	public ImageContainer getImageContainer(Object imageData, int colors) {
 		RawPCXImage pcx = (RawPCXImage) imageData;
-		
+
 		PCXHeader header = null;
 
-    	byte[] data = pcx.getData();
-        
-        try {
+		byte[] data = pcx.getData();
+
+		try {
 			header = new PCXHeader(data);
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-        int width = header.getWidth();
-        int height = header.getHeight();
-        
-        ImageContainerText result = new ImageContainerText(colors, pcx , width, height);
-        addToImageToProcess(result);
+		int width = header.getWidth();
+		int height = header.getHeight();
+
+		ImageContainerText result = new ImageContainerText(colors, pcx , width, height);
+		addToImageToProcess(result);
 		return result;
-			
-			
+
+
 	}
 	@Override
 	public void setAlpha(float a) {
-		alpha = a;		
+		alpha = a;
 	}
 	@Override
 	public void setClip(Rectangle r) {
@@ -561,7 +568,7 @@ public class LMugenDrawer extends MugenDrawer {
 			GL11.glLoadIdentity();
 			GL11.glOrtho(0, xr - xl, (yb - yt), 0, -10000, 10000);
 			GL11.glViewport(xl, 480 - yb, xr - xl, (yb - yt));
-			//			
+			//
 			GL11.glScaled(2f, 2f, 0);
 
 		} else {
@@ -572,6 +579,10 @@ public class LMugenDrawer extends MugenDrawer {
 			GL11.glScaled((float) 640 / 320, (float) 640 / 240, 0);
 		}
 
-	}	
+	}
+
+
+
+
 
 }
