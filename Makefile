@@ -23,14 +23,9 @@ MAIN_CLASS = org.lee.mugen.test.TestGameFight
 # MAIN_CLASS = org.lee.mugen.test.ExpressionTester
 # MAIN_CLASS = com.Ostermiller.Syntax.ProgrammerEditorDemo
 
-run-lwjgl:
+run:
 	${JAVA} ${JAVA_OPTS} \
 	-Djava.library.path=natives \
-	-cp JMugen.Properties/target/JMugen.Properties-0.0.1-SNAPSHOT.jar:JMugen.Debug/target/JMugen.Debug-0.0.1-SNAPSHOT.jar:JMugen.Launcher/target/JMugen.Launcher-0.0.1-SNAPSHOT.jar:${HOME}/.m2/repository/com/googlecode/soundlibs/mp3spi/1.9.5.4/mp3spi-1.9.5.4.jar \
-	${MAIN_CLASS}
-
-run-jogl:
-	${JAVA} ${JAVA_OPTS} \
 	-cp JMugen.Properties/target/JMugen.Properties-0.0.1-SNAPSHOT.jar:JMugen.Debug/target/JMugen.Debug-0.0.1-SNAPSHOT.jar:JMugen.Launcher/target/JMugen.Launcher-0.0.1-SNAPSHOT.jar:${HOME}/.m2/repository/com/googlecode/soundlibs/mp3spi/1.9.5.4/mp3spi-1.9.5.4.jar \
 	${MAIN_CLASS}
 
