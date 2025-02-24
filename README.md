@@ -2,6 +2,8 @@
 
 [![CI](https://github.com/humbertodias/jmugen/actions/workflows/ci.yml/badge.svg)](https://github.com/humbertodias/jmugen/actions/workflows/ci.yml)
 [![CD](https://github.com/humbertodias/jmugen/actions/workflows/cd.yml/badge.svg)](https://github.com/humbertodias/jmugen/actions/workflows/cd.yml)
+![GitHub all releases](https://img.shields.io/github/downloads/humbertodias/jmugen/total)
+
 
 ## 🕹️ Description
 
