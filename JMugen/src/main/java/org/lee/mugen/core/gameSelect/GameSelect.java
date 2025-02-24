@@ -96,7 +96,7 @@ public class GameSelect implements Game {
 		return nextMode;
 	}
 
-	private String getSelectedSprite(Point p) {
+	public String getSelectedSprite(Point p) {
 		int row = MugenSystem.getInstance().getSelectInfo().getRows();
 		int col = MugenSystem.getInstance().getSelectInfo().getColumns();
 		Characters characters = MugenSystem.getInstance().getFiles().getSelect().getCharacters();

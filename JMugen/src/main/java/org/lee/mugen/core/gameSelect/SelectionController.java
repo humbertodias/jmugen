@@ -1,7 +1,6 @@
 package org.lee.mugen.core.gameSelect;
 
 import java.awt.Point;
-import java.awt.event.KeyEvent;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import org.lee.mugen.core.sound.SoundSystem;
@@ -9,7 +8,6 @@ import org.lee.mugen.fight.section.elem.SndType;
 import org.lee.mugen.fight.section.elem.Type;
 import org.lee.mugen.fight.system.MugenSystem;
 import org.lee.mugen.input.CmdProcDispatcher;
-import org.lee.mugen.input.ISpriteCmdProcess;
 import org.lee.mugen.renderer.GraphicsWrapper;
 import org.lee.mugen.renderer.GameWindow.MugenKeyListener;
 
@@ -194,7 +192,7 @@ public class SelectionController implements MugenKeyListener {
 		try {
 			return PropertyUtils.getNestedProperty(o, path);
 		} catch (Exception e) {
-			throw new IllegalArgumentException("Unknow path " + path + " for " + o.getClass());
+			throw new IllegalArgumentException("Unknown path " + path + " for " + o.getClass());
 		} 
 	}
 	@Override
@@ -218,7 +216,7 @@ public class SelectionController implements MugenKeyListener {
 				addToPosition(0, -1);
 			} else if (cmd.getForward() == key) {
 				addToPosition(0, 1);
-			} else if (isButtonConfirm(cmd, key)) {
+			} else if (isButtonConfirm(cmd, key) && isPlayerSelectable()) {
 				setSelected();
 			}
 		} else {
@@ -279,7 +277,8 @@ public class SelectionController implements MugenKeyListener {
 		return position;
 	}
 
-	
-	
-	
+	public boolean isPlayerSelectable() {
+		return gs.getSelectedSprite(getPosition()) != null;
+	}
+
 }
