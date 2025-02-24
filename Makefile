@@ -13,8 +13,8 @@ JAVA=java
 
 # Uncomment to switch the MAIN_CLASS:
 # MAIN_CLASS = org.mugen.launch.Launch
-# MAIN_CLASS = org.lee.mugen.test.TestMenu
-MAIN_CLASS = org.lee.mugen.test.TestGameFight
+MAIN_CLASS = org.lee.mugen.test.TestMenu
+#MAIN_CLASS = org.lee.mugen.test.TestGameFight
 # MAIN_CLASS = org.lee.mugen.test.TestScene
 # MAIN_CLASS = org.lee.mugen.test.TestSelect
 # MAIN_CLASS = org.lee.mugen.core.sound.SoundSystem
