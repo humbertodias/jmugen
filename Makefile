@@ -9,6 +9,10 @@ JAVA_OPTS= -agentlib:jdwp=transport=dt_socket,server=y,suspend=${DEBUG_SUSPEND},
 # Caught AppContextInfo(Bug 1004) IllegalAccessException: class com.jogamp.nativewindow.awt.AppContextInfo cannot access class sun.awt.AppContext (in module java.desktop) because module java.desktop does not export sun.awt to unnamed module @300ffa5d on thread AppKit Thread
 JAVA_OPTS+= --add-opens java.desktop/sun.awt=ALL-UNNAMED
 
+ifeq ($(OS),Darwin)
+JAVA_OPTS+= -XstartOnFirstThread -Dorg.lwjgl.util.Debug=true -Dorg.lwjgl.util.DebugLoader=true
+endif
+
 JAVA=java
 
 # Uncomment to switch the MAIN_CLASS:
