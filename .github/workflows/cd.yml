@@ -58,8 +58,8 @@ jobs:
         run: |
           pwd
           
-          # resource
-          zip -9 -r resource.zip resource
+          # data
+          zip -9 -r data.zip data
 
           # jar
           cp JMugen.Debug/target/JMugen.Debug-0.0.1-SNAPSHOT.jar jmugen-${GITHUB_REF_NAME}.jar 
@@ -72,7 +72,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           files: |
-            resource.zip
+            data.zip
             jmugen-*.jar
             jmugen-*.tar.gz
 
