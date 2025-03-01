@@ -1,13 +1,12 @@
-# JMugen
 
 [![CI](https://github.com/humbertodias/jmugen/actions/workflows/ci.yml/badge.svg)](https://github.com/humbertodias/jmugen/actions/workflows/ci.yml)
 [![CD](https://github.com/humbertodias/jmugen/actions/workflows/cd.yml/badge.svg)](https://github.com/humbertodias/jmugen/actions/workflows/cd.yml)
 ![GitHub all releases](https://img.shields.io/github/downloads/humbertodias/jmugen/total)
 
 
-## 🕹️ Description
+# JMugen
 
-**JMugen** is a Java-based recreation of the classic 2D fighting engine [M.U.G.E.N](https://www.elecbyte.com/mugendocs-11b1/mugen.html).
+Is a Java-based recreation of the classic 2D fighting engine [M.U.G.E.N](https://www.elecbyte.com/mugendocs-11b1/mugen.html).
 
 Forked from [code.google/jmugen](https://code.google.com/archive/p/jmugen/)
 
