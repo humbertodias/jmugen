@@ -51,21 +51,15 @@ app-image:
 	--name jmugen \
 	--main-jar jmugen.jar \
 	--type app-image \
-	--java-options "--add-opens java.desktop/sun.awt=ALL-UNNAMED" \
+	--java-options "--add-opens java.desktop/sun.awt=ALL-UNNAMED -Djava.library.path=natives" \
 	--dest dist/
 	rm -rf tmp
 
 copy-release-files:
-	echo "OS: ${OS}"
-ifeq ($(OS),Linux)
-	cp release/lin/* dist/
-else ifeq ($(OS),Darwin)
-	cp release/mac/* dist/
-else
-	echo "unknown"
-endif
+	cp release/${OS}/* dist/
+	cp JMugen.Properties/src/main/resources/*.properties dist/
 
-app-image-tar-gz:	app-image	copy-release-files
+dist:	app-image	copy-release-files
 	(cd dist && tar cfzv ../jmugen-${TAG_NAME}-${OS}-${ARCH}.tar.gz *)
 
 natives:
@@ -74,4 +68,4 @@ natives:
 	find ${HOME}/.m2 -name jogl-all-natives-*-v2.4.0-rc4.jar -exec unzip -o {} -d natives \;
 	find ${HOME}/.m2 -name gluegen-rt-natives-macosx-universal-v2.4.0-rc4.jar -exec unzip -o {} -d natives \;
 
-.PHONY: natives package run-lwjgl run-jogl clean
+.PHONY: natives package run dist clean

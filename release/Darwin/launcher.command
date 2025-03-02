@@ -8,4 +8,4 @@ if [ ! -d "data" ]; then
     unzip data.zip && rm data.zip
 fi
 
-exec jmugen.app/Contents/MacOS/jmugen -d data
+exec jmugen.app/Contents/MacOS/jmugen
