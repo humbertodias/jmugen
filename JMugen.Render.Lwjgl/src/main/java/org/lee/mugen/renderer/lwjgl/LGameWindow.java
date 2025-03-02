@@ -268,6 +268,7 @@ public class LGameWindow implements GameWindow {
                 Display.destroy();
                 System.exit(0);
             }
+
         }
 
     }
@@ -281,7 +282,8 @@ public class LGameWindow implements GameWindow {
                     GL11.GL_TEXTURE_2D, temp.getTextureID(), 0);
             EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, myFBOId);
             GL11.glPushAttrib(GL11.GL_VIEWPORT_BIT);
-            GL11.glViewport(0, 0, 640, 480);
+//            GL11.glViewport(0, 0, 640, 480);
+            GL11.glViewport(0, 0, width, height);
             GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
 
             try {
@@ -525,6 +527,7 @@ public class LGameWindow implements GameWindow {
     private boolean setDisplayMode() {
         try {
             Display.setDisplayMode(new DisplayMode(width, height));
+            Display.setResizable(true);
             return true;
         } catch (Exception e) {
             e.printStackTrace();

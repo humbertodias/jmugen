@@ -1,13 +1,7 @@
 package org.lee.mugen.renderer.jogl;
 
 import java.awt.Dimension;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -28,6 +22,7 @@ import org.lee.mugen.input.CmdProcDispatcher;
 import org.lee.mugen.input.ISpriteCmdProcess;
 import org.lee.mugen.renderer.GameWindow;
 import org.lee.mugen.renderer.GraphicsWrapper;
+import org.lee.mugen.util.Logger;
 
 public class JoglGameWindow implements GameWindow, GLEventListener {
 	
@@ -43,6 +38,8 @@ public class JoglGameWindow implements GameWindow, GLEventListener {
 
 	private final MouseCtrl mouse = new MouseCtrl();
 	private boolean isFinishInit = false;
+	private JFrame frame;
+
 	public boolean isFinishInit() {
 		return isFinishInit;
 	}
@@ -66,14 +63,7 @@ public class JoglGameWindow implements GameWindow, GLEventListener {
 
 	public JoglGameWindow() {
 		setTitle("JMugen - JOGL2");
-		width = 640;
-		height = 480;
-
-		GLCapabilities glCapabilities = new GLCapabilities(glProfile);
-		GLDrawableFactory factory = GLDrawableFactory.getFactory(glProfile);
-		GLAutoDrawable sharedPbuffer = factory.createOffscreenAutoDrawable(
-				null, glCapabilities, null, 1, 1);
-		sharedPbuffer.display();
+		setResolution(640, 480);
 	}
 
 	/* */
@@ -265,7 +255,6 @@ public class JoglGameWindow implements GameWindow, GLEventListener {
 	public void setResolution(int w, int h) {
 		width = w;
 		height = h;
-		
 	}
 
 	@Override
@@ -276,7 +265,7 @@ public class JoglGameWindow implements GameWindow, GLEventListener {
 
 	@Override
 	public void start() throws Exception {
-        JFrame frame = new JFrame(title);
+        frame = new JFrame(title);
         GLCapabilities caps = new GLCapabilities(glProfile);
         canvas = new GLCanvas(caps);
         canvas.addGLEventListener(this);
@@ -285,21 +274,23 @@ public class JoglGameWindow implements GameWindow, GLEventListener {
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         
-        final Animator animator =
-        	new Animator(canvas);
+        final Animator animator = new Animator(canvas);
         frame.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
             	System.exit(0);
             }
         });
 
+
         frame.pack();
         WindowsUtils.centerScreen(frame);
         frame.setVisible(true);
+		frame.setResizable(false);
 
         animator.start();
         
 	}
+
 	boolean isFinishTextureLoading;
 	
 	/*
@@ -338,25 +329,7 @@ public class JoglGameWindow implements GameWindow, GLEventListener {
 		loadingInitThread.start();
 		canvas.requestFocus();
 		canvas.addKeyListener(debugEventManager);
-		canvas.addMouseListener(new MouseListener() {
-
-			@Override
-			public void mouseClicked(MouseEvent e) {
-
-				
-			}
-
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void mouseExited(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
+		canvas.addMouseListener(new MouseAdapter() {
 
 			@Override
 			public void mousePressed(MouseEvent e) {
@@ -390,14 +363,12 @@ public class JoglGameWindow implements GameWindow, GLEventListener {
 			public void mouseDragged(MouseEvent e) {
 				mouse.setX((int) (e.getX()/2f));
 				mouse.setY((int) (e.getY()/2f));
-				
 			}
 
 			@Override
 			public void mouseMoved(MouseEvent e) {
 				mouse.setX((int) (e.getX()/2f));
 				mouse.setY((int) (e.getY()/2f));
-				
 			}});
 		
 	}
@@ -418,8 +389,7 @@ public class JoglGameWindow implements GameWindow, GLEventListener {
 			}
 		} else {
 			try {
-				_gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT
-						| GL2.GL_ACCUM_BUFFER_BIT);
+				_gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT | GL2.GL_ACCUM_BUFFER_BIT);
 				_gl.glMatrixMode(GL2.GL_MODELVIEW);
 				_gl.glLoadIdentity();
 				callback.update(1);
@@ -472,18 +442,17 @@ public class JoglGameWindow implements GameWindow, GLEventListener {
 	@Override
 	public void reshape(GLAutoDrawable drawable, int x, int y, int width,
 			int height) {
-		// TODO Auto-generated method stub
-		
+		Logger.log("reshape x %s y %s width %s height %s", x, y, width, height);
+		canvas.setSize(width, height);
+		_gl.glViewport(0, 0, width, height);
 	}
 
 	@Override
 	public void addActionListener(final MugenKeyListener key) {
-		canvas.addKeyListener(new KeyListener() {
-
+		canvas.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				key.action(e.getKeyCode(), true);
-				
 			}
 
 			@Override
@@ -491,13 +460,6 @@ public class JoglGameWindow implements GameWindow, GLEventListener {
 				key.action(e.getKeyCode(), false);
 				
 			}
-
-			@Override
-			public void keyTyped(KeyEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-			
 		});
 	}
 
