@@ -514,7 +514,7 @@ public class LMugenDrawer extends MugenDrawer {
 
 
 
-	private LwjglGameWindow gameWindow = new LwjglGameWindow();
+	private LGameWindow gameWindow = new LGameWindow();
 
 	@Override
 	public GameWindow getInstanceOfGameWindow() {
