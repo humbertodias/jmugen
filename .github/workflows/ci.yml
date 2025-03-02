@@ -12,6 +12,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Maven cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: maven-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            maven-${{ runner.os }}-${{ runner.arch }}-
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
