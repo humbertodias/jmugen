@@ -48,7 +48,7 @@ app-image:
 	mkdir tmp
 	cp JMugen.Debug/target/JMugen.Debug-0.0.1-SNAPSHOT.jar tmp/jmugen.jar
 	jpackage --input tmp \
-	--name jmugen-${TAG_NAME} \
+	--name jmugen \
 	--main-jar jmugen.jar \
 	--type app-image \
 	--java-options "--add-opens java.desktop/sun.awt=ALL-UNNAMED" \

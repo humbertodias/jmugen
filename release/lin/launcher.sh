@@ -4,41 +4,26 @@
 script_dir="$(cd "$(dirname "$0")" && pwd)"
 echo "script_dir: $script_dir"
 
-# Download and extract resource.zip if the resource directory doesn't exist
-if [ ! -d "$script_dir/resource" ]; then
-    echo "Downloading resource.zip..."
-    curl -L https://github.com/humbertodias/jmugen/releases/download/v0.01/resource.zip -o "$script_dir/resource.zip"
+# Download and extract data.zip if the data directory doesn't exist
+if [ ! -d "$script_dir/data" ]; then
+    echo "Downloading data.zip..."
+    curl -L https://github.com/humbertodias/jmugen/releases/download/v0.01/data.zip -o "$script_dir/data.zip"
     
     # Unzip the file into the script's directory
-    unzip "$script_dir/resource.zip" -d "$script_dir" && rm "$script_dir/resource.zip"
+    unzip "$script_dir/data.zip" -d "$script_dir" && rm "$script_dir/data.zip"
     
     # Check if the extraction was successful
-    if [ ! -d "$script_dir/resource" ]; then
-        echo "Error: Resource extraction failed!"
+    if [ ! -d "$script_dir/data" ]; then
+        echo "Error: data extraction failed!"
         exit 1
     fi
 fi
 
-# Find the jmugen application directory
-app_path=$(find "$script_dir" -type d -name "jmugen-*" -print -quit)
-
-# Check if the application directory was found
-if [ -n "$app_path" ]; then
-    echo "Application found at: $app_path"
-    
-    # Find the main executable file inside the MacOS directory
-    main_path=$(find "$app_path" -type f -name "jmugen-*" -print -quit)
-
-    if [ -n "$main_path" ]; then
-        # Launch the application with the resource directory argument
-        echo "Launching application..."
-        "$main_path" -d "$script_dir/resource"
-    else
-        echo "Error: Main application executable not found!"
-        exit 1
-    fi
-
+main_path="$script_dir/jmugen"
+if [ -n "$main_path" ]; then
+    echo "Launching application..."
+    "$main_path" -d "$script_dir/data"
 else
-    echo "Error: Application not found!"
+    echo "Error: Main application executable not found!"
     exit 1
 fi
