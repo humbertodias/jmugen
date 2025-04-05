@@ -134,6 +134,7 @@ public class TextureLoader {
 			} else {
 				// Create a direct buffer from the data
 				directBuffer = ByteBuffer.allocateDirect(intBuffer.capacity() * Integer.BYTES)
+						.order(ByteOrder.nativeOrder())
 						.asIntBuffer();
 				directBuffer.put(intBuffer); // Copy data to the direct buffer
 				directBuffer.flip();
