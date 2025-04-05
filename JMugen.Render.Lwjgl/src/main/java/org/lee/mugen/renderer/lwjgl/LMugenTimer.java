@@ -1,7 +1,6 @@
 package org.lee.mugen.renderer.lwjgl;
 
 import org.lee.mugen.renderer.MugenTimer;
-import org.lwjgl.util.Timer;
 
 /**
  * Timer class Wrapper
@@ -10,6 +9,13 @@ import org.lwjgl.util.Timer;
  * 
  */
 public final class LMugenTimer implements MugenTimer {
+
+	private long lastTime = System.nanoTime();
+	private float tick;
+	private float deltas;
+	private int frames;
+	private int fps;
+	private boolean nextTimeReset;
 
 	@Override
 	public int getFps() {
@@ -23,8 +29,7 @@ public final class LMugenTimer implements MugenTimer {
 
 	@Override
 	public void setFramerate(long framerate) {
-		// TODO Auto-generated method stub
-
+		// Not implemented
 	}
 
 	public float getDeltas() {
@@ -35,51 +40,46 @@ public final class LMugenTimer implements MugenTimer {
 		return frames;
 	}
 
-	Timer timer = new Timer();
-	float lastTime = timer.getTime();
-	float tick;
-	float deltas;
-	int frames;
-	int fps;
 	public void reset() {
-		fps = (int) (frames / deltas);
+		if (deltas > 0) {
+			fps = (int) (frames / deltas);
+		} else {
+			fps = 0;
+		}
 		frames = 0;
 		deltas = 0;
 	}
-	boolean nextTimeReset;
+
 	public void listen() {
 		if (nextTimeReset) {
 			nextTimeReset = false;
 			reset();
 		}
-		Timer.tick();
-		tick = timer.getTime() - lastTime;
+
+		long currentTime = System.nanoTime();
+		tick = (currentTime - lastTime) / 1_000_000_000.0f; // convert to seconds
 		deltas += tick;
-		lastTime = timer.getTime();
+		lastTime = currentTime;
 
 		frames++;
-		if (frames == 50000) {
-//			fps = (int) (frames / deltas);
-//			frames = 0;
-//			deltas = 0;
 
-		}
-		if (1f/getFramerate() <= getDeltas()) {
+		if (1f / getFramerate() <= getDeltas()) {
 			nextTimeReset = true;
 		}
-
 	}
 
 	@Override
 	public int sleep() {
-		Timer.tick();
+		// You can add Thread.sleep(...) here if needed
 		return 0;
 	}
 
 	@Override
 	public void sleep(long ms) {
-		Timer.tick();
-
+		try {
+			Thread.sleep(ms);
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+		}
 	}
-
 }

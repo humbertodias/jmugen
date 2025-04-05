@@ -1,8 +1,8 @@
 package org.lee.mugen.renderer.lwjgl.shader;
 
 import org.lee.mugen.renderer.RGB;
-import org.lwjgl.opengl.ARBShaderObjects;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL20;
 
 public class PalFxShader extends Shader {
 
@@ -18,23 +18,25 @@ public class PalFxShader extends Shader {
 	@Override
 	public void compileShader() {
 		super.compileShader();
-		ARBShaderObjects.glGetObjectParameterARB(programID,
-				ARBShaderObjects.GL_OBJECT_LINK_STATUS_ARB, programBuffer);
-		if (programBuffer.get(0) == GL11.GL_FALSE)
-			System.err.println("A linking error occurred in a shader program.");
 
-		addUniPos = getUniformLocation(programID, "add");
-		mulUniPos = getUniformLocation(programID, "mul");
-		amplUniPos = getUniformLocation(programID, "ampl");
-		alphaUniPos = getUniformLocation(programID, "alpha");
+		int status = GL20.glGetProgrami(programID, GL20.GL_LINK_STATUS);
+		if (status == GL11.GL_FALSE) {
+			System.err.println("A linking error occurred in the shader program.");
+			System.err.println(GL20.glGetProgramInfoLog(programID));
+		}
+
+		addUniPos = GL20.glGetUniformLocation(programID, "add");
+		mulUniPos = GL20.glGetUniformLocation(programID, "mul");
+		amplUniPos = GL20.glGetUniformLocation(programID, "ampl");
+		alphaUniPos = GL20.glGetUniformLocation(programID, "alpha");
 	}
 
 	public void render(RGB add, RGB mul, RGB ampl, float alpha) {
-		ARBShaderObjects.glUseProgramObjectARB(programID);
+		GL20.glUseProgram(programID);
 
-		ARBShaderObjects.glUniform4fARB(addUniPos, add.getR(), add.getG(), add.getB(), add.getA());
-		ARBShaderObjects.glUniform4fARB(mulUniPos, mul.getR(), mul.getG(), mul.getB(), mul.getA());
-		ARBShaderObjects.glUniform4fARB(amplUniPos, ampl.getR(), ampl.getG(), ampl.getB(), ampl.getA());
-		ARBShaderObjects.glUniform1fARB(alphaUniPos, alpha);
+		GL20.glUniform4f(addUniPos, add.getR(), add.getG(), add.getB(), add.getA());
+		GL20.glUniform4f(mulUniPos, mul.getR(), mul.getG(), mul.getB(), mul.getA());
+		GL20.glUniform4f(amplUniPos, ampl.getR(), ampl.getG(), ampl.getB(), ampl.getA());
+		GL20.glUniform1f(alphaUniPos, alpha);
 	}
 }

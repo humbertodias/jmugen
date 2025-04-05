@@ -46,9 +46,9 @@ public class Shader {
 
 	public void compileShader2() {
 		fshID = ARBShaderObjects.glCreateShaderObjectARB(ARBFragmentShader.GL_FRAGMENT_SHADER_ARB);
-		ByteBuffer b = ByteBuffer.wrap(shaderPrg.getBytes());
-		b.rewind();
-		ARBShaderObjects.glShaderSourceARB(fshID, b);
+//		ByteBuffer b = ByteBuffer.wrap(shaderPrg.getBytes());
+//		b.rewind();
+		ARBShaderObjects.glShaderSourceARB(fshID, shaderPrg);
 		ARBShaderObjects.glCompileShaderARB(fshID);
 		programID = ARBShaderObjects.glCreateProgramObjectARB();
 		ARBShaderObjects.glAttachObjectARB(programID, fshID);
@@ -60,13 +60,13 @@ public class Shader {
 		// Create the shader object (fragment shader)
 		fshID = ARBShaderObjects.glCreateShaderObjectARB(ARBFragmentShader.GL_FRAGMENT_SHADER_ARB);
 
-		// Create a direct ByteBuffer to hold the shader program
-		ByteBuffer b = ByteBuffer.allocateDirect(shaderPrg.length());  // Ensure the buffer is large enough
-		b.put(shaderPrg.getBytes());  // Fill the buffer with the shader program byte data
-		b.flip();  // Prepare the buffer for reading by OpenGL
+//		// Create a direct ByteBuffer to hold the shader program
+//		ByteBuffer b = ByteBuffer.allocateDirect(shaderPrg.length());  // Ensure the buffer is large enough
+//		b.put(shaderPrg.getBytes());  // Fill the buffer with the shader program byte data
+//		b.flip();  // Prepare the buffer for reading by OpenGL
 
 		// Pass the direct ByteBuffer to the shader
-		ARBShaderObjects.glShaderSourceARB(fshID, b);
+		ARBShaderObjects.glShaderSourceARB(fshID, shaderPrg);
 
 		// Compile the shader
 		ARBShaderObjects.glCompileShaderARB(fshID);
