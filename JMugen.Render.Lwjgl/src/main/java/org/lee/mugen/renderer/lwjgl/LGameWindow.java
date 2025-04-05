@@ -142,15 +142,7 @@ public class LGameWindow implements GameWindow {
     }
 
     public LGameWindow() {
-//		setResolution(640, 480);
-
-        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        GraphicsDevice gd = ge.getDefaultScreenDevice();
-        DisplayMode dm = gd.getDisplayMode();
-
-        int width = dm.getWidth();
-        int height = dm.getHeight();
-        setResolution(width, height);
+		setResolution(640, 480);
     }
 
     private Game callback;
@@ -212,7 +204,7 @@ public class LGameWindow implements GameWindow {
 
 //			Mouse.create();
             if (myFBOId == 0) {
-                IntBuffer buffer = ByteBuffer.allocateDirect(1*4).order(ByteOrder.nativeOrder()).asIntBuffer(); // allocate a 1 int byte buffer
+                IntBuffer buffer = ByteBuffer.allocateDirect(4).order(ByteOrder.nativeOrder()).asIntBuffer(); // allocate a 1 int byte buffer
                 EXTFramebufferObject.glGenFramebuffersEXT( buffer ); // generate
                 int status = EXTFramebufferObject.glCheckFramebufferStatusEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT);
                 if (status != EXTFramebufferObject.GL_FRAMEBUFFER_COMPLETE_EXT) {
@@ -277,7 +269,6 @@ public class LGameWindow implements GameWindow {
                             | GL11.GL_DEPTH_BUFFER_BIT | GL11.GL_ACCUM_BUFFER_BIT);
                     GL11.glMatrixMode(GL11.GL_MODELVIEW);
                     GL11.glLoadIdentity();
-
 
                     callback.update(1);
 
@@ -355,11 +346,8 @@ public class LGameWindow implements GameWindow {
                     GL11.GL_MODULATE);
             GL11.glBlendFunc(GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
-
             ((LMugenDrawer)GraphicsWrapper.getInstance()).drawChild(dp);
             GL11.glScalef(1f/scale, 1f/scale, 1);
-
-
 
             if (callback instanceof AbstractGameFight) {
                 ((AbstractGameFight)callback).renderDebugInfo();
@@ -734,33 +722,14 @@ public class LGameWindow implements GameWindow {
 
             System.out.println("GLFW initialized successfully");
 
-            long monitor = GLFW.glfwGetPrimaryMonitor();
-            if (monitor == 0) {
-                System.out.println("No monitor detected");
-                return false;
-            }
-            System.out.println("Monitor ID: " + monitor);
-
-            GLFWVidMode.Buffer vidModes = GLFW.glfwGetVideoModes(monitor);
-            while (vidModes.hasRemaining()) {
-                GLFWVidMode mode = vidModes.get();
-                System.out.println("Supported mode: " + mode.width() + "x" + mode.height() + " @ " + mode.refreshRate() + "Hz");
-            }
-
             GLFW.glfwWindowHint(GLFW.GLFW_REFRESH_RATE, 60);  // Taxa de atualização
             GLFW.glfwWindowHint(GLFW.GLFW_SAMPLES, 4); // Anti-aliasing (opcional)
 
-//            window = GLFW.glfwCreateWindow(width, height, "JMugen", GLFW.glfwGetPrimaryMonitor(), 0);
-//            if (window == 0) {
-//                System.out.println("Failed to create the GLFW window.");
-//                return false;
-//            }
-
-            GLFW.glfwWindowHint(GLFW.GLFW_DECORATED, GLFW.GLFW_FALSE);
-            GLFW.glfwWindowHint(GLFW.GLFW_RESIZABLE, GLFW.GLFW_FALSE);
-
-            GLFWVidMode vidMode = GLFW.glfwGetVideoMode(monitor);
-            window = GLFW.glfwCreateWindow(vidMode.width(), vidMode.height(), "JMugen", monitor, 0);
+            window = GLFW.glfwCreateWindow(width, height, "JMugen", 0, 0);
+            if (window == 0) {
+                System.out.println("Failed to create the GLFW window.");
+                return false;
+            }
 
             GLFW.glfwSetWindowPos(window, 0, 0);
 
@@ -769,7 +738,6 @@ public class LGameWindow implements GameWindow {
             GL.createCapabilities(); // Habilita OpenGL no contexto
             GLFW.glfwSwapInterval(1); // Sincronizar com a taxa de atualização do monitor
             GLFW.glfwShowWindow(window);
-
 
             return true;
         } catch (Exception e) {
