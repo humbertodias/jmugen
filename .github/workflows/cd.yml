@@ -42,7 +42,7 @@ jobs:
 
       - name: jpackage app-image
         run: |
-          make dist
+          make dist natives
 
 #      - name: Download and install AppImageTool
 #        run: |
@@ -74,6 +74,7 @@ jobs:
         with:
           files: |
             data.zip
+            natives.zip
             jmugen-*.jar
             jmugen-*.tar.gz
 

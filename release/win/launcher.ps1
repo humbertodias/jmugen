@@ -17,6 +17,10 @@ if (-not (Test-Path "$scriptDir\data")) {
         Write-Host "Error: data extraction failed!"
         Exit 1
     }
+
+    Invoke-WebRequest -Uri "https://github.com/humbertodias/jmugen/releases/download/v0.01/natives.zip" -OutFile "$scriptDir\natives.zip"
+    Expand-Archive -Path "$scriptDir\natives.zip" -DestinationPath "$scriptDir"
+    Remove-Item "$scriptDir\natives.zip"
 }
 
 # Find the jmugen application executable
