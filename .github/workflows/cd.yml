@@ -62,6 +62,9 @@ jobs:
           # data
           zip -9 -r data.zip data
 
+          # natives
+          zip -9 -r natives.zip natives
+
           # jar
           cp JMugen.Debug/target/JMugen.Debug-0.0.1-SNAPSHOT.jar jmugen-${GITHUB_REF_NAME}.jar 
 
