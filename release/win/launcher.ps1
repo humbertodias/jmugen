@@ -2,23 +2,20 @@
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 Write-Host "script_dir: $scriptDir"
 
+$tagName = Invoke-RestMethod -Uri "https://api.github.com/repos/humbertodias/jmugen/tags" | Select-Object -First 1 -ExpandProperty name
+Write-Host "Version: $tagName"
+
 # Download and extract data.zip if the data directory doesn't exist
 if (-not (Test-Path "$scriptDir\data")) {
     Write-Host "Downloading data.zip..."
-    Invoke-WebRequest -Uri "https://github.com/humbertodias/jmugen/releases/download/v0.01/data.zip" -OutFile "$scriptDir\data.zip"
+    Invoke-WebRequest -Uri "https://github.com/humbertodias/jmugen/releases/download/$tagName/data.zip" -OutFile "$scriptDir\data.zip"
     
     # Unzip the file into the script's directory
     Write-Host "Extracting data.zip..."
     Expand-Archive -Path "$scriptDir\data.zip" -DestinationPath "$scriptDir"
     Remove-Item "$scriptDir\data.zip"
-    
-    # Check if the extraction was successful
-    if (-not (Test-Path "$scriptDir\data")) {
-        Write-Host "Error: data extraction failed!"
-        Exit 1
-    }
 
-    Invoke-WebRequest -Uri "https://github.com/humbertodias/jmugen/releases/download/v0.01/natives.zip" -OutFile "$scriptDir\natives.zip"
+    Invoke-WebRequest -Uri "https://github.com/humbertodias/jmugen/releases/download/$tagName/natives.zip" -OutFile "$scriptDir\natives.zip"
     Expand-Archive -Path "$scriptDir\natives.zip" -DestinationPath "$scriptDir"
     Remove-Item "$scriptDir\natives.zip"
 }
