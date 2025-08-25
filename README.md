@@ -24,6 +24,8 @@ Explore the available [features](./FEATURES.md) and contribute to implementing t
 You can configure the controls in the [keys.properties](JMugen.Properties/src/main/resources/keys.properties) file.
 
 ## 🐞 Debug Mode
+<img width="640" height="520" alt="image" src="https://github.com/user-attachments/assets/d38851cd-88f2-4249-915e-40fda655310c" />
+
 ![jmuge-statecontroller-debugger](https://github.com/user-attachments/assets/63908d34-83b8-462b-aecc-21ba9c237a5b)
 
 
