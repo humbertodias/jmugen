@@ -123,7 +123,7 @@ jobs:
     runs-on: ${{ matrix.runner }}
     strategy:
       matrix:
-        runner: [ windows-latest ]
+        runner: [ windows-latest, windows-11-arm ]
     defaults:
       run:
         shell: cmd
