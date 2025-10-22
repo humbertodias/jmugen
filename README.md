@@ -37,7 +37,7 @@ You can configure the controls in the [keys.properties](JMugen.Properties/src/ma
 - ✅ macOS - x64
 - ✅ macOS - ARM64
 - ✅ Windows - x86_64
-- ❌ Windows - ARM64 (Not supported yet)
+- ✅ Windows - ARM64
 
 Check out the latest [releases](https://github.com/humbertodias/jmugen/releases).
 
