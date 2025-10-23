@@ -1,6 +1,7 @@
 
 [![CI](https://github.com/humbertodias/jmugen/actions/workflows/ci.yml/badge.svg)](https://github.com/humbertodias/jmugen/actions/workflows/ci.yml)
 [![CD](https://github.com/humbertodias/jmugen/actions/workflows/cd.yml/badge.svg)](https://github.com/humbertodias/jmugen/actions/workflows/cd.yml)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/humbertodias/jmugen)
 ![GitHub all releases](https://img.shields.io/github/downloads/humbertodias/jmugen/total)
 
 
@@ -11,8 +12,6 @@ Is a Java-based recreation of the classic 2D fighting engine [M.U.G.E.N](https:/
 Forked from [code.google/jmugen](https://code.google.com/archive/p/jmugen/)
 
 Explore the available [features](./FEATURES.md) and contribute to implementing the missing ones.
-
-Documentation in [Wiki](https://deepwiki.com/humbertodias/jmugen/)
 
 ![JMugen Gameplay](https://github.com/user-attachments/assets/1b7c5e84-4abc-4200-9580-c0d00d7397b8)
 
