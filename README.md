@@ -12,6 +12,8 @@ Forked from [code.google/jmugen](https://code.google.com/archive/p/jmugen/)
 
 Explore the available [features](./FEATURES.md) and contribute to implementing the missing ones.
 
+Documentation in [Wiki](https://deepwiki.com/humbertodias/jmugen/)
+
 ![JMugen Gameplay](https://github.com/user-attachments/assets/1b7c5e84-4abc-4200-9580-c0d00d7397b8)
 
 ## 🎮 Controls
