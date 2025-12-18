@@ -2,20 +2,14 @@ package org.lee.mugen.renderer.lwjgl.shader;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
 
 import org.apache.commons.io.IOUtils;
-import org.lwjgl.system.MemoryUtil;
 import org.lwjgl.opengl.ARBFragmentShader;
 import org.lwjgl.opengl.ARBShaderObjects;
 import org.lwjgl.opengl.GL11;
 
 
 public class Shader {
-	// Use instance buffer for file operations
-	protected ByteBuffer fileBuffer;
-
 	protected int fshID;
 	protected int programID;
 	protected String name;
@@ -24,8 +18,6 @@ public class Shader {
 	public Shader(String name) {
 		shaderPrg = getShaderText(name);
 		this.name = name;
-		// Allocate buffer per instance for uniform location lookups
-		fileBuffer = MemoryUtil.memAlloc(1024 * 10);
 	}
 	
 	protected static String getShaderText(String file) {
@@ -95,26 +87,11 @@ public class Shader {
 		ARBShaderObjects.glDetachObjectARB(programID, fshID);
 		ARBShaderObjects.glDeleteObjectARB(fshID);
 		ARBShaderObjects.glDeleteObjectARB(programID);
-		
-		// Free allocated buffer
-		if (fileBuffer != null) {
-			MemoryUtil.memFree(fileBuffer);
-			fileBuffer = null;
-		}
 	}
 	
 	protected int getUniformLocation(int id, String name) {
-		fileBuffer.clear();
-		int length = name.length();
-
-		char[] charArray = new char[length];
-		name.getChars(0, length, charArray, 0);
-
-		for ( int i = 0; i < length; i++ )
-			fileBuffer.put((byte)charArray[i]);
-		fileBuffer.put((byte)0); // Must be null-terminated.
-		fileBuffer.flip();
-		final int location = ARBShaderObjects.glGetUniformLocationARB(id, fileBuffer);
+		// In LWJGL 3, glGetUniformLocationARB accepts String directly
+		final int location = ARBShaderObjects.glGetUniformLocationARB(id, name);
 
 		if ( location == -1 )
 			throw new IllegalArgumentException("The uniform \"" + name + "\" does not exist in the Shader Program.");
