@@ -87,6 +87,19 @@ public class GLFWKeyMapper {
     public static final int KEY_NEXT = GLFW_KEY_PAGE_DOWN;
     public static final int KEY_INSERT = GLFW_KEY_INSERT;
     
+    // Punctuation and symbols
+    public static final int KEY_SEMICOLON = GLFW_KEY_SEMICOLON;
+    public static final int KEY_APOSTROPHE = GLFW_KEY_APOSTROPHE;
+    public static final int KEY_COMMA = GLFW_KEY_COMMA;
+    public static final int KEY_PERIOD = GLFW_KEY_PERIOD;
+    public static final int KEY_SLASH = GLFW_KEY_SLASH;
+    public static final int KEY_BACKSLASH = GLFW_KEY_BACKSLASH;
+    public static final int KEY_LBRACKET = GLFW_KEY_LEFT_BRACKET;
+    public static final int KEY_RBRACKET = GLFW_KEY_RIGHT_BRACKET;
+    public static final int KEY_MINUS = GLFW_KEY_MINUS;
+    public static final int KEY_EQUALS = GLFW_KEY_EQUAL;
+    public static final int KEY_GRAVE = GLFW_KEY_GRAVE_ACCENT;
+    
     // Keypad
     public static final int KEY_ADD = GLFW_KEY_KP_ADD;
     public static final int KEY_SUBTRACT = GLFW_KEY_KP_SUBTRACT;
