@@ -190,6 +190,10 @@ public class LGameWindow implements GameWindow {
         glfwDefaultWindowHints();
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+        
+        // macOS requires forward-compatible context for OpenGL 3.0+
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 
         // Create the window
         window = glfwCreateWindow(width, height, "JMugen - LWJGL 3", NULL, NULL);
@@ -253,6 +257,9 @@ public class LGameWindow implements GameWindow {
         GL.createCapabilities();
 
         setTitle("JMugen - LWJGL 3");
+
+        // Set the clear color (background) to black
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
         // enable textures since we're going to use these for our sprites
         glEnable(GL_TEXTURE_2D);
