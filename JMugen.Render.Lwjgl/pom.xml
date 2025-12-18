@@ -141,6 +141,19 @@
 
     </dependencies>
 
-
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <!-- Exclude LWJGL 2 test files that are not compatible with LWJGL 3 -->
+                    <excludes>
+                        <exclude>**/org/lwjgl/test/**/*.java</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

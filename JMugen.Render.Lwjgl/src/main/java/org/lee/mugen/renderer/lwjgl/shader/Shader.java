@@ -13,8 +13,7 @@ import org.lwjgl.opengl.GL11;
 
 
 public class Shader {
-	// Use instance buffers instead of static to allow proper cleanup
-	protected IntBuffer programBuffer;
+	// Use instance buffer for file operations
 	protected ByteBuffer fileBuffer;
 
 	protected int fshID;
@@ -25,8 +24,7 @@ public class Shader {
 	public Shader(String name) {
 		shaderPrg = getShaderText(name);
 		this.name = name;
-		// Allocate buffers per instance
-		programBuffer = MemoryUtil.memAllocInt(1);
+		// Allocate buffer per instance for uniform location lookups
 		fileBuffer = MemoryUtil.memAlloc(1024 * 10);
 	}
 	
@@ -49,9 +47,8 @@ public class Shader {
 
 	public void compileShader2() {
 		fshID = ARBShaderObjects.glCreateShaderObjectARB(ARBFragmentShader.GL_FRAGMENT_SHADER_ARB);
-		ByteBuffer b = ByteBuffer.wrap(shaderPrg.getBytes());
-		b.rewind();
-		ARBShaderObjects.glShaderSourceARB(fshID, b);
+		// In LWJGL 3, glShaderSourceARB takes CharSequence instead of ByteBuffer
+		ARBShaderObjects.glShaderSourceARB(fshID, shaderPrg);
 		ARBShaderObjects.glCompileShaderARB(fshID);
 		programID = ARBShaderObjects.glCreateProgramObjectARB();
 		ARBShaderObjects.glAttachObjectARB(programID, fshID);
@@ -63,32 +60,23 @@ public class Shader {
 		// Create the shader object (fragment shader)
 		fshID = ARBShaderObjects.glCreateShaderObjectARB(ARBFragmentShader.GL_FRAGMENT_SHADER_ARB);
 
-		// Create a direct ByteBuffer to hold the shader program
-		ByteBuffer b = MemoryUtil.memAlloc(shaderPrg.length());  // Ensure the buffer is large enough
-		try {
-			b.put(shaderPrg.getBytes());  // Fill the buffer with the shader program byte data
-			b.flip();  // Prepare the buffer for reading by OpenGL
+		// In LWJGL 3, glShaderSourceARB takes CharSequence (String) instead of ByteBuffer
+		ARBShaderObjects.glShaderSourceARB(fshID, shaderPrg);
 
-			// Pass the direct ByteBuffer to the shader
-			ARBShaderObjects.glShaderSourceARB(fshID, b);
+		// Compile the shader
+		ARBShaderObjects.glCompileShaderARB(fshID);
 
-			// Compile the shader
-			ARBShaderObjects.glCompileShaderARB(fshID);
+		// Create the program object
+		programID = ARBShaderObjects.glCreateProgramObjectARB();
 
-			// Create the program object
-			programID = ARBShaderObjects.glCreateProgramObjectARB();
+		// Attach the shader to the program
+		ARBShaderObjects.glAttachObjectARB(programID, fshID);
 
-			// Attach the shader to the program
-			ARBShaderObjects.glAttachObjectARB(programID, fshID);
+		// Link the program
+		ARBShaderObjects.glLinkProgramARB(programID);
 
-			// Link the program
-			ARBShaderObjects.glLinkProgramARB(programID);
-
-			// Validate the program
-			ARBShaderObjects.glValidateProgramARB(programID);
-		} finally {
-			MemoryUtil.memFree(b);
-		}
+		// Validate the program
+		ARBShaderObjects.glValidateProgramARB(programID);
 	}
 
 
@@ -108,11 +96,7 @@ public class Shader {
 		ARBShaderObjects.glDeleteObjectARB(fshID);
 		ARBShaderObjects.glDeleteObjectARB(programID);
 		
-		// Free allocated buffers
-		if (programBuffer != null) {
-			MemoryUtil.memFree(programBuffer);
-			programBuffer = null;
-		}
+		// Free allocated buffer
 		if (fileBuffer != null) {
 			MemoryUtil.memFree(fileBuffer);
 			fileBuffer = null;
