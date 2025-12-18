@@ -232,7 +232,7 @@ public class LGameWindow implements GameWindow {
         callback.init(this);
         int lack = 0;
         while (gameRunning) {
-            // Poll for window events - CRITICAL for LWJGL3
+            // Poll for window events - required in LWJGL3 to process system messages and prevent window freezing
             GLFW.glfwPollEvents();
             
             ((LMugenTimer) timer).listen();
@@ -728,7 +728,7 @@ public class LGameWindow implements GameWindow {
 
             // Set window hints before creating the window
             GLFW.glfwDefaultWindowHints();
-            GLFW.glfwWindowHint(GLFW.GLFW_VISIBLE, GLFW.GLFW_FALSE); // Window will be shown explicitly later
+            GLFW.glfwWindowHint(GLFW.GLFW_VISIBLE, GLFW.GLFW_FALSE); // Hide during setup to prevent flickering
             GLFW.glfwWindowHint(GLFW.GLFW_RESIZABLE, GLFW.GLFW_TRUE);
             GLFW.glfwWindowHint(GLFW.GLFW_REFRESH_RATE, 60);  // Taxa de atualização
             GLFW.glfwWindowHint(GLFW.GLFW_SAMPLES, 4); // Anti-aliasing (opcional)
