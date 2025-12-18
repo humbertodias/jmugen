@@ -6,16 +6,16 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
 import org.apache.commons.io.IOUtils;
-import org.lwjgl.BufferUtils;
+import org.lwjgl.system.MemoryUtil;
 import org.lwjgl.opengl.ARBFragmentShader;
 import org.lwjgl.opengl.ARBShaderObjects;
 import org.lwjgl.opengl.GL11;
 
 
 public class Shader {
-	private static final IntBuffer int_buffer = BufferUtils.createIntBuffer(16);
-	protected static IntBuffer programBuffer = BufferUtils.createIntBuffer(1);
-	protected static ByteBuffer fileBuffer = BufferUtils.createByteBuffer(1024 * 10);
+	private static final IntBuffer int_buffer = MemoryUtil.memAllocInt(16);
+	protected static IntBuffer programBuffer = MemoryUtil.memAllocInt(1);
+	protected static ByteBuffer fileBuffer = MemoryUtil.memAlloc(1024 * 10);
 
 	protected int fshID;
 	protected int programID;
@@ -61,27 +61,31 @@ public class Shader {
 		fshID = ARBShaderObjects.glCreateShaderObjectARB(ARBFragmentShader.GL_FRAGMENT_SHADER_ARB);
 
 		// Create a direct ByteBuffer to hold the shader program
-		ByteBuffer b = ByteBuffer.allocateDirect(shaderPrg.length());  // Ensure the buffer is large enough
-		b.put(shaderPrg.getBytes());  // Fill the buffer with the shader program byte data
-		b.flip();  // Prepare the buffer for reading by OpenGL
+		ByteBuffer b = MemoryUtil.memAlloc(shaderPrg.length());  // Ensure the buffer is large enough
+		try {
+			b.put(shaderPrg.getBytes());  // Fill the buffer with the shader program byte data
+			b.flip();  // Prepare the buffer for reading by OpenGL
 
-		// Pass the direct ByteBuffer to the shader
-		ARBShaderObjects.glShaderSourceARB(fshID, b);
+			// Pass the direct ByteBuffer to the shader
+			ARBShaderObjects.glShaderSourceARB(fshID, b);
 
-		// Compile the shader
-		ARBShaderObjects.glCompileShaderARB(fshID);
+			// Compile the shader
+			ARBShaderObjects.glCompileShaderARB(fshID);
 
-		// Create the program object
-		programID = ARBShaderObjects.glCreateProgramObjectARB();
+			// Create the program object
+			programID = ARBShaderObjects.glCreateProgramObjectARB();
 
-		// Attach the shader to the program
-		ARBShaderObjects.glAttachObjectARB(programID, fshID);
+			// Attach the shader to the program
+			ARBShaderObjects.glAttachObjectARB(programID, fshID);
 
-		// Link the program
-		ARBShaderObjects.glLinkProgramARB(programID);
+			// Link the program
+			ARBShaderObjects.glLinkProgramARB(programID);
 
-		// Validate the program
-		ARBShaderObjects.glValidateProgramARB(programID);
+			// Validate the program
+			ARBShaderObjects.glValidateProgramARB(programID);
+		} finally {
+			MemoryUtil.memFree(b);
+		}
 	}
 
 
