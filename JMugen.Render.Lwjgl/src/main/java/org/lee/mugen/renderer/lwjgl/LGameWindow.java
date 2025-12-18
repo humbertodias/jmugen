@@ -276,6 +276,8 @@ public class LGameWindow implements GameWindow {
                         continue;
                     }
 
+                    // Ensure clear color is set to black for main framebuffer
+                    GL11.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
                     GL11.glClear(GL11.GL_COLOR_BUFFER_BIT
                             | GL11.GL_DEPTH_BUFFER_BIT | GL11.GL_ACCUM_BUFFER_BIT);
                     GL11.glMatrixMode(GL11.GL_MODELVIEW);
@@ -330,6 +332,8 @@ public class LGameWindow implements GameWindow {
             EXTFramebufferObject.glBindFramebufferEXT( EXTFramebufferObject.GL_FRAMEBUFFER_EXT, myFBOId );
             GL11.glPushAttrib(GL11.GL_VIEWPORT_BIT);
             GL11.glViewport( 0, 0, 640, 480);
+            // Ensure FBO is cleared with black
+            GL11.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
             GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
 
             try {
@@ -768,6 +772,8 @@ public class LGameWindow implements GameWindow {
             framebufferWidth = fbWidth[0];
             framebufferHeight = fbHeight[0];
             Logger.log("Window size: " + width + "x" + height + ", Framebuffer size: " + framebufferWidth + "x" + framebufferHeight);
+            Logger.log("Setting projection: glOrtho(0, " + framebufferWidth + ", " + framebufferHeight + ", 0, -1, 1)");
+            Logger.log("Setting scale: glScaled(" + ((float) framebufferWidth / 320) + ", " + ((float) framebufferHeight / 240) + ", 0)");
             
             // Set initial viewport to match framebuffer size
             GL11.glViewport(0, 0, framebufferWidth, framebufferHeight);
