@@ -169,6 +169,8 @@ public class LGameWindow implements GameWindow {
     private String title;
 
     private long window;
+    private int framebufferWidth;
+    private int framebufferHeight;
 
     public void addSpriteKeyProcessor(ISpriteCmdProcess scp) {
         spriteCmdProcess.add(new SprCmdProcessListenerAction(scp));
@@ -179,6 +181,12 @@ public class LGameWindow implements GameWindow {
             setDisplayMode();
 //			Display.create();
 
+            // Set clear color to black before clearing
+            GL11.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+            
+            // Set initial viewport to match framebuffer size (important for Retina displays)
+            GL11.glViewport(0, 0, framebufferWidth, framebufferHeight);
+            
             GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 
             // enable textures since we're going to use these for our sprites
@@ -234,6 +242,9 @@ public class LGameWindow implements GameWindow {
         while (gameRunning) {
             // Poll for window events - required in LWJGL3 to process system messages and prevent window freezing
             GLFW.glfwPollEvents();
+            
+            // Update viewport to match current framebuffer size (for Retina/HiDPI displays)
+            GL11.glViewport(0, 0, framebufferWidth, framebufferHeight);
             
             ((LMugenTimer) timer).listen();
             if (1f/timer.getFramerate() > timer.getDeltas()) {
@@ -751,6 +762,21 @@ public class LGameWindow implements GameWindow {
             GLFW.glfwMakeContextCurrent(window);
             GL.createCapabilities(); // Habilita OpenGL no contexto
             GLFW.glfwSwapInterval(1); // Sincronizar com a taxa de atualização do monitor
+            
+            // Get actual framebuffer size (important for Retina/HiDPI displays)
+            int[] fbWidth = new int[1];
+            int[] fbHeight = new int[1];
+            GLFW.glfwGetFramebufferSize(window, fbWidth, fbHeight);
+            framebufferWidth = fbWidth[0];
+            framebufferHeight = fbHeight[0];
+            System.out.println("Window size: " + width + "x" + height + ", Framebuffer size: " + framebufferWidth + "x" + framebufferHeight);
+            
+            // Set framebuffer size callback to handle Retina display changes
+            GLFW.glfwSetFramebufferSizeCallback(window, (win, w, h) -> {
+                framebufferWidth = w;
+                framebufferHeight = h;
+                System.out.println("Framebuffer resized to: " + w + "x" + h);
+            });
             
             // Show the window after everything is set up
             GLFW.glfwShowWindow(window);
