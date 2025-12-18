@@ -176,7 +176,6 @@ public class LGameWindow implements GameWindow {
 
     private void initDisplay() throws Exception {
         try {
-            GLFW.glfwSetErrorCallback(GLFWErrorCallback.createPrint(System.err));
             setDisplayMode();
 //			Display.create();
 
@@ -233,6 +232,9 @@ public class LGameWindow implements GameWindow {
         callback.init(this);
         int lack = 0;
         while (gameRunning) {
+            // Poll for window events - CRITICAL for LWJGL3
+            GLFW.glfwPollEvents();
+            
             ((LMugenTimer) timer).listen();
             if (1f/timer.getFramerate() > timer.getDeltas()) {
                 continue;
@@ -715,6 +717,8 @@ public class LGameWindow implements GameWindow {
 
     private boolean setDisplayMode() {
         try {
+            // Set error callback before initializing GLFW
+            GLFW.glfwSetErrorCallback(GLFWErrorCallback.createPrint(System.err));
 
             if (!GLFW.glfwInit()) {
                 throw new IllegalStateException("Unable to initialize GLFW");
@@ -722,6 +726,10 @@ public class LGameWindow implements GameWindow {
 
             System.out.println("GLFW initialized successfully");
 
+            // Set window hints before creating the window
+            GLFW.glfwDefaultWindowHints();
+            GLFW.glfwWindowHint(GLFW.GLFW_VISIBLE, GLFW.GLFW_FALSE); // Window will be shown explicitly later
+            GLFW.glfwWindowHint(GLFW.GLFW_RESIZABLE, GLFW.GLFW_TRUE);
             GLFW.glfwWindowHint(GLFW.GLFW_REFRESH_RATE, 60);  // Taxa de atualização
             GLFW.glfwWindowHint(GLFW.GLFW_SAMPLES, 4); // Anti-aliasing (opcional)
 
@@ -731,12 +739,20 @@ public class LGameWindow implements GameWindow {
                 return false;
             }
 
-            GLFW.glfwSetWindowPos(window, 0, 0);
+            // Center the window on screen
+            GLFWVidMode vidmode = GLFW.glfwGetVideoMode(GLFW.glfwGetPrimaryMonitor());
+            if (vidmode != null) {
+                GLFW.glfwSetWindowPos(window, 
+                    (vidmode.width() - width) / 2, 
+                    (vidmode.height() - height) / 2);
+            }
 
             // Tornar a janela o contexto atual
             GLFW.glfwMakeContextCurrent(window);
             GL.createCapabilities(); // Habilita OpenGL no contexto
             GLFW.glfwSwapInterval(1); // Sincronizar com a taxa de atualização do monitor
+            
+            // Show the window after everything is set up
             GLFW.glfwShowWindow(window);
 
             return true;
