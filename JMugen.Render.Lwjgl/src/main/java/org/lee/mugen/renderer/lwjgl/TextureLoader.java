@@ -293,11 +293,11 @@ public class TextureLoader {
 		GL11.glTexParameteri(target, GL11.GL_TEXTURE_MAG_FILTER, magFilter);
 
 		if (minFilter == GL11.GL_LINEAR_MIPMAP_NEAREST) {
-			// Generate mipmaps using GL functionality instead of GLU
-			GL11.glTexParameteri(target, GL11.GL_GENERATE_MIPMAP, GL11.GL_TRUE);
+			// Use modern OpenGL mipmap generation
 			GL11.glTexImage2D(target, 0, dstPixelFormat, get2Fold(width),
 					get2Fold(height), 0, srcPixelFormat, GL11.GL_UNSIGNED_BYTE,
 					textureBuffer);
+			GL11.glGenerateMipmap(target);
 		} else {
 			// produce a texture from the byte buffer
 			GL11.glTexImage2D(target, 0, dstPixelFormat, get2Fold(width),

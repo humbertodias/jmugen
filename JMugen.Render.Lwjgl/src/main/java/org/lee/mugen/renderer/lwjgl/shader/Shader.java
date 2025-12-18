@@ -13,9 +13,9 @@ import org.lwjgl.opengl.GL11;
 
 
 public class Shader {
-	private static final IntBuffer int_buffer = MemoryUtil.memAllocInt(16);
-	protected static IntBuffer programBuffer = MemoryUtil.memAllocInt(1);
-	protected static ByteBuffer fileBuffer = MemoryUtil.memAlloc(1024 * 10);
+	// Use instance buffers instead of static to allow proper cleanup
+	protected IntBuffer programBuffer;
+	protected ByteBuffer fileBuffer;
 
 	protected int fshID;
 	protected int programID;
@@ -25,8 +25,11 @@ public class Shader {
 	public Shader(String name) {
 		shaderPrg = getShaderText(name);
 		this.name = name;
-
+		// Allocate buffers per instance
+		programBuffer = MemoryUtil.memAllocInt(1);
+		fileBuffer = MemoryUtil.memAlloc(1024 * 10);
 	}
+	
 	protected static String getShaderText(String file) {
 		ClassLoader loader = Shader.class.getClassLoader();
 		String shaderPath = "org/lee/mugen/renderer/lwjgl/shader/" + file;
@@ -99,13 +102,24 @@ public class Shader {
 		ARBShaderObjects.glUseProgramObjectARB(0);
 
 	}
+	
 	public void clean() {
 		ARBShaderObjects.glDetachObjectARB(programID, fshID);
 		ARBShaderObjects.glDeleteObjectARB(fshID);
 		ARBShaderObjects.glDeleteObjectARB(programID);
-
+		
+		// Free allocated buffers
+		if (programBuffer != null) {
+			MemoryUtil.memFree(programBuffer);
+			programBuffer = null;
+		}
+		if (fileBuffer != null) {
+			MemoryUtil.memFree(fileBuffer);
+			fileBuffer = null;
+		}
 	}
-	protected static int getUniformLocation(int id, String name) {
+	
+	protected int getUniformLocation(int id, String name) {
 		fileBuffer.clear();
 		int length = name.length();
 
