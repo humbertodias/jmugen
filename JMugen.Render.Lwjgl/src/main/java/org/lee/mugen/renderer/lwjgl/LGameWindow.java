@@ -202,9 +202,11 @@ public class LGameWindow implements GameWindow {
             // grab the mouse, don't want that hideous cursor when we're playing!
             // Mouse.setGrabbed(true);
 
-            GL11.glOrtho(0, width, height, 0, -1, 1);
+            // Use framebuffer size for projection on Retina displays
+            GL11.glOrtho(0, framebufferWidth, framebufferHeight, 0, -1, 1);
 
-            GL11.glScaled((float) width / 320, (float) height / 240, 0);
+            // Scale to maintain 320x240 logical coordinate system
+            GL11.glScaled((float) framebufferWidth / 320, (float) framebufferHeight / 240, 0);
 
             initKeys();
 
@@ -241,9 +243,6 @@ public class LGameWindow implements GameWindow {
         while (gameRunning) {
             // Poll for window events - required in LWJGL3 to process system messages and prevent window freezing
             GLFW.glfwPollEvents();
-            
-            // Update viewport to match current framebuffer size (for Retina/HiDPI displays)
-            GL11.glViewport(0, 0, framebufferWidth, framebufferHeight);
             
             ((LMugenTimer) timer).listen();
             if (1f/timer.getFramerate() > timer.getDeltas()) {
@@ -778,6 +777,12 @@ public class LGameWindow implements GameWindow {
                 framebufferWidth = w;
                 framebufferHeight = h;
                 GL11.glViewport(0, 0, w, h);
+                // Update projection matrix for new framebuffer size
+                GL11.glMatrixMode(GL11.GL_PROJECTION);
+                GL11.glLoadIdentity();
+                GL11.glOrtho(0, w, h, 0, -1, 1);
+                GL11.glScaled((float) w / 320, (float) h / 240, 0);
+                GL11.glMatrixMode(GL11.GL_MODELVIEW);
                 Logger.log("Framebuffer resized to: " + w + "x" + h);
             });
             
