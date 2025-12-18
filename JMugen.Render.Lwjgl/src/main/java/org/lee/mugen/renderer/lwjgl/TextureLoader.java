@@ -23,6 +23,7 @@ import java.nio.ShortBuffer;
 import org.lee.mugen.util.Logger;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
+import org.lwjgl.opengl.GL30;
 import org.lwjgl.system.MemoryUtil;
 
 /**
@@ -293,11 +294,11 @@ public class TextureLoader {
 		GL11.glTexParameteri(target, GL11.GL_TEXTURE_MAG_FILTER, magFilter);
 
 		if (minFilter == GL11.GL_LINEAR_MIPMAP_NEAREST) {
-			// Use modern OpenGL mipmap generation
+			// Use modern OpenGL mipmap generation (glGenerateMipmap is in GL30)
 			GL11.glTexImage2D(target, 0, dstPixelFormat, get2Fold(width),
 					get2Fold(height), 0, srcPixelFormat, GL11.GL_UNSIGNED_BYTE,
 					textureBuffer);
-			GL11.glGenerateMipmap(target);
+			GL30.glGenerateMipmap(target);
 		} else {
 			// produce a texture from the byte buffer
 			GL11.glTexImage2D(target, 0, dstPixelFormat, get2Fold(width),
