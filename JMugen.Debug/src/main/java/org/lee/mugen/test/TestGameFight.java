@@ -233,7 +233,7 @@ public class TestGameFight  {
 		SpriteDebugerUI debugerUI = new SpriteDebugerUI();
 		
 		gameWindow.setRender(true);
-//		debugerUI.setVisible(true);
+		debugerUI.setVisible(true);
 //		ExpressionTester.lanch();
 		gameWindow.start();
 //		Method m = gameWindow.getClass().getDeclaredMethod("isFinishInit");
