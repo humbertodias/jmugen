@@ -253,10 +253,6 @@ public class LMugenDrawer extends MugenDrawer {
 
 		Texture text = (Texture) dp.getIc().getImg();
 
-		GL11.glColor4f(1f, 1f, 1f, 1f);
-		GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_MODE,
-				GL11.GL_MODULATE);
-		GL11.glBlendFunc(GL11.GL_SRC_COLOR, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		text.bind();
 		drawChild(dp);
 
@@ -265,13 +261,16 @@ public class LMugenDrawer extends MugenDrawer {
 	public void drawChild(DrawProperties dp) {
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 
-		//GL11.glColorMask(true, true, true, true);
+		GL11.glColorMask(true, true, true, true);
 		GL11.glDisable(GL11.GL_COLOR_LOGIC_OP);
 		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glDisable(GL11.GL_ALPHA_TEST);
+		//GL11.glDisable(GL11.GL_ALPHA_TEST);
 
+		GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_MODE, GL11.GL_MODULATE);
 
 		GL11.glEnable(GL11.GL_BLEND);
+		GL11.glBlendFunc(GL11.GL_SRC_COLOR, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		GL11.glColor4f(1f, 1f, 1f, 1f);
 
 		// store the current model matrix
 		GL11.glPushMatrix();
