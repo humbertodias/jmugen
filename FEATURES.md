@@ -13,5 +13,5 @@
 - [ ] **Joystick**: Joystick detection and mapping.
 - [ ] **Android**: After LWJGL v3 will be able to use libGDX that supports mobile.
 - [ ] **iOS**: After LWJGL v3 will be able to use libGDX that supports mobile.
-- [] **libGDX**: Migrate to LibGDX.
+- [ ] **libGDX**: Migrate to LibGDX.
 
