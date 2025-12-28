@@ -43,16 +43,18 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
-import org.lwjgl.BufferUtils;
+import org.lwjgl.system.MemoryUtil;
 import org.lwjgl.opengl.ARBProgram;
 import org.lwjgl.opengl.ARBShaderObjects;
 import org.lwjgl.opengl.GL11;
 
+import static org.lwjgl.opengl.GL11.*;
+
 abstract class Shader {
 
-	private static final IntBuffer int_buffer = BufferUtils.createIntBuffer(16);
-	protected static IntBuffer programBuffer = BufferUtils.createIntBuffer(1);
-	protected static ByteBuffer fileBuffer = BufferUtils.createByteBuffer(1024 * 10);
+	private static final IntBuffer int_buffer = MemoryUtil.memAllocInt(16);
+	protected static IntBuffer programBuffer = MemoryUtil.memAllocInt(1);
+	protected static ByteBuffer fileBuffer = MemoryUtil.memAlloc(1024 * 10);
 
 	protected Shader() {
 	}
@@ -69,8 +71,7 @@ abstract class Shader {
 	 * @return the integer value
 	 */
 	public static int glGetInteger(int gl_enum) {
-		GL11.glGetInteger(gl_enum, int_buffer);
-		return int_buffer.get(0);
+		return glGetInteger(gl_enum);
 	}
 
 	protected static ByteBuffer getShaderText(String file) {
@@ -93,10 +94,10 @@ abstract class Shader {
 
 			fileBuffer.flip();
 
-			shader = BufferUtils.createByteBuffer(fileBuffer.limit());
+			shader = MemoryUtil.memAlloc(fileBuffer.limit());
 			shader.put(fileBuffer);
 
-			shader.clear();
+			shader.flip();
 			fileBuffer.clear();
 		} catch (IOException e) {
 			ShadersTest.kill("Failed to read the shader source file: " + file, e);
@@ -135,19 +136,7 @@ abstract class Shader {
 	}
 
 	protected static int getUniformLocation(int ID, String name) {
-		fileBuffer.clear();
-
-		int length = name.length();
-
-		char[] charArray = new char[length];
-		name.getChars(0, length, charArray, 0);
-
-		for ( int i = 0; i < length; i++ )
-			fileBuffer.put((byte)charArray[i]);
-		fileBuffer.put((byte)0); // Must be null-terminated.
-		fileBuffer.flip();
-
-		final int location = ARBShaderObjects.glGetUniformLocationARB(ID, fileBuffer);
+		final int location = ARBShaderObjects.glGetUniformLocationARB(ID, name);
 
 		if ( location == -1 )
 			throw new IllegalArgumentException("The uniform \"" + name + "\" does not exist in the Shader Program.");
@@ -156,45 +145,29 @@ abstract class Shader {
 	}
 
 	protected static void printShaderObjectInfoLog(String file, int ID) {
-		ARBShaderObjects.glGetObjectParameterARB(ID, ARBShaderObjects.GL_OBJECT_INFO_LOG_LENGTH_ARB, programBuffer);
-
-		final int logLength = programBuffer.get(0);
+		final int logLength = ARBShaderObjects.glGetObjectParameteriARB(ID, ARBShaderObjects.GL_OBJECT_INFO_LOG_LENGTH_ARB);
 
 		if ( logLength <= 1 )
 			return;
 
-		final ByteBuffer log = BufferUtils.createByteBuffer(logLength);
-
-		ARBShaderObjects.glGetInfoLogARB(ID, null, log);
-
-		final char[] charArray = new char[logLength];
-		for ( int i = 0; i < logLength; i++ )
-			charArray[i] = (char)log.get();
+		final String log = ARBShaderObjects.glGetInfoLogARB(ID, logLength);
 
 		System.out.println("\nInfo Log of Shader Object: " + file);
 		System.out.println("--------------------------");
-		System.out.println(new String(charArray, 0, logLength));
+		System.out.println(log);
 	}
 
 	protected static void printShaderProgramInfoLog(int ID) {
-		ARBShaderObjects.glGetObjectParameterARB(ID, ARBShaderObjects.GL_OBJECT_INFO_LOG_LENGTH_ARB, programBuffer);
-
-		final int logLength = programBuffer.get(0);
+		final int logLength = ARBShaderObjects.glGetObjectParameteriARB(ID, ARBShaderObjects.GL_OBJECT_INFO_LOG_LENGTH_ARB);
 
 		if ( logLength <= 1 )
 			return;
 
-		final ByteBuffer log = BufferUtils.createByteBuffer(logLength);
-
-		ARBShaderObjects.glGetInfoLogARB(ID, null, log);
-
-		final char[] charArray = new char[logLength];
-		for ( int i = 0; i < logLength; i++ )
-			charArray[i] = (char)log.get();
+		final String log = ARBShaderObjects.glGetInfoLogARB(ID, logLength);
 
 		System.out.println("\nShader Program Info Log: ");
 		System.out.println("--------------------------");
-		System.out.println(new String(charArray, 0, logLength));
+		System.out.println(log);
 	}
 
 }

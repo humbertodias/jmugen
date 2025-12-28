@@ -34,37 +34,37 @@
  * User: spasi
  * Date: 2004-03-30
  * Time: 8:41:42 pm
+ * 
+ * Converted to LWJGL 3 with GLFW
  */
 
 package org.lwjgl.test.opengl.shaders;
 
 import java.nio.FloatBuffer;
 
-import org.lwjgl.BufferUtils;
-import org.lwjgl.LWJGLException;
-import org.lwjgl.Sys;
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.DisplayMode;
+import org.lwjgl.system.MemoryUtil;
+import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GLContext;
-import org.lwjgl.opengl.PixelFormat;
-import org.lwjgl.util.glu.GLU;
-import org.lwjgl.util.glu.Sphere;
+import org.lwjgl.opengl.GLCapabilities;
+
+import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.system.MemoryUtil.*;
 
 public final class ShadersTest {
 
-	private static DisplayMode displayMode;
+	private static int displayWidth = 1024;
+	private static int displayHeight = 768;
+	
+	private static long window;
 
 	private static boolean run = true;
 
-	private static final FloatBuffer vectorBuffer = BufferUtils.createFloatBuffer(4);
-
-	private static Sphere sphere;
+	private static final FloatBuffer vectorBuffer = MemoryUtil.memAllocFloat(4);
 
 	private static Shader shader;
 
+	private static long lastFrameTime;
 	private static float frameTime;
 
 	private static float angle;
@@ -78,41 +78,34 @@ public final class ShadersTest {
 		initialize(args);
 
 		long frameStart;
-		long lastFrameTime = 0;
+		lastFrameTime = System.nanoTime();
 
-		while ( run ) {
-			if (!Display.isVisible() )
-				Thread.yield();
-			else {
-				// This is the current frame time.
-				frameStart = Sys.getTime();
+		while ( run && !glfwWindowShouldClose(window) ) {
+			glfwPollEvents();
+			
+			// This is the current frame time.
+			frameStart = System.nanoTime();
 
-				// How many seconds passed since last frame.
-				frameTime = (float)((frameStart - lastFrameTime) / (double)Sys.getTimerResolution());
+			// How many seconds passed since last frame.
+			frameTime = (float)((frameStart - lastFrameTime) / 1000000000.0);
 
-				lastFrameTime = frameStart;
+			lastFrameTime = frameStart;
 
-				angle += frameTime * 90.0f;
-				sin = (float)Math.sin(Math.toRadians(angle));
+			angle += frameTime * 90.0f;
+			sin = (float)Math.sin(Math.toRadians(angle));
 
-				handleIO();
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-				GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
+			if ( shader != null )
+				shader.render();
+			else
+				renderObject();
 
-				if ( shader != null )
-					shader.render();
-				else
-					renderObject();
+			// Restore camera position.
+			glPopMatrix();
+			glPushMatrix();
 
-				// Restore camera position.
-				GL11.glPopMatrix();
-				GL11.glPushMatrix();
-			}
-
-			Display.update();
-
-			if ( Display.isCloseRequested() )
-				break;
+			glfwSwapBuffers(window);
 		}
 
 		cleanup();
@@ -123,50 +116,85 @@ public final class ShadersTest {
 		if ( args.length != 1 )
 			argsError();
 
-		try {
-			DisplayMode[] modes = Display.getAvailableDisplayModes();
+		if (!glfwInit())
+			kill("Failed to initialize GLFW");
 
-			DisplayMode displayMode;
+		// Configure window hints
+		glfwDefaultWindowHints();
+		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+		glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
-			displayMode = chooseMode(modes, 1024, 768);
-			if ( displayMode == null )
-				displayMode = chooseMode(modes, 800, 600);
-			if ( displayMode == null )
-				displayMode = chooseMode(modes, 640, 480);
-			if ( displayMode == null )
-				kill("Failed to set an appropriate display mode.");
-
-			System.out.println("Setting display mode to: " + displayMode);
-			Display.setDisplayMode(displayMode);
-			Display.create(new PixelFormat(8, 24, 0));
-			ShadersTest.displayMode = displayMode;
-		} catch (LWJGLException e) {
-			kill(e.getMessage());
+		// Try different display modes
+		int[] widths = {1024, 800, 640};
+		int[] heights = {768, 600, 480};
+		
+		for (int i = 0; i < widths.length; i++) {
+			displayWidth = widths[i];
+			displayHeight = heights[i];
+			
+			window = glfwCreateWindow(displayWidth, displayHeight, "LWJGL 3 Shaders Test", NULL, NULL);
+			if (window != NULL) {
+				System.out.println("Setting display mode to: " + displayWidth + "x" + displayHeight);
+				break;
+			}
 		}
+
+		if (window == NULL)
+			kill("Failed to create the GLFW window");
+
+		// Setup key callback
+		glfwSetKeyCallback(window, (win, key, scancode, action, mods) -> {
+			if (action == GLFW_PRESS) {
+				if (key == GLFW_KEY_ESCAPE) {
+					run = false;
+				} else if (key == GLFW_KEY_EQUAL || key == GLFW_KEY_KP_ADD) {
+					if (specularity < 8)
+						specularity++;
+				} else if (key == GLFW_KEY_MINUS || key == GLFW_KEY_KP_SUBTRACT) {
+					if (specularity > 1)
+						specularity--;
+				}
+			}
+		});
+
+		// Make the OpenGL context current
+		glfwMakeContextCurrent(window);
+		// Enable v-sync
+		glfwSwapInterval(1);
+
+		// Make the window visible
+		glfwShowWindow(window);
+
+		// This line is critical for LWJGL's interoperation with GLFW's
+		// OpenGL context, or any context that is managed externally.
+		// LWJGL detects the context that is current in the current thread,
+		// creates the GLCapabilities instance and makes the OpenGL
+		// bindings available for use.
+		GLCapabilities caps = GL.createCapabilities();
 
 		if ( "NONE".equalsIgnoreCase(args[0]) ) {
 			shader = null;
 		} else if ( "VP".equalsIgnoreCase(args[0]) ) {
-			if ( !GLContext.getCapabilities().GL_ARB_vertex_program )
+			if ( !caps.GL_ARB_vertex_program )
 				kill("The ARB_vertex_program extension is not supported.");
 
 			shader = new ShaderVP("shaderVP.vp");
 		} else if ( "FP".equalsIgnoreCase(args[0]) ) {
-			if ( !GLContext.getCapabilities().GL_ARB_vertex_program )
+			if ( !caps.GL_ARB_vertex_program )
 				kill("The ARB_vertex_program extension is not supported.");
-			if ( !GLContext.getCapabilities().GL_ARB_fragment_program )
+			if ( !caps.GL_ARB_fragment_program )
 				kill("The ARB_fragment_program extension is not supported.");
 
 			shader = new ShaderFP("shaderFP.vp", "shaderFP.fp");
 		} else if ( "VSH".equalsIgnoreCase(args[0]) ) {
-			if ( !GLContext.getCapabilities().GL_ARB_vertex_shader )
+			if ( !caps.GL_ARB_vertex_shader )
 				kill("The ARB_vertex_shader extension is not supported.");
 
 			shader = new ShaderVSH("shaderVSH.vsh");
 		} else if ( "FSH".equalsIgnoreCase(args[0]) ) {
-			if ( !GLContext.getCapabilities().GL_ARB_vertex_shader )
+			if ( !caps.GL_ARB_vertex_shader )
 				kill("The ARB_vertex_shader extension is not supported.");
-			if ( !GLContext.getCapabilities().GL_ARB_fragment_shader )
+			if ( !caps.GL_ARB_fragment_shader )
 				kill("The ARB_fragment_shader extension is not supported.");
 
 			shader = new ShaderFSH("shaderFSH.vsh", "shaderFSH.fsh");
@@ -174,100 +202,84 @@ public final class ShadersTest {
 			argsError();
 		}
 
-		GL11.glViewport(0, 0, displayMode.getWidth(), displayMode.getHeight());
+		glViewport(0, 0, displayWidth, displayHeight);
 
-		GL11.glMatrixMode(GL11.GL_PROJECTION);
-		GL11.glLoadIdentity();
-		GLU.gluPerspective(45, displayMode.getWidth() / (float)displayMode.getHeight(), 1.0f, 10.0f);
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		// gluPerspective replacement
+		float fovy = 45.0f;
+		float aspect = displayWidth / (float)displayHeight;
+		float zNear = 1.0f;
+		float zFar = 10.0f;
+		float fH = (float)Math.tan(fovy / 360.0f * Math.PI) * zNear;
+		float fW = fH * aspect;
+		glFrustum(-fW, fW, -fH, fH, zNear, zFar);
 
-		GL11.glMatrixMode(GL11.GL_MODELVIEW);
-		GL11.glLoadIdentity();
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
 
 		// Setup camera position.
-		GL11.glTranslatef(0.0f, 0.0f, -4.0f);
-		GL11.glRotatef(15.0f, 1.0f, 0.0f, 0.0f);
-		GL11.glPushMatrix();
+		glTranslatef(0.0f, 0.0f, -4.0f);
+		glRotatef(15.0f, 1.0f, 0.0f, 0.0f);
+		glPushMatrix();
 
-		GL11.glClearDepth(1.0f);
-		GL11.glDepthFunc(GL11.GL_LEQUAL);
+		glClearDepth(1.0f);
+		glDepthFunc(GL_LEQUAL);
 
-		GL11.glHint(GL11.GL_PERSPECTIVE_CORRECTION_HINT, GL11.GL_NICEST);
+		glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
-		GL11.glFrontFace(GL11.GL_CCW);
-		GL11.glPolygonMode(GL11.GL_FRONT, GL11.GL_FILL);
+		glFrontFace(GL_CCW);
+		glPolygonMode(GL_FRONT, GL_FILL);
 
-		GL11.glCullFace(GL11.GL_BACK);
-		GL11.glEnable(GL11.GL_CULL_FACE);
+		glCullFace(GL_BACK);
+		glEnable(GL_CULL_FACE);
 
-		GL11.glAlphaFunc(GL11.GL_NOTEQUAL, 0.0f);
-		GL11.glEnable(GL11.GL_ALPHA_TEST);
+		glAlphaFunc(GL_NOTEQUAL, 0.0f);
+		glEnable(GL_ALPHA_TEST);
 
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glEnable(GL11.GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glEnable(GL_BLEND);
 
 		// Setup lighting for when we have fixed function fragment rendering.
-		GL11.glShadeModel(GL11.GL_SMOOTH);
+		glShadeModel(GL_SMOOTH);
 
 		if ( shader == null ) {
-			GL11.glEnable(GL11.GL_LIGHTING);
-			GL11.glEnable(GL11.GL_LIGHT0);
+			glEnable(GL_LIGHTING);
+			glEnable(GL_LIGHT0);
 		}
 
 		vectorBuffer.clear();
 		vectorBuffer.put(1.0f).put(1.0f).put(1.0f).put(1.0f);
-		vectorBuffer.clear();
-		GL11.glLight(GL11.GL_LIGHT0, GL11.GL_DIFFUSE, vectorBuffer);
+		vectorBuffer.flip();
+		glLight(GL_LIGHT0, GL_DIFFUSE, vectorBuffer);
 
+		vectorBuffer.clear();
 		vectorBuffer.put(1.0f).put(1.0f).put(1.0f).put(1.0f);
-		vectorBuffer.clear();
-		GL11.glLight(GL11.GL_LIGHT0, GL11.GL_AMBIENT, vectorBuffer);
+		vectorBuffer.flip();
+		glLight(GL_LIGHT0, GL_AMBIENT, vectorBuffer);
 
+		vectorBuffer.clear();
 		vectorBuffer.put(1.0f).put(1.0f).put(0.5f).put(1.0f);
-		vectorBuffer.clear();
-		GL11.glLight(GL11.GL_LIGHT0, GL11.GL_SPECULAR, vectorBuffer);
+		vectorBuffer.flip();
+		glLight(GL_LIGHT0, GL_SPECULAR, vectorBuffer);
 
+		vectorBuffer.clear();
 		vectorBuffer.put(-1.0f / 3.0f).put(1.0f / 3.0f).put(1.0f / 3.0f).put(0.0f); // Infinite
-		vectorBuffer.clear();
-		GL11.glLight(GL11.GL_LIGHT0, GL11.GL_POSITION, vectorBuffer);
+		vectorBuffer.flip();
+		glLight(GL_LIGHT0, GL_POSITION, vectorBuffer);
 
+		vectorBuffer.clear();
 		vectorBuffer.put(0.2f).put(0.2f).put(0.2f).put(1.0f);
-		vectorBuffer.clear();
-		GL11.glLightModel(GL11.GL_LIGHT_MODEL_AMBIENT, vectorBuffer);
-
-		sphere = new Sphere();
-	}
-
-	private static void handleIO() {
-		if ( Keyboard.getNumKeyboardEvents() != 0 ) {
-			while ( Keyboard.next() ) {
-				if ( Keyboard.getEventKeyState() )
-					continue;
-
-				switch ( Keyboard.getEventKey() ) {
-					case Keyboard.KEY_EQUALS:
-						if ( specularity < 8 )
-							specularity++;
-						break;
-					case Keyboard.KEY_MINUS:
-						if ( specularity > 1 )
-							specularity--;
-						break;
-					case Keyboard.KEY_ESCAPE:
-						run = false;
-						break;
-				}
-			}
-		}
-
-		while ( Mouse.next() ) ;
+		vectorBuffer.flip();
+		glLightModel(GL_LIGHT_MODEL_AMBIENT, vectorBuffer);
 	}
 
 	static int getDisplayWidth() {
-		return displayMode.getWidth();
+		return displayWidth;
 	}
 
 	static int getDisplayHeight() {
-		return displayMode.getHeight();
+		return displayHeight;
 	}
 
 	static float getSin() {
@@ -279,22 +291,34 @@ public final class ShadersTest {
 	}
 
 	static void renderObject() {
-		GL11.glColor3b((byte)255, (byte)255, (byte)255);
-		sphere.draw(1.0f, 32, 32);
+		glColor3f(1.0f, 1.0f, 1.0f);
+		// Draw a sphere using quad strips (simple sphere replacement)
+		drawSphere(1.0f, 32, 32);
 	}
 
-	private static DisplayMode chooseMode(DisplayMode[] modes, int width, int height) {
-		DisplayMode bestMode = null;
+	private static void drawSphere(float radius, int slices, int stacks) {
+		for (int i = 0; i < stacks; i++) {
+			float lat0 = (float) (Math.PI * (-0.5 + (double) (i) / stacks));
+			float z0 = (float) (Math.sin(lat0));
+			float zr0 = (float) (Math.cos(lat0));
 
-		for ( int i = 0; i < modes.length; i++ ) {
-			DisplayMode mode = modes[i];
-			if ( mode.getWidth() == width && mode.getHeight() == height && mode.getFrequency() <= 85 ) {
-				if ( bestMode == null || (mode.getBitsPerPixel() >= bestMode.getBitsPerPixel() && mode.getFrequency() > bestMode.getFrequency()) )
-					bestMode = mode;
+			float lat1 = (float) (Math.PI * (-0.5 + (double) (i + 1) / stacks));
+			float z1 = (float) (Math.sin(lat1));
+			float zr1 = (float) (Math.cos(lat1));
+
+			glBegin(GL_QUAD_STRIP);
+			for (int j = 0; j <= slices; j++) {
+				float lng = (float) (2 * Math.PI * (double) (j - 1) / slices);
+				float x = (float) (Math.cos(lng));
+				float y = (float) (Math.sin(lng));
+
+				glNormal3f(x * zr0, y * zr0, z0);
+				glVertex3f(radius * x * zr0, radius * y * zr0, radius * z0);
+				glNormal3f(x * zr1, y * zr1, z1);
+				glVertex3f(radius * x * zr1, radius * y * zr1, radius * z1);
 			}
+			glEnd();
 		}
-
-		return bestMode;
 	}
 
 	private static void cleanup() {
@@ -302,8 +326,12 @@ public final class ShadersTest {
 		if ( shader != null )
 			shader.cleanup();
 
-		if ( Display.isCreated() )
-			Display.destroy();
+		MemoryUtil.memFree(vectorBuffer);
+
+		if ( window != NULL ) {
+			glfwDestroyWindow(window);
+		}
+		glfwTerminate();
 	}
 
 	private static void argsError() {
@@ -320,7 +348,7 @@ public final class ShadersTest {
 	}
 
 	static void kill(String reason) {
-		System.out.println("The ShaderTest program was terminated because an error occured.\n");
+		System.out.println("The ShaderTest program was terminated because an error occurred.\n");
 		System.out.println("Reason: " + (reason == null ? "Unknown" : reason));
 
 		cleanup();
@@ -328,8 +356,8 @@ public final class ShadersTest {
 	}
 
 	static void kill(String reason, Throwable t) {
-		System.out.println("The ShaderTest program was terminated because an exception occured.\n");
-		System.out.println("Reason: " + reason == null ? "Unknown" : reason);
+		System.out.println("The ShaderTest program was terminated because an exception occurred.\n");
+		System.out.println("Reason: " + (reason == null ? "Unknown" : reason));
 
 		System.out.println("Exception message: " + t.getMessage());
 
