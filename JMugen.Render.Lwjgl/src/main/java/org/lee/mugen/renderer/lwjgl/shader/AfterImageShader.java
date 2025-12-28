@@ -27,10 +27,11 @@ public class AfterImageShader extends Shader {
 	public void compileShader() {
 		super.compileShader();
 		
-		ARBShaderObjects.glGetObjectParameterARB(programID,
-				ARBShaderObjects.GL_OBJECT_LINK_STATUS_ARB, programBuffer);
-		if (programBuffer.get(0) == GL11.GL_FALSE)
-			System.err.println("A linking error occured in a shader program.");
+		// In LWJGL 3, glGetObjectParameteri returns int directly
+		int linkStatus = ARBShaderObjects.glGetObjectParameteriARB(programID,
+				ARBShaderObjects.GL_OBJECT_LINK_STATUS_ARB);
+		if (linkStatus == GL11.GL_FALSE)
+			System.err.println("A linking error occurred in a shader program.");
 		palbrightUniPos = getUniformLocation(programID, "palbright");
 		palcontrastUniPos = getUniformLocation(programID, "palcontrast");
 		palpostbrightUniPos = getUniformLocation(programID, "palpostbright");

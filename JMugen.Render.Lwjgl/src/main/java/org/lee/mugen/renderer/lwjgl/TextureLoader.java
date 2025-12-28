@@ -21,10 +21,10 @@ import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
 import org.lee.mugen.util.Logger;
-import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
-import org.lwjgl.util.glu.GLU;
+import org.lwjgl.opengl.GL30;
+import org.lwjgl.system.MemoryUtil;
 
 /**
  * A utility class to load textures for JOGL. This source is based on a texture
@@ -240,10 +240,13 @@ public class TextureLoader {
 			throws IOException {
 		int textWidth = get2Fold(width);
 		int texHeight = get2Fold(height);
-		ByteBuffer buffer = BufferUtils.createByteBuffer(textWidth * texHeight
-				* 4);
-		return getTexture(32, width, height, textWidth, texHeight, buffer,
-				GL11.GL_NEAREST, GL11.GL_RGBA);
+		ByteBuffer buffer = MemoryUtil.memAlloc(textWidth * texHeight * 4);
+		try {
+			return getTexture(32, width, height, textWidth, texHeight, buffer,
+					GL11.GL_NEAREST, GL11.GL_RGBA);
+		} finally {
+			MemoryUtil.memFree(buffer);
+		}
 	}
 
 	public Texture getTexture(int detpth, int width, int height, int texWidth,
@@ -279,8 +282,8 @@ public class TextureLoader {
 		texture.setHeight(height);
 		// texture.setAlpha(hasAlpha);
 
-		IntBuffer temp = BufferUtils.createIntBuffer(16);
-		GL11.glGetInteger(GL11.GL_MAX_TEXTURE_SIZE, temp);
+		IntBuffer temp = createIntBuffer(1);
+		GL11.glGetIntegerv(GL11.GL_MAX_TEXTURE_SIZE, temp);
 		int max = temp.get(0);
 		if ((texWidth > max) || (texHeight > max)) {
 			throw new IOException(
@@ -291,10 +294,11 @@ public class TextureLoader {
 		GL11.glTexParameteri(target, GL11.GL_TEXTURE_MAG_FILTER, magFilter);
 
 		if (minFilter == GL11.GL_LINEAR_MIPMAP_NEAREST) {
-			// generate a mip map textur
-			GLU.gluBuild2DMipmaps(GL11.GL_TEXTURE_2D, componentCount, texWidth,
-					texHeight, srcPixelFormat, GL11.GL_UNSIGNED_BYTE,
+			// Use modern OpenGL mipmap generation (glGenerateMipmap is in GL30)
+			GL11.glTexImage2D(target, 0, dstPixelFormat, get2Fold(width),
+					get2Fold(height), 0, srcPixelFormat, GL11.GL_UNSIGNED_BYTE,
 					textureBuffer);
+			GL30.glGenerateMipmap(target);
 		} else {
 			// produce a texture from the byte buffer
 			GL11.glTexImage2D(target, 0, dstPixelFormat, get2Fold(width),
@@ -307,7 +311,7 @@ public class TextureLoader {
 
 	public void free(Texture texture) {
 		Logger.log("Free Texture");
-		IntBuffer scratch = BufferUtils.createIntBuffer(1);
+		IntBuffer scratch = createIntBuffer(1);
 		scratch.put(0, texture.getTextureID());
 		GL11.glDeleteTextures(scratch);
 	}

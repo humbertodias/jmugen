@@ -24,10 +24,13 @@ import org.lee.mugen.renderer.GraphicsWrapper;
 import org.lee.mugen.renderer.ImageContainer;
 import org.lee.mugen.renderer.MugenTimer;
 import org.lee.mugen.util.Logger;
-import org.lwjgl.LWJGLException;
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
+import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
+import org.lwjgl.system.MemoryStack;
+
+import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class LGameWindow implements GameWindow {
 
@@ -37,19 +40,19 @@ public class LGameWindow implements GameWindow {
 
 
         public DebugEventManager() {
-            addAction(DebugAction.SWITCH_PLAYER_DEBUG_INFO, new int[]{Keyboard.KEY_LCONTROL, Keyboard.KEY_D});
-            addAction(DebugAction.EXPLOD_DEBUG_INFO, new int[]{Keyboard.KEY_LCONTROL, Keyboard.KEY_E});
-            addAction(DebugAction.INIT_PLAYER, new int[]{Keyboard.KEY_SPACE});
-            addAction(DebugAction.SHOW_HIDE_CNS, new int[]{Keyboard.KEY_LCONTROL, Keyboard.KEY_C});
-            addAction(DebugAction.SHOW_HIDE_ATTACK_CNS, new int[]{Keyboard.KEY_LCONTROL, Keyboard.KEY_X});
-            addAction(DebugAction.INCREASE_FPS, new int[]{Keyboard.KEY_LCONTROL, Keyboard.KEY_ADD}, true);
-            addAction(DebugAction.DECREASE_FPS, new int[]{Keyboard.KEY_LCONTROL, Keyboard.KEY_SUBTRACT}, true);
-            addAction(DebugAction.RESET_FPS, new int[]{Keyboard.KEY_LCONTROL, Keyboard.KEY_MULTIPLY});
+            addAction(DebugAction.SWITCH_PLAYER_DEBUG_INFO, new int[]{GLFWKeyMapper.KEY_LCONTROL, GLFWKeyMapper.KEY_D});
+            addAction(DebugAction.EXPLOD_DEBUG_INFO, new int[]{GLFWKeyMapper.KEY_LCONTROL, GLFWKeyMapper.KEY_E});
+            addAction(DebugAction.INIT_PLAYER, new int[]{GLFWKeyMapper.KEY_SPACE});
+            addAction(DebugAction.SHOW_HIDE_CNS, new int[]{GLFWKeyMapper.KEY_LCONTROL, GLFWKeyMapper.KEY_C});
+            addAction(DebugAction.SHOW_HIDE_ATTACK_CNS, new int[]{GLFWKeyMapper.KEY_LCONTROL, GLFWKeyMapper.KEY_X});
+            addAction(DebugAction.INCREASE_FPS, new int[]{GLFWKeyMapper.KEY_LCONTROL, GLFWKeyMapper.KEY_ADD}, true);
+            addAction(DebugAction.DECREASE_FPS, new int[]{GLFWKeyMapper.KEY_LCONTROL, GLFWKeyMapper.KEY_SUBTRACT}, true);
+            addAction(DebugAction.RESET_FPS, new int[]{GLFWKeyMapper.KEY_LCONTROL, GLFWKeyMapper.KEY_MULTIPLY});
 
-            addAction(DebugAction.DEBUG_PAUSE, new int[]{Keyboard.KEY_LCONTROL, Keyboard.KEY_P});
-            addAction(DebugAction.PAUSE_PLUS_ONE_FRAME, new int[]{Keyboard.KEY_LCONTROL, Keyboard.KEY_A});
+            addAction(DebugAction.DEBUG_PAUSE, new int[]{GLFWKeyMapper.KEY_LCONTROL, GLFWKeyMapper.KEY_P});
+            addAction(DebugAction.PAUSE_PLUS_ONE_FRAME, new int[]{GLFWKeyMapper.KEY_LCONTROL, GLFWKeyMapper.KEY_A});
 
-            addAction(DebugAction.DISPLAY_HELP, new int[]{Keyboard.KEY_F1});
+            addAction(DebugAction.DISPLAY_HELP, new int[]{GLFWKeyMapper.KEY_F1});
 
 
         }
@@ -68,7 +71,7 @@ public class LGameWindow implements GameWindow {
             for (DebugAction action : actionKeyMap.keySet()) {
                 boolean isAllKeyOk = true;
                 for (int key : actionKeyMap.get(action)) {
-                    isAllKeyOk = isAllKeyOk && Keyboard.isKeyDown(key);
+                    isAllKeyOk = isAllKeyOk && isKeyDown(key);
                 }
                 if (isAllKeyOk && actionPressMap.get(action) == null) {
                     if (callback instanceof AbstractGameFight) {
@@ -156,52 +159,140 @@ public class LGameWindow implements GameWindow {
      */
     private String title;
 
+    // GLFW window handle
+    private long window;
+    
+    // Keyboard state tracking for GLFW
+    private Map<Integer, Boolean> keyStates = new HashMap<>();
+    
+    // Mouse state tracking
+    private double mouseX = 0;
+    private double mouseY = 0;
+    private boolean leftButtonPressed = false;
+
 
     public void addSpriteKeyProcessor(ISpriteCmdProcess scp) {
         spriteCmdProcess.add(new SprCmdProcessListenerAction(scp));
     }
+    
+    // Helper method to check if a key is currently pressed
+    private boolean isKeyDown(int key) {
+        return keyStates.getOrDefault(key, false);
+    }
 
     private void initDisplay() throws Exception {
-        try {
-            setDisplayMode();
+        // Initialize GLFW
+        if (!glfwInit()) {
+            throw new IllegalStateException("Unable to initialize GLFW");
+        }
 
-            Display.create();
+        // Configure GLFW
+        glfwDefaultWindowHints();
+        glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+        
+        // macOS requires forward-compatible context for OpenGL 3.0+
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 
-            setTitle("JMugen - LWJGL");
-            // grab the mouse, dont want that hideous cursor when we're playing!
-            // Mouse.setGrabbed(true);
+        // Create the window
+        window = glfwCreateWindow(width, height, "JMugen - LWJGL 3", NULL, NULL);
+        if (window == NULL) {
+            throw new RuntimeException("Failed to create the GLFW window");
+        }
 
-            // enable textures since we're going to use these for our sprites
-            GL11.glEnable(GL11.GL_TEXTURE_2D);
-
-            // disable the OpenGL depth test since we're rendering 2D graphics
-            GL11.glDisable(GL11.GL_DEPTH_TEST);
-            GL11.glEnable(GL11.GL_BLEND);
-
-            GL11.glMatrixMode(GL11.GL_PROJECTION);
-            GL11.glLoadIdentity();
-
-            GL11.glOrtho(0, width, height, 0, -1, 1);
-
-            GL11.glScaled((float) width / 320, (float) height / 240, 0);
-            initKeys();
-
-            Mouse.create();
-            if (myFBOId == 0) {
-                IntBuffer buffer = ByteBuffer.allocateDirect(1 * 4).order(ByteOrder.nativeOrder()).asIntBuffer(); // allocate a 1 int byte buffer
-                EXTFramebufferObject.glGenFramebuffersEXT(buffer); // generate
-                myFBOId = buffer.get();
-                BufferedImage img = new BufferedImage(640, 480, BufferedImage.TYPE_INT_ARGB);
-                try {
-                    temp = TextureLoader.getTextureLoader().getTexture(img);
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
+        // Setup keyboard callback
+        glfwSetKeyCallback(window, (win, key, scancode, action, mods) -> {
+            if (action == GLFW_PRESS) {
+                keyStates.put(key, true);
+            } else if (action == GLFW_RELEASE) {
+                keyStates.put(key, false);
             }
+        });
 
-        } catch (LWJGLException le) {
-            le.printStackTrace();
+        // Setup mouse callbacks
+        glfwSetCursorPosCallback(window, (win, xpos, ypos) -> {
+            mouseX = xpos;
+            mouseY = ypos;
+        });
+
+        glfwSetMouseButtonCallback(window, (win, button, action, mods) -> {
+            if (button == GLFW_MOUSE_BUTTON_LEFT) {
+                leftButtonPressed = (action == GLFW_PRESS);
+            }
+        });
+
+        // Get the thread stack and push a new frame
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            IntBuffer pWidth = stack.mallocInt(1);
+            IntBuffer pHeight = stack.mallocInt(1);
+
+            // Get the window size passed to glfwCreateWindow
+            glfwGetWindowSize(window, pWidth, pHeight);
+
+            // Get the resolution of the primary monitor
+            GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+
+            // Center the window
+            glfwSetWindowPos(
+                window,
+                (vidmode.width() - pWidth.get(0)) / 2,
+                (vidmode.height() - pHeight.get(0)) / 2
+            );
+        }
+
+        // Make the OpenGL context current
+        glfwMakeContextCurrent(window);
+        // Enable v-sync
+        glfwSwapInterval(1);
+
+        // Make the window visible
+        glfwShowWindow(window);
+
+        // This line is critical for LWJGL's interoperation with GLFW's
+        // OpenGL context, or any context that is managed externally.
+        // LWJGL detects the context that is current in the current thread,
+        // creates the GLCapabilities instance and makes the OpenGL
+        // bindings available for use.
+        GL.createCapabilities();
+
+        setTitle("JMugen - LWJGL 3");
+
+        // Set the clear color (background) to black
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
+        // Set viewport to match window size
+        glViewport(0, 0, width, height);
+
+        // enable textures since we're going to use these for our sprites
+        glEnable(GL_TEXTURE_2D);
+
+        // disable the OpenGL depth test since we're rendering 2D graphics
+        glDisable(GL_DEPTH_TEST);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+
+        glOrtho(0, width, height, 0, -1, 1);
+
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+
+        glScaled((float) width / 320, (float) height / 240, 0);
+        initKeys();
+
+        if (myFBOId == 0) {
+            IntBuffer buffer = ByteBuffer.allocateDirect(1 * 4).order(ByteOrder.nativeOrder()).asIntBuffer();
+            EXTFramebufferObject.glGenFramebuffersEXT(buffer);
+            myFBOId = buffer.get();
+            BufferedImage img = new BufferedImage(640, 480, BufferedImage.TYPE_INT_ARGB);
+            try {
+                temp = TextureLoader.getTextureLoader().getTexture(img);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -211,7 +302,10 @@ public class LGameWindow implements GameWindow {
     public void gameLoop() throws Exception {
         callback.init(this);
         int lack = 0;
-        while (gameRunning) {
+        while (gameRunning && !glfwWindowShouldClose(window)) {
+            // Poll for window events
+            glfwPollEvents();
+            
             timer.listen();
             if (1f / timer.getFramerate() > timer.getDeltas()) {
                 continue;
@@ -221,10 +315,10 @@ public class LGameWindow implements GameWindow {
                 getTimer().sleep(1000 / 60);
                 continue;
             }
-            GL11.glEnable(GL11.GL_TEXTURE_2D);
+            glEnable(GL_TEXTURE_2D);
 
             // disable the OpenGL depth test since we're rendering 2D graphics
-            if (mouse.isLeftClick() && !Mouse.isButtonDown(0)) {
+            if (mouse.isLeftClick() && !leftButtonPressed) {
                 mouse.setLeftPress(false);
             } else {
                 mouse.setLeftPress(true);
@@ -239,14 +333,13 @@ public class LGameWindow implements GameWindow {
                     if (getTimer().getFramerate() == 0) {
                         getTimer().sleep(1000 / 60);
                         callback.render();
-                        Display.update();
+                        glfwSwapBuffers(window);
                         continue;
                     }
 
-                    GL11.glClear(GL11.GL_COLOR_BUFFER_BIT
-                            | GL11.GL_DEPTH_BUFFER_BIT | GL11.GL_ACCUM_BUFFER_BIT);
-                    GL11.glMatrixMode(GL11.GL_MODELVIEW);
-                    GL11.glLoadIdentity();
+                    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ACCUM_BUFFER_BIT);
+                    glMatrixMode(GL_MODELVIEW);
+                    glLoadIdentity();
 
 
                     callback.update(1);
@@ -263,13 +356,12 @@ public class LGameWindow implements GameWindow {
                 lack = getTimer().sleep();
             }
 
-            if (Display.isCloseRequested()) {
-                gameRunning = false;
-                Display.destroy();
-                System.exit(0);
-            }
-
         }
+        
+        // Cleanup
+        glfwDestroyWindow(window);
+        glfwTerminate();
+        System.exit(0);
 
     }
 
@@ -279,12 +371,12 @@ public class LGameWindow implements GameWindow {
 
             EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, myFBOId);
             EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT,
-                    GL11.GL_TEXTURE_2D, temp.getTextureID(), 0);
+                    GL_TEXTURE_2D, temp.getTextureID(), 0);
             EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, myFBOId);
-            GL11.glPushAttrib(GL11.GL_VIEWPORT_BIT);
-//            GL11.glViewport(0, 0, 640, 480);
-            GL11.glViewport(0, 0, width, height);
-            GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
+            glPushAttrib(GL_VIEWPORT_BIT);
+//            glViewport(0, 0, 640, 480);
+            glViewport(0, 0, width, height);
+            glClear(GL_COLOR_BUFFER_BIT);
 
             try {
                 callback.render();
@@ -295,7 +387,7 @@ public class LGameWindow implements GameWindow {
 
 
             EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, 0);
-            GL11.glPopAttrib();
+            glPopAttrib();
 
             temp.bind();
 
@@ -304,22 +396,22 @@ public class LGameWindow implements GameWindow {
 
             float scale = 0.5f;
             float alpha = GraphicsWrapper.getInstance().getAlpha();
-            GL11.glScalef(scale, scale, 1);
-            GL11.glColor4f(alpha, alpha, alpha, alpha);
+            glScalef(scale, scale, 1);
+            glColor4f(alpha, alpha, alpha, alpha);
 
-            GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_MODE,
-                    GL11.GL_MODULATE);
-            GL11.glBlendFunc(GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
+            glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE,
+                    GL_MODULATE);
+            glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
             ((LMugenDrawer) GraphicsWrapper.getInstance()).drawChild(dp);
-            GL11.glScalef(1f / scale, 1f / scale, 1);
+            glScalef(1f / scale, 1f / scale, 1);
 
 
             if (callback instanceof AbstractGameFight) {
                 ((AbstractGameFight) callback).renderDebugInfo();
             }
         }
-        Display.update();
+        glfwSwapBuffers(window);
     }
 
 
@@ -333,12 +425,11 @@ public class LGameWindow implements GameWindow {
 
     @Override
     public MouseCtrl getMouseStatus() {
-        Mouse.next();
-        mouse.setX(Mouse.getX() / 2);
-        mouse.setY(240 - Mouse.getY() / 2);
+        mouse.setX((int)(mouseX / 2));
+        mouse.setY((int)(240 - mouseY / 2));
 
-        mouse.setLeftPress(Mouse.isButtonDown(0));
-        mouse.setLeftRelease(!Mouse.isButtonDown(0));
+        mouse.setLeftPress(leftButtonPressed);
+        mouse.setLeftRelease(!leftButtonPressed);
         return mouse;
     }
 
@@ -359,25 +450,25 @@ public class LGameWindow implements GameWindow {
         ResourceBundle bundle = ResourceBundleHelper.getBundle("keys");
         {
             CmdProcessListener cmdProcessListener = new CmdProcessListener();
-            cmdProcessListener.setKeys(new int[]{Keyboard.KEY_ESCAPE, Keyboard.KEY_F1, Keyboard.KEY_F2, Keyboard.KEY_F3, Keyboard.KEY_F4, Keyboard.KEY_F5, Keyboard.KEY_F6, Keyboard.KEY_F7, Keyboard.KEY_F8, Keyboard.KEY_F9, Keyboard.KEY_F10, Keyboard.KEY_F11, Keyboard.KEY_F12});
+            cmdProcessListener.setKeys(new int[]{GLFWKeyMapper.KEY_ESCAPE, GLFWKeyMapper.KEY_F1, GLFWKeyMapper.KEY_F2, GLFWKeyMapper.KEY_F3, GLFWKeyMapper.KEY_F4, GLFWKeyMapper.KEY_F5, GLFWKeyMapper.KEY_F6, GLFWKeyMapper.KEY_F7, GLFWKeyMapper.KEY_F8, GLFWKeyMapper.KEY_F9, GLFWKeyMapper.KEY_F10, GLFWKeyMapper.KEY_F11, GLFWKeyMapper.KEY_F12});
             cmdProcess.add(cmdProcessListener);
         }
         // P1
 
 
         CmdProcDispatcher cd1 = new CmdProcDispatcher(
-                Keyboard.class.getDeclaredField("KEY_" + bundle.getString("P1.UP").toUpperCase()).getInt(null),
-                Keyboard.class.getDeclaredField("KEY_" + bundle.getString("P1.DOWN").toUpperCase()).getInt(null),
-                Keyboard.class.getDeclaredField("KEY_" + bundle.getString("P1.LEFT").toUpperCase()).getInt(null),
-                Keyboard.class.getDeclaredField("KEY_" + bundle.getString("P1.RIGHT").toUpperCase()).getInt(null),
-                Keyboard.class.getDeclaredField("KEY_" + bundle.getString("P1.A").toUpperCase()).getInt(null),
-                Keyboard.class.getDeclaredField("KEY_" + bundle.getString("P1.B").toUpperCase()).getInt(null),
-                Keyboard.class.getDeclaredField("KEY_" + bundle.getString("P1.C").toUpperCase()).getInt(null),
-                Keyboard.class.getDeclaredField("KEY_" + bundle.getString("P1.X").toUpperCase()).getInt(null),
-                Keyboard.class.getDeclaredField("KEY_" + bundle.getString("P1.Y").toUpperCase()).getInt(null),
-                Keyboard.class.getDeclaredField("KEY_" + bundle.getString("P1.Z").toUpperCase()).getInt(null),
-                Keyboard.class.getDeclaredField("KEY_" + bundle.getString("P1.ABC").toUpperCase()).getInt(null),
-                Keyboard.class.getDeclaredField("KEY_" + bundle.getString("P1.XYZ").toUpperCase()).getInt(null));
+                GLFWKeyMapper.class.getDeclaredField("KEY_" + bundle.getString("P1.UP").toUpperCase()).getInt(null),
+                GLFWKeyMapper.class.getDeclaredField("KEY_" + bundle.getString("P1.DOWN").toUpperCase()).getInt(null),
+                GLFWKeyMapper.class.getDeclaredField("KEY_" + bundle.getString("P1.LEFT").toUpperCase()).getInt(null),
+                GLFWKeyMapper.class.getDeclaredField("KEY_" + bundle.getString("P1.RIGHT").toUpperCase()).getInt(null),
+                GLFWKeyMapper.class.getDeclaredField("KEY_" + bundle.getString("P1.A").toUpperCase()).getInt(null),
+                GLFWKeyMapper.class.getDeclaredField("KEY_" + bundle.getString("P1.B").toUpperCase()).getInt(null),
+                GLFWKeyMapper.class.getDeclaredField("KEY_" + bundle.getString("P1.C").toUpperCase()).getInt(null),
+                GLFWKeyMapper.class.getDeclaredField("KEY_" + bundle.getString("P1.X").toUpperCase()).getInt(null),
+                GLFWKeyMapper.class.getDeclaredField("KEY_" + bundle.getString("P1.Y").toUpperCase()).getInt(null),
+                GLFWKeyMapper.class.getDeclaredField("KEY_" + bundle.getString("P1.Z").toUpperCase()).getInt(null),
+                GLFWKeyMapper.class.getDeclaredField("KEY_" + bundle.getString("P1.ABC").toUpperCase()).getInt(null),
+                GLFWKeyMapper.class.getDeclaredField("KEY_" + bundle.getString("P1.XYZ").toUpperCase()).getInt(null));
 
         CmdProcDispatcher.getSpriteDispatcherMap().put("1", cd1);
         {
@@ -386,18 +477,18 @@ public class LGameWindow implements GameWindow {
             cmdProcess.add(cmdProcessListener);
         }
         CmdProcDispatcher cd2 = new CmdProcDispatcher(
-                Keyboard.class.getDeclaredField("KEY_" + bundle.getString("P2.UP").toUpperCase()).getInt(null),
-                Keyboard.class.getDeclaredField("KEY_" + bundle.getString("P2.DOWN").toUpperCase()).getInt(null),
-                Keyboard.class.getDeclaredField("KEY_" + bundle.getString("P2.LEFT").toUpperCase()).getInt(null),
-                Keyboard.class.getDeclaredField("KEY_" + bundle.getString("P2.RIGHT").toUpperCase()).getInt(null),
-                Keyboard.class.getDeclaredField("KEY_" + bundle.getString("P2.A").toUpperCase()).getInt(null),
-                Keyboard.class.getDeclaredField("KEY_" + bundle.getString("P2.B").toUpperCase()).getInt(null),
-                Keyboard.class.getDeclaredField("KEY_" + bundle.getString("P2.C").toUpperCase()).getInt(null),
-                Keyboard.class.getDeclaredField("KEY_" + bundle.getString("P2.X").toUpperCase()).getInt(null),
-                Keyboard.class.getDeclaredField("KEY_" + bundle.getString("P2.Y").toUpperCase()).getInt(null),
-                Keyboard.class.getDeclaredField("KEY_" + bundle.getString("P2.Z").toUpperCase()).getInt(null),
-                Keyboard.class.getDeclaredField("KEY_" + bundle.getString("P2.ABC").toUpperCase()).getInt(null),
-                Keyboard.class.getDeclaredField("KEY_" + bundle.getString("P2.XYZ").toUpperCase()).getInt(null));
+                GLFWKeyMapper.class.getDeclaredField("KEY_" + bundle.getString("P2.UP").toUpperCase()).getInt(null),
+                GLFWKeyMapper.class.getDeclaredField("KEY_" + bundle.getString("P2.DOWN").toUpperCase()).getInt(null),
+                GLFWKeyMapper.class.getDeclaredField("KEY_" + bundle.getString("P2.LEFT").toUpperCase()).getInt(null),
+                GLFWKeyMapper.class.getDeclaredField("KEY_" + bundle.getString("P2.RIGHT").toUpperCase()).getInt(null),
+                GLFWKeyMapper.class.getDeclaredField("KEY_" + bundle.getString("P2.A").toUpperCase()).getInt(null),
+                GLFWKeyMapper.class.getDeclaredField("KEY_" + bundle.getString("P2.B").toUpperCase()).getInt(null),
+                GLFWKeyMapper.class.getDeclaredField("KEY_" + bundle.getString("P2.C").toUpperCase()).getInt(null),
+                GLFWKeyMapper.class.getDeclaredField("KEY_" + bundle.getString("P2.X").toUpperCase()).getInt(null),
+                GLFWKeyMapper.class.getDeclaredField("KEY_" + bundle.getString("P2.Y").toUpperCase()).getInt(null),
+                GLFWKeyMapper.class.getDeclaredField("KEY_" + bundle.getString("P2.Z").toUpperCase()).getInt(null),
+                GLFWKeyMapper.class.getDeclaredField("KEY_" + bundle.getString("P2.ABC").toUpperCase()).getInt(null),
+                GLFWKeyMapper.class.getDeclaredField("KEY_" + bundle.getString("P2.XYZ").toUpperCase()).getInt(null));
 
         CmdProcDispatcher.getSpriteDispatcherMap().put("2", cd2);
         {
@@ -406,18 +497,18 @@ public class LGameWindow implements GameWindow {
             cmdProcess.add(cmdProcessListener);
         }
         CmdProcDispatcher cd3 = new CmdProcDispatcher(
-                Keyboard.class.getDeclaredField("KEY_" + bundle.getString("P3.UP").toUpperCase()).getInt(null),
-                Keyboard.class.getDeclaredField("KEY_" + bundle.getString("P3.DOWN").toUpperCase()).getInt(null),
-                Keyboard.class.getDeclaredField("KEY_" + bundle.getString("P3.LEFT").toUpperCase()).getInt(null),
-                Keyboard.class.getDeclaredField("KEY_" + bundle.getString("P3.RIGHT").toUpperCase()).getInt(null),
-                Keyboard.class.getDeclaredField("KEY_" + bundle.getString("P3.A").toUpperCase()).getInt(null),
-                Keyboard.class.getDeclaredField("KEY_" + bundle.getString("P3.B").toUpperCase()).getInt(null),
-                Keyboard.class.getDeclaredField("KEY_" + bundle.getString("P3.C").toUpperCase()).getInt(null),
-                Keyboard.class.getDeclaredField("KEY_" + bundle.getString("P3.X").toUpperCase()).getInt(null),
-                Keyboard.class.getDeclaredField("KEY_" + bundle.getString("P3.Y").toUpperCase()).getInt(null),
-                Keyboard.class.getDeclaredField("KEY_" + bundle.getString("P3.Z").toUpperCase()).getInt(null),
-                Keyboard.class.getDeclaredField("KEY_" + bundle.getString("P3.ABC").toUpperCase()).getInt(null),
-                Keyboard.class.getDeclaredField("KEY_" + bundle.getString("P3.XYZ").toUpperCase()).getInt(null));
+                GLFWKeyMapper.class.getDeclaredField("KEY_" + bundle.getString("P3.UP").toUpperCase()).getInt(null),
+                GLFWKeyMapper.class.getDeclaredField("KEY_" + bundle.getString("P3.DOWN").toUpperCase()).getInt(null),
+                GLFWKeyMapper.class.getDeclaredField("KEY_" + bundle.getString("P3.LEFT").toUpperCase()).getInt(null),
+                GLFWKeyMapper.class.getDeclaredField("KEY_" + bundle.getString("P3.RIGHT").toUpperCase()).getInt(null),
+                GLFWKeyMapper.class.getDeclaredField("KEY_" + bundle.getString("P3.A").toUpperCase()).getInt(null),
+                GLFWKeyMapper.class.getDeclaredField("KEY_" + bundle.getString("P3.B").toUpperCase()).getInt(null),
+                GLFWKeyMapper.class.getDeclaredField("KEY_" + bundle.getString("P3.C").toUpperCase()).getInt(null),
+                GLFWKeyMapper.class.getDeclaredField("KEY_" + bundle.getString("P3.X").toUpperCase()).getInt(null),
+                GLFWKeyMapper.class.getDeclaredField("KEY_" + bundle.getString("P3.Y").toUpperCase()).getInt(null),
+                GLFWKeyMapper.class.getDeclaredField("KEY_" + bundle.getString("P3.Z").toUpperCase()).getInt(null),
+                GLFWKeyMapper.class.getDeclaredField("KEY_" + bundle.getString("P3.ABC").toUpperCase()).getInt(null),
+                GLFWKeyMapper.class.getDeclaredField("KEY_" + bundle.getString("P3.XYZ").toUpperCase()).getInt(null));
 
         CmdProcDispatcher.getSpriteDispatcherMap().put("3", cd3);
         {
@@ -427,18 +518,18 @@ public class LGameWindow implements GameWindow {
         }
 
         CmdProcDispatcher cd4 = new CmdProcDispatcher(
-                Keyboard.class.getDeclaredField("KEY_" + bundle.getString("P4.UP").toUpperCase()).getInt(null),
-                Keyboard.class.getDeclaredField("KEY_" + bundle.getString("P4.DOWN").toUpperCase()).getInt(null),
-                Keyboard.class.getDeclaredField("KEY_" + bundle.getString("P4.LEFT").toUpperCase()).getInt(null),
-                Keyboard.class.getDeclaredField("KEY_" + bundle.getString("P4.RIGHT").toUpperCase()).getInt(null),
-                Keyboard.class.getDeclaredField("KEY_" + bundle.getString("P4.A").toUpperCase()).getInt(null),
-                Keyboard.class.getDeclaredField("KEY_" + bundle.getString("P4.B").toUpperCase()).getInt(null),
-                Keyboard.class.getDeclaredField("KEY_" + bundle.getString("P4.C").toUpperCase()).getInt(null),
-                Keyboard.class.getDeclaredField("KEY_" + bundle.getString("P4.X").toUpperCase()).getInt(null),
-                Keyboard.class.getDeclaredField("KEY_" + bundle.getString("P4.Y").toUpperCase()).getInt(null),
-                Keyboard.class.getDeclaredField("KEY_" + bundle.getString("P4.Z").toUpperCase()).getInt(null),
-                Keyboard.class.getDeclaredField("KEY_" + bundle.getString("P4.ABC").toUpperCase()).getInt(null),
-                Keyboard.class.getDeclaredField("KEY_" + bundle.getString("P4.XYZ").toUpperCase()).getInt(null));
+                GLFWKeyMapper.class.getDeclaredField("KEY_" + bundle.getString("P4.UP").toUpperCase()).getInt(null),
+                GLFWKeyMapper.class.getDeclaredField("KEY_" + bundle.getString("P4.DOWN").toUpperCase()).getInt(null),
+                GLFWKeyMapper.class.getDeclaredField("KEY_" + bundle.getString("P4.LEFT").toUpperCase()).getInt(null),
+                GLFWKeyMapper.class.getDeclaredField("KEY_" + bundle.getString("P4.RIGHT").toUpperCase()).getInt(null),
+                GLFWKeyMapper.class.getDeclaredField("KEY_" + bundle.getString("P4.A").toUpperCase()).getInt(null),
+                GLFWKeyMapper.class.getDeclaredField("KEY_" + bundle.getString("P4.B").toUpperCase()).getInt(null),
+                GLFWKeyMapper.class.getDeclaredField("KEY_" + bundle.getString("P4.C").toUpperCase()).getInt(null),
+                GLFWKeyMapper.class.getDeclaredField("KEY_" + bundle.getString("P4.X").toUpperCase()).getInt(null),
+                GLFWKeyMapper.class.getDeclaredField("KEY_" + bundle.getString("P4.Y").toUpperCase()).getInt(null),
+                GLFWKeyMapper.class.getDeclaredField("KEY_" + bundle.getString("P4.Z").toUpperCase()).getInt(null),
+                GLFWKeyMapper.class.getDeclaredField("KEY_" + bundle.getString("P4.ABC").toUpperCase()).getInt(null),
+                GLFWKeyMapper.class.getDeclaredField("KEY_" + bundle.getString("P4.XYZ").toUpperCase()).getInt(null));
 
         CmdProcDispatcher.getSpriteDispatcherMap().put("4", cd4);
         {
@@ -482,12 +573,12 @@ public class LGameWindow implements GameWindow {
             int[] keys = cmd.getKeys();
 
             for (int i = 0; i < keys.length; ++i) {
-                if (!areKeysPress[i] && Keyboard.isKeyDown(keys[i])) {
+                if (!areKeysPress[i] && isKeyDown(keys[i])) {
                     areKeysPress[i] = true;
                     for (MugenKeyListener kl : mugenKeyListeners)
                         kl.action(keys[i], true);
 
-                } else if (areKeysPress[i] && !Keyboard.isKeyDown(keys[i])) {
+                } else if (areKeysPress[i] && !isKeyDown(keys[i])) {
                     areKeysPress[i] = false;
                     for (MugenKeyListener kl : mugenKeyListeners)
                         kl.action(keys[i], false);
@@ -502,13 +593,13 @@ public class LGameWindow implements GameWindow {
             ISpriteCmdProcess scp = sa.getScp();
 
             for (int i = 0; i < keys.length; ++i) {
-                if (!areKeysPress[i] && Keyboard.isKeyDown(keys[i])) {
+                if (!areKeysPress[i] && isKeyDown(keys[i])) {
                     areKeysPress[i] = true;
                     scp.keyPressed(keys[i]);
                     for (MugenKeyListener kl : mugenKeyListeners)
                         kl.action(keys[i], true);
 
-                } else if (areKeysPress[i] && !Keyboard.isKeyDown(keys[i])) {
+                } else if (areKeysPress[i] && !isKeyDown(keys[i])) {
                     areKeysPress[i] = false;
                     scp.keyReleased(keys[i]);
                     for (MugenKeyListener kl : mugenKeyListeners)
@@ -525,16 +616,9 @@ public class LGameWindow implements GameWindow {
     }
 
     private boolean setDisplayMode() {
-        try {
-            Display.setDisplayMode(new DisplayMode(width, height));
-            Display.setResizable(true);
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            Logger.error("Unable to enter fullscreen, continuing in windowed mode");
-        }
-
-        return false;
+        // This method is now handled in initDisplay() with GLFW
+        // Keep it for compatibility but make it a no-op
+        return true;
     }
 
 
@@ -559,8 +643,8 @@ public class LGameWindow implements GameWindow {
 
     public void setTitle(String title) {
         this.title = title;
-        if (Display.isCreated()) {
-            Display.setTitle(title);
+        if (window != 0) {
+            glfwSetWindowTitle(window, title);
         }
     }
 
@@ -585,22 +669,22 @@ public class LGameWindow implements GameWindow {
 
     @Override
     public int getKeyEsc() {
-        return Keyboard.KEY_ESCAPE;
+        return GLFWKeyMapper.KEY_ESCAPE;
     }
 
     @Override
     public int getKeyF1() {
-        return Keyboard.KEY_F1;
+        return GLFWKeyMapper.KEY_F1;
     }
 
     @Override
     public int getKeyF2() {
-        return Keyboard.KEY_F2;
+        return GLFWKeyMapper.KEY_F2;
     }
 
     @Override
     public int getKeyF3() {
-        return Keyboard.KEY_F3;
+        return GLFWKeyMapper.KEY_F3;
     }
 
 }

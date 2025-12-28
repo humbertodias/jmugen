@@ -1,7 +1,8 @@
 package org.lee.mugen.renderer.lwjgl;
 
 import org.lee.mugen.renderer.MugenTimer;
-import org.lwjgl.util.Timer;
+
+import static org.lwjgl.glfw.GLFW.glfwGetTime;
 
 /**
  * Timer class Wrapper
@@ -35,8 +36,7 @@ public final class LMugenTimer implements MugenTimer {
 		return frames;
 	}
 
-	Timer timer = new Timer();
-	float lastTime = timer.getTime();
+	float lastTime = (float) glfwGetTime();
 	float tick;
 	float deltas;
 	int frames;
@@ -52,10 +52,10 @@ public final class LMugenTimer implements MugenTimer {
 			nextTimeReset = false;
 			reset();
 		}
-		Timer.tick();
-		tick = timer.getTime() - lastTime;
+		float currentTime = (float) glfwGetTime();
+		tick = currentTime - lastTime;
 		deltas += tick;
-		lastTime = timer.getTime();
+		lastTime = currentTime;
 
 		frames++;
 		if (frames == 50000) {
@@ -72,14 +72,16 @@ public final class LMugenTimer implements MugenTimer {
 
 	@Override
 	public int sleep() {
-		Timer.tick();
 		return 0;
 	}
 
 	@Override
 	public void sleep(long ms) {
-		Timer.tick();
-
+		try {
+			Thread.sleep(ms);
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+		}
 	}
 
 }

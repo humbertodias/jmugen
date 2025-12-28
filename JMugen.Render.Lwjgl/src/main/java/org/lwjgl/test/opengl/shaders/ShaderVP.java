@@ -40,9 +40,10 @@ package org.lwjgl.test.opengl.shaders;
 
 import java.nio.ByteBuffer;
 
-import org.lwjgl.opengl.ARBProgram;
 import org.lwjgl.opengl.ARBVertexProgram;
 import org.lwjgl.opengl.GL11;
+
+import static org.lwjgl.opengl.ARBVertexProgram.*;
 
 final class ShaderVP extends Shader {
 
@@ -55,31 +56,31 @@ final class ShaderVP extends Shader {
 		file = shaderFile;
 		source = getShaderText(shaderFile);
 
-		ARBProgram.glGenProgramsARB(programBuffer);
+		int[] programs = new int[1];
+		glGenProgramsARB(programs);
+		ID = programs[0];
 
-		ID = programBuffer.get(0);
-
-		ARBProgram.glBindProgramARB(ARBVertexProgram.GL_VERTEX_PROGRAM_ARB, ID);
-		ARBProgram.glProgramStringARB(ARBVertexProgram.GL_VERTEX_PROGRAM_ARB, ARBProgram.GL_PROGRAM_FORMAT_ASCII_ARB, source);
+		glBindProgramARB(GL_VERTEX_PROGRAM_ARB, ID);
+		glProgramStringARB(GL_VERTEX_PROGRAM_ARB, GL_PROGRAM_FORMAT_ASCII_ARB, source);
 
 		checkProgramError(file, source);
 	}
 
 	void render() {
-		GL11.glEnable(ARBVertexProgram.GL_VERTEX_PROGRAM_ARB);
-		ARBProgram.glBindProgramARB(ARBVertexProgram.GL_VERTEX_PROGRAM_ARB, ID);
+		GL11.glEnable(GL_VERTEX_PROGRAM_ARB);
+		glBindProgramARB(GL_VERTEX_PROGRAM_ARB, ID);
 
-		ARBProgram.glProgramLocalParameter4fARB(ARBVertexProgram.GL_VERTEX_PROGRAM_ARB, 0,
+		glProgramLocalParameter4fARB(GL_VERTEX_PROGRAM_ARB, 0,
 		                                        ShadersTest.getSin(), ShadersTest.getSpecularity() * 8.0f, 0.0f, 0.0f);
 
 		ShadersTest.renderObject();
 
-		GL11.glDisable(ARBVertexProgram.GL_VERTEX_PROGRAM_ARB);
+		GL11.glDisable(GL_VERTEX_PROGRAM_ARB);
 	}
 
 	void cleanup() {
-		programBuffer.put(0, ID);
-		ARBProgram.glDeleteProgramsARB(programBuffer);
+		int[] programs = {ID};
+		glDeleteProgramsARB(programs);
 	}
 
 }

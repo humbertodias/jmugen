@@ -67,28 +67,38 @@ final class ShaderFSH extends Shader {
 		vshSource = getShaderText(vshFile);
 
 		vshID = ARBShaderObjects.glCreateShaderObjectARB(ARBVertexShader.GL_VERTEX_SHADER_ARB);
-		ARBShaderObjects.glShaderSourceARB(vshID, vshSource);
+		
+		// Convert ByteBuffer to String for LWJGL 3
+		byte[] vshBytes = new byte[vshSource.remaining()];
+		vshSource.get(vshBytes);
+		String vshSourceStr = new String(vshBytes);
+		
+		ARBShaderObjects.glShaderSourceARB(vshID, vshSourceStr);
 		ARBShaderObjects.glCompileShaderARB(vshID);
 
 		printShaderObjectInfoLog(this.vshFile, vshID);
 
-		ARBShaderObjects.glGetObjectParameterARB(vshID, ARBShaderObjects.GL_OBJECT_COMPILE_STATUS_ARB, programBuffer);
-		if ( programBuffer.get(0) == GL11.GL_FALSE )
-			ShadersTest.kill("A compilation error occured in a vertex shader.");
+		if ( ARBShaderObjects.glGetObjectParameteriARB(vshID, ARBShaderObjects.GL_OBJECT_COMPILE_STATUS_ARB) == GL11.GL_FALSE )
+			ShadersTest.kill("A compilation error occurred in a vertex shader.");
 
 		// Initialize the fragment shader.
 		this.fshFile = fshFile;
 		fshSource = getShaderText(fshFile);
 
 		fshID = ARBShaderObjects.glCreateShaderObjectARB(ARBFragmentShader.GL_FRAGMENT_SHADER_ARB);
-		ARBShaderObjects.glShaderSourceARB(fshID, fshSource);
+		
+		// Convert ByteBuffer to String for LWJGL 3
+		byte[] fshBytes = new byte[fshSource.remaining()];
+		fshSource.get(fshBytes);
+		String fshSourceStr = new String(fshBytes);
+		
+		ARBShaderObjects.glShaderSourceARB(fshID, fshSourceStr);
 		ARBShaderObjects.glCompileShaderARB(fshID);
 
 		printShaderObjectInfoLog(this.fshFile, fshID);
 
-		ARBShaderObjects.glGetObjectParameterARB(fshID, ARBShaderObjects.GL_OBJECT_COMPILE_STATUS_ARB, programBuffer);
-		if ( programBuffer.get(0) == GL11.GL_FALSE )
-			ShadersTest.kill("A compilation error occured in a fragment shader.");
+		if ( ARBShaderObjects.glGetObjectParameteriARB(fshID, ARBShaderObjects.GL_OBJECT_COMPILE_STATUS_ARB) == GL11.GL_FALSE )
+			ShadersTest.kill("A compilation error occurred in a fragment shader.");
 
 		// Initialize the shader program.
 		programID = ARBShaderObjects.glCreateProgramObjectARB();
@@ -100,9 +110,8 @@ final class ShaderFSH extends Shader {
 
 		printShaderProgramInfoLog(programID);
 
-		ARBShaderObjects.glGetObjectParameterARB(programID, ARBShaderObjects.GL_OBJECT_LINK_STATUS_ARB, programBuffer);
-		if ( programBuffer.get(0) == GL11.GL_FALSE )
-			ShadersTest.kill("A linking error occured in a shader program.");
+		if ( ARBShaderObjects.glGetObjectParameteriARB(programID, ARBShaderObjects.GL_OBJECT_LINK_STATUS_ARB) == GL11.GL_FALSE )
+			ShadersTest.kill("A linking error occurred in a shader program.");
 
 		uniformLocation = getUniformLocation(programID, "UNIFORMS");
 	}
