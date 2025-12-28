@@ -74,7 +74,7 @@ public class Shader {
 
 
 	public void render() {
-		ARBShaderObjects.glUseProgramObjectARB(fshID);
+		ARBShaderObjects.glUseProgramObjectARB(programID);
 
 	}
 
