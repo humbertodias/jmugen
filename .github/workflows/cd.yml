@@ -22,10 +22,10 @@ jobs:
       matrix:
         runner: [ ubuntu-24.04, ubuntu-24.04-arm ]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Maven cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.m2/repository
           key: maven-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/pom.xml') }}
@@ -43,7 +43,7 @@ jobs:
 
       - name: jpackage app-image
         run: |
-          make dist natives
+          make dist
 
 #      - name: Download and install AppImageTool
 #        run: |
@@ -63,9 +63,6 @@ jobs:
           # data
           zip -9 -r data.zip data
 
-          # natives
-          zip -9 -r natives.zip natives
-
           # jar
           cp JMugen.Debug/target/JMugen.Debug-0.0.1-SNAPSHOT.jar jmugen-${GITHUB_REF_NAME}.jar 
 
@@ -78,7 +75,6 @@ jobs:
         with:
           files: |
             data.zip
-            natives.zip
             jmugen-*.jar
             jmugen-*.tar.gz
 
@@ -88,10 +84,10 @@ jobs:
       matrix:
         runner: [ macos-latest, macos-13 ]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Maven cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.m2/repository
           key: maven-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/pom.xml') }}
@@ -129,10 +125,10 @@ jobs:
       run:
         shell: cmd
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Maven cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.m2/repository
           key: maven-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/pom.xml') }}
