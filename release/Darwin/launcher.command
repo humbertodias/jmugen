@@ -9,10 +9,6 @@ if [ ! -d "data" ]; then
     echo "Downloading data.zip"
     curl -L https://github.com/humbertodias/jmugen/releases/download/$TAG_NAME/data.zip -o data.zip
     unzip data.zip && rm data.zip
-
-    echo "Downloading natives.zip"
-    curl -L https://github.com/humbertodias/jmugen/releases/download/$TAG_NAME/natives.zip -o natives.zip
-    unzip natives.zip && rm natives.zip
 fi
 
 exec jmugen.app/Contents/MacOS/jmugen

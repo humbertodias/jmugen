@@ -14,10 +14,6 @@ if (-not (Test-Path "$scriptDir\data")) {
     Write-Host "Extracting data.zip..."
     Expand-Archive -Path "$scriptDir\data.zip" -DestinationPath "$scriptDir"
     Remove-Item "$scriptDir\data.zip"
-
-    Invoke-WebRequest -Uri "https://github.com/humbertodias/jmugen/releases/download/$tagName/natives.zip" -OutFile "$scriptDir\natives.zip"
-    Expand-Archive -Path "$scriptDir\natives.zip" -DestinationPath "$scriptDir"
-    Remove-Item "$scriptDir\natives.zip"
 }
 
 # Find the jmugen application executable
