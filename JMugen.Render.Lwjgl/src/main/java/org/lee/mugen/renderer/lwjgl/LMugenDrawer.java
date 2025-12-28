@@ -161,9 +161,6 @@ public class LMugenDrawer extends MugenDrawer {
 			// Afterimage
 			trans = dp.getImageProperties().getTrans();
 		}
-		
-		// Set default blend function - will be overridden by trans-specific settings below
-		GL11.glBlendFunc(GL11.GL_SRC_COLOR, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
 		if (trans == Trans.ADD || trans == Trans.ADDALPHA) {
 			GL11.glTexEnvf(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_MODE,
@@ -272,6 +269,7 @@ public class LMugenDrawer extends MugenDrawer {
 		GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_MODE, GL11.GL_MODULATE);
 
 		GL11.glEnable(GL11.GL_BLEND);
+		GL11.glBlendFunc(GL11.GL_SRC_COLOR, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glColor4f(1f, 1f, 1f, 1f);
 
 		// store the current model matrix
