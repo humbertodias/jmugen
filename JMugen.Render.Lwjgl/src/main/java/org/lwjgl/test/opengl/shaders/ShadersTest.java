@@ -251,27 +251,27 @@ public final class ShadersTest {
 		vectorBuffer.clear();
 		vectorBuffer.put(1.0f).put(1.0f).put(1.0f).put(1.0f);
 		vectorBuffer.flip();
-		glLight(GL_LIGHT0, GL_DIFFUSE, vectorBuffer);
+		glLightfv(GL_LIGHT0, GL_DIFFUSE, vectorBuffer);
 
 		vectorBuffer.clear();
 		vectorBuffer.put(1.0f).put(1.0f).put(1.0f).put(1.0f);
 		vectorBuffer.flip();
-		glLight(GL_LIGHT0, GL_AMBIENT, vectorBuffer);
+		glLightfv(GL_LIGHT0, GL_AMBIENT, vectorBuffer);
 
 		vectorBuffer.clear();
 		vectorBuffer.put(1.0f).put(1.0f).put(0.5f).put(1.0f);
 		vectorBuffer.flip();
-		glLight(GL_LIGHT0, GL_SPECULAR, vectorBuffer);
+		glLightfv(GL_LIGHT0, GL_SPECULAR, vectorBuffer);
 
 		vectorBuffer.clear();
 		vectorBuffer.put(-1.0f / 3.0f).put(1.0f / 3.0f).put(1.0f / 3.0f).put(0.0f); // Infinite
 		vectorBuffer.flip();
-		glLight(GL_LIGHT0, GL_POSITION, vectorBuffer);
+		glLightfv(GL_LIGHT0, GL_POSITION, vectorBuffer);
 
 		vectorBuffer.clear();
 		vectorBuffer.put(0.2f).put(0.2f).put(0.2f).put(1.0f);
 		vectorBuffer.flip();
-		glLightModel(GL_LIGHT_MODEL_AMBIENT, vectorBuffer);
+		glLightModelfv(GL_LIGHT_MODEL_AMBIENT, vectorBuffer);
 	}
 
 	static int getDisplayWidth() {

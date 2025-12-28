@@ -44,17 +44,18 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
 import org.lwjgl.system.MemoryUtil;
-import org.lwjgl.opengl.ARBProgram;
 import org.lwjgl.opengl.ARBShaderObjects;
+import org.lwjgl.opengl.ARBVertexProgram;
+import org.lwjgl.opengl.ARBFragmentProgram;
 import org.lwjgl.opengl.GL11;
 
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.ARBVertexProgram.*;
+import static org.lwjgl.opengl.ARBFragmentProgram.*;
 
 abstract class Shader {
 
 	private static final IntBuffer int_buffer = MemoryUtil.memAllocInt(16);
-	protected static IntBuffer programBuffer = MemoryUtil.memAllocInt(1);
-	protected static ByteBuffer fileBuffer = MemoryUtil.memAlloc(1024 * 10);
 
 	protected Shader() {
 	}
@@ -86,6 +87,7 @@ abstract class Shader {
 
 			BufferedInputStream stream = new BufferedInputStream(inputStream);
 
+			ByteBuffer fileBuffer = MemoryUtil.memAlloc(1024 * 10);
 			byte character;
 			while ( (character = (byte)stream.read()) != -1 )
 				fileBuffer.put(character);
@@ -98,7 +100,7 @@ abstract class Shader {
 			shader.put(fileBuffer);
 
 			shader.flip();
-			fileBuffer.clear();
+			MemoryUtil.memFree(fileBuffer);
 		} catch (IOException e) {
 			ShadersTest.kill("Failed to read the shader source file: " + file, e);
 		}
@@ -112,7 +114,7 @@ abstract class Shader {
 			final byte[] bytes = new byte[programSource.capacity()];
 			programSource.get(bytes);
 
-			final int errorPos = glGetInteger(ARBProgram.GL_PROGRAM_ERROR_POSITION_ARB);
+			final int errorPos = glGetInteger(GL_PROGRAM_ERROR_POSITION_ARB);
 			int lineStart = 0;
 			int lineEnd = -1;
 			for ( int i = 0; i < bytes.length; i++ ) {
@@ -131,7 +133,7 @@ abstract class Shader {
 
 			ShadersTest.kill("Low-level program error in file: " + programFile
 			                 + "\n\tError line: " + new String(bytes, lineStart, lineEnd - lineStart)
-			                 + "\n\tError message: " + GL11.glGetString(ARBProgram.GL_PROGRAM_ERROR_STRING_ARB));
+			                 + "\n\tError message: " + GL11.glGetString(GL_PROGRAM_ERROR_STRING_ARB));
 		}
 	}
 

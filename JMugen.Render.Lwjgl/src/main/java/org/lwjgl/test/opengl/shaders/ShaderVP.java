@@ -56,9 +56,9 @@ final class ShaderVP extends Shader {
 		file = shaderFile;
 		source = getShaderText(shaderFile);
 
-		glGenProgramsARB(programBuffer);
-
-		ID = programBuffer.get(0);
+		int[] programs = new int[1];
+		glGenProgramsARB(programs);
+		ID = programs[0];
 
 		glBindProgramARB(GL_VERTEX_PROGRAM_ARB, ID);
 		glProgramStringARB(GL_VERTEX_PROGRAM_ARB, GL_PROGRAM_FORMAT_ASCII_ARB, source);
@@ -79,8 +79,8 @@ final class ShaderVP extends Shader {
 	}
 
 	void cleanup() {
-		programBuffer.put(0, ID);
-		glDeleteProgramsARB(programBuffer);
+		int[] programs = {ID};
+		glDeleteProgramsARB(programs);
 	}
 
 }

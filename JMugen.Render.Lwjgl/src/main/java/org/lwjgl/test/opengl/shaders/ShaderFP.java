@@ -64,9 +64,9 @@ final class ShaderFP extends Shader {
 		vpFile = vpShaderFile;
 		vpSource = getShaderText(vpShaderFile);
 
-		glGenProgramsARB(programBuffer);
-
-		vpID = programBuffer.get(0);
+		int[] programs = new int[1];
+		glGenProgramsARB(programs);
+		vpID = programs[0];
 
 		glBindProgramARB(GL_VERTEX_PROGRAM_ARB, vpID);
 		glProgramStringARB(GL_VERTEX_PROGRAM_ARB, GL_PROGRAM_FORMAT_ASCII_ARB, vpSource);
@@ -77,9 +77,8 @@ final class ShaderFP extends Shader {
 		fpFile = fpShaderFile;
 		fpSource = getShaderText(fpShaderFile);
 
-		glGenProgramsARB(programBuffer);
-
-		fpID = programBuffer.get(0);
+		glGenProgramsARB(programs);
+		fpID = programs[0];
 
 		glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, fpID);
 		glProgramStringARB(GL_FRAGMENT_PROGRAM_ARB, GL_PROGRAM_FORMAT_ASCII_ARB, fpSource);
@@ -108,11 +107,10 @@ final class ShaderFP extends Shader {
 	}
 
 	void cleanup() {
-		programBuffer.put(0, vpID);
-		glDeleteProgramsARB(programBuffer);
-
-		programBuffer.put(0, fpID);
-		glDeleteProgramsARB(programBuffer);
+		int[] programs = {vpID};
+		glDeleteProgramsARB(programs);
+		programs[0] = fpID;
+		glDeleteProgramsARB(programs);
 	}
 
 }
