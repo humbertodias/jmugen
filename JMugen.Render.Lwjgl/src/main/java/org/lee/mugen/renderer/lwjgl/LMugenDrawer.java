@@ -57,7 +57,7 @@ public class LMugenDrawer extends MugenDrawer {
 	}
 
 	public void fillRect(float x1, float y1, float width, float height) {
-		GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_MODE, GL11.GL_MODULATE);
+		GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_MODE, GL11.GL_REPLACE);
 		GL11.glBlendFunc(GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		// GL11.glColor4f(rgb.getA(), rgb.getG(), rgb.getB(), rgb.getA());
@@ -204,7 +204,7 @@ public class LMugenDrawer extends MugenDrawer {
 
 			type = 3;
 		} else {
-			GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_MODE, GL11.GL_MODULATE);
+			GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_MODE, GL11.GL_REPLACE);
 			GL11.glBlendFunc(GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
 		}
@@ -256,7 +256,7 @@ public class LMugenDrawer extends MugenDrawer {
 		GL11.glColor4f(1f, 1f, 1f, 1f);
 		GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_MODE,
 				GL11.GL_MODULATE);
-		GL11.glBlendFunc(GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		GL11.glBlendFunc(GL11.GL_SRC_COLOR, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		text.bind();
 		drawChild(dp);
 
