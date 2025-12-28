@@ -261,6 +261,9 @@ public class LGameWindow implements GameWindow {
         // Set the clear color (background) to black
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
+        // Set viewport to match window size
+        glViewport(0, 0, width, height);
+
         // enable textures since we're going to use these for our sprites
         glEnable(GL_TEXTURE_2D);
 
