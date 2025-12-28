@@ -30,7 +30,6 @@ MAIN_CLASS = org.lee.mugen.test.TestMenu
 
 run:
 	${JAVA} ${JAVA_OPTS} \
-	-Djava.library.path=natives \
 	-cp JMugen.Properties/target/JMugen.Properties-0.0.1-SNAPSHOT.jar:JMugen.Debug/target/JMugen.Debug-0.0.1-SNAPSHOT.jar:JMugen.Launcher/target/JMugen.Launcher-0.0.1-SNAPSHOT.jar:${HOME}/.m2/repository/com/googlecode/soundlibs/mp3spi/1.9.5.4/mp3spi-1.9.5.4.jar \
 	${MAIN_CLASS}
 
@@ -51,7 +50,7 @@ app-image:
 	--name jmugen \
 	--main-jar jmugen.jar \
 	--type app-image \
-	--java-options "--add-opens java.desktop/sun.awt=ALL-UNNAMED -Djava.library.path=natives" \
+	--java-options "--add-opens java.desktop/sun.awt=ALL-UNNAMED" \
 	--dest dist/
 	rm -rf tmp
 
@@ -62,10 +61,4 @@ copy-release-files:
 dist:	app-image	copy-release-files
 	(cd dist && tar cfzv ../jmugen-${TAG_NAME}-${OS}-${ARCH}.tar.gz *)
 
-natives:
-	mkdir -p natives
-	find ${HOME}/.m2 -name lwjgl-platform-2.9.3-natives-*.jar -exec unzip -o {} -d natives \;
-	find ${HOME}/.m2 -name jogl-all-natives-*-v2.4.0-rc4.jar -exec unzip -o {} -d natives \;
-	find ${HOME}/.m2 -name gluegen-rt-natives-macosx-universal-v2.4.0-rc4.jar -exec unzip -o {} -d natives \;
-
-.PHONY: natives package run dist clean
+.PHONY: package run dist clean
