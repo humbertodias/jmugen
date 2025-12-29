@@ -49,6 +49,14 @@ To debug the project, use the following Java options:
 JAVA_OPTS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=0.0.0.0:5005"
 ```
 
+
+## Release version
+
+```shell
+mvn package
+java $JAVA_OPTS -jar JMugen.Launcher/target/JMugen.Launcher-0.0.1-SNAPSHOT.jar
+```
+
 ## References
 
 - [Download JMugen 0.2 Alpha](https://sourceforge.net/projects/mugen-net/files/)
