@@ -120,7 +120,7 @@
     </dependencies>
 
     <properties>
-        <jogl.version>v2.4.0-rc4</jogl.version>
+        <jogl.version>2.6.0</jogl.version>
     </properties>
 
     <repositories>
