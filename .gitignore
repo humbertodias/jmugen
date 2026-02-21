@@ -11,3 +11,4 @@ natives
 *.iml
 *.tar.gz
 resource/cache
+.DS_Store
