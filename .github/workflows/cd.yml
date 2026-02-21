@@ -32,11 +32,11 @@ jobs:
           restore-keys: |
             maven-${{ runner.os }}-${{ runner.arch }}-
 
-      - name: Set up JDK 17
+      - name: Set up JDK
         uses: actions/setup-java@v5
         with:
           distribution: 'corretto'
-          java-version: '17'
+          java-version: '8'
 
       - name: Package jar
         run: mvn package
@@ -94,11 +94,11 @@ jobs:
           restore-keys: |
             maven-${{ runner.os }}-${{ runner.arch }}-
 
-      - name: Set up JDK 17
+      - name: Set up JDK
         uses: actions/setup-java@v5
         with:
           distribution: 'corretto'
-          java-version: '17'
+          java-version: '8'
 
       - name: Package jar
         run: mvn package
@@ -135,11 +135,11 @@ jobs:
           restore-keys: |
             maven-${{ runner.os }}-${{ runner.arch }}-
 
-      - name: Set up JDK 17
+      - name: Set up JDK
         uses: actions/setup-java@v5
         with:
           distribution: 'zulu'
-          java-version: '17'
+          java-version: '8'
 
       - name: Package jar
         run: mvn package
