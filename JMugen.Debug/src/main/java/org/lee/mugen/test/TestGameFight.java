@@ -41,36 +41,39 @@ public class TestGameFight  {
 		String stage = null;
 		String music = null;
 
-		JOptionPane.showMessageDialog(null, """
-        JMugen : This version is an alpha version
-        * Memory is not optimized but now it is better with jogl
-        * There are two versions of this JMugen (Default is OpenGL)
-            - OpenGL (For now Shader 2 is required)
-            - Software (no support for now palFx, proper rotation, ...)
-        * Key Mapping => edit the file keys.properties
-        * To change Renderer edit the file render.properties
-        
-        For Hi Res Stage support you have to add in the 
-            file Stage.def in [Scaling] section these 2 new elements: xscale = 0.5 and yscale = 0.5
-        
-        *- Not Implemented Yet and very needed by Mugen
-            - Reversedef
-        *- WIP:
-            1 - Parser Speed Optimization
-                (RAOH's state.cns is about 1.5M and has many many expressions,
-                 it takes about 12 sec to load it all)
-            
-            2 - ReversalDef (it might be a complicated part)
-            3 - I'll see
-        
-        * Note:
-            - You have to keep this directory structure and you will need this file: resource\\data\\common.cmd
-              This file is a list of controllers that append the statedef -1 and is used for controlling the sprite.
-            - There is a Debugger window; you can change the state on the fly. To use it, once the two sprites appear, click on 'click here'.
-        
-        -------------------------------------------------------------------------------------------------------
-        Now it will prompt to choose Characters, Stage, and Music (Music is not required).
-        """, "JMugen 0.01b", JOptionPane.INFORMATION_MESSAGE);
+		JOptionPane.showMessageDialog(
+        null,
+        "JMugen : This version is an alpha version\n"
+      + "* Memory is not optimized but now it is better with jogl\n"
+      + "* There are two versions of this JMugen (Default is OpenGL)\n"
+      + "    - OpenGL (For now Shader 2 is required)\n"
+      + "    - Software (no support for now palFx, proper rotation, ...)\n"
+      + "* Key Mapping => edit the file keys.properties\n"
+      + "* To change Renderer edit the file render.properties\n"
+      + "\n"
+      + "For Hi Res Stage support you have to add in the\n"
+      + "    file Stage.def in [Scaling] section these 2 new elements: xscale = 0.5 and yscale = 0.5\n"
+      + "\n"
+      + "*- Not Implemented Yet and very needed by Mugen\n"
+      + "    - Reversedef\n"
+      + "*- WIP:\n"
+      + "    1 - Parser Speed Optimization\n"
+      + "        (RAOH's state.cns is about 1.5M and has many many expressions,\n"
+      + "         it takes about 12 sec to load it all)\n"
+      + "\n"
+      + "    2 - ReversalDef (it might be a complicated part)\n"
+      + "    3 - I'll see\n"
+      + "\n"
+      + "* Note:\n"
+      + "    - You have to keep this directory structure and you will need this file: resource\\data\\common.cmd\n"
+      + "      This file is a list of controllers that append the statedef -1 and is used for controlling the sprite.\n"
+      + "    - There is a Debugger window; you can change the state on the fly. To use it, once the two sprites appear, click on 'click here'.\n"
+      + "\n"
+      + "-------------------------------------------------------------------------------------------------------\n"
+      + "Now it will prompt to choose Characters, Stage, and Music (Music is not required).",
+        "JMugen 0.01b",
+        JOptionPane.INFORMATION_MESSAGE
+);
 		
 		JOptionPane.showMessageDialog(null, "Choose the first Char", "JMugen 0.01b", JOptionPane.INFORMATION_MESSAGE);
 		JFileChooser fcSelectChar = new JFileChooser(new File(".", JMugenConstant.RESOURCE + "chars"));

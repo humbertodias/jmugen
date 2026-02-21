@@ -18,7 +18,7 @@ public class ExternalBundleControl extends ResourceBundle.Control {
     @Override
     public ResourceBundle newBundle(String baseName, Locale locale, String format, ClassLoader loader, boolean reload)
             throws IOException {
-        String fileName = "%s/%s.properties".formatted(basePath, baseName);
+        String fileName = String.format("%s/%s.properties", basePath, baseName);
         File file = new File(fileName);
 
         if (!file.exists()) {

@@ -136,19 +136,19 @@ public class LMugenDrawer extends MugenDrawer {
 		}
 		return afterImageShader;
 	}
-	private Texture toTexture(Object obj){
-		if (obj instanceof Texture) {
-            return (Texture) obj;
+	private Texture toTexture(Object obj) {
+    if (obj instanceof Texture) {
+        return (Texture) obj;
+    } else if (obj instanceof BufferedImage) {
+        BufferedImage bufferedImage = (BufferedImage) obj;
+        try {
+            return TextureLoader.getTextureLoader().getTexture(bufferedImage);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-		else if (obj instanceof BufferedImage bufferedImage) {
-            try {
-                return TextureLoader.getTextureLoader().getTexture(bufferedImage);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-		return null;
-	}
+    }
+    return null;
+}
 
 	private void drawWithPropertiesColor(DrawProperties dp) {
 //		Texture texture = (Texture) dp.getIc().getImg();
