@@ -13,6 +13,10 @@ Forked from [code.google/jmugen](https://code.google.com/archive/p/jmugen/)
 
 Explore the available [features](./FEATURES.md) and contribute to implementing the missing ones.
 
+```shell
+mvn package
+java -jar JMugen.Launcher/target/JMugen.Launcher-0.0.1-SNAPSHOT.jar
+```
 ![JMugen Gameplay](https://github.com/user-attachments/assets/1b7c5e84-4abc-4200-9580-c0d00d7397b8)
 
 ## 🎮 Controls
