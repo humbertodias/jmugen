@@ -2,14 +2,18 @@ package org.lee.mugen.renderer.libgdx;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.HdpiUtils;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import org.lee.mugen.imageIO.PCXLoader;
 import org.lee.mugen.imageIO.PCXPalette;
 import org.lee.mugen.imageIO.RawPCXImage;
@@ -46,7 +50,16 @@ public class LGDXMugenDrawer extends MugenDrawer {
     
     // Image cache
     private Map<Object, ImageContainer> imageCache = new HashMap<>();
-    
+
+    /** Projects Mugen world corners to logical screen pixels using the same matrix as {@link SpriteBatch} at frame start. */
+    private final Vector3 clipProjTmp = new Vector3();
+    private final com.badlogic.gdx.math.Rectangle tmpClipScreen = new com.badlogic.gdx.math.Rectangle();
+    private boolean clipActive;
+    private float clipPivotX;
+    private float clipPivotY;
+    /** When true with an active clip, uniform shrink/zoom scales about {@link #clipPivotX}/{@link #clipPivotY}. */
+    private boolean uniformScaleAboutClipCorner;
+
     public LGDXMugenDrawer() {
         if (!LibGDXRendererFactory.isInitialized()) {
             try {
@@ -95,14 +108,34 @@ public class LGDXMugenDrawer extends MugenDrawer {
     public GameWindow getInstanceOfGameWindow() {
         return gameWindow;
     }
-    
+
+
     @Override
     public void scale(float x, float y) {
         SpriteBatch batch = getBatch();
         if (batch == null) {
             return;
         }
-        batch.setTransformMatrix(batch.getTransformMatrix().scale(x, y, 1));
+        Matrix4 m = batch.getTransformMatrix();
+        if (clipActive && uniformScaleAboutClipCorner && shouldScaleAboutClipPivot(x, y)) {
+            m.translate(clipPivotX, clipPivotY, 0);
+            m.scale(x, y, 1);
+            m.translate(-clipPivotX, -clipPivotY, 0);
+        } else {
+            m.scale(x, y, 1);
+        }
+    }
+
+    /**
+     * Uniform shrink/zoom about the clip corner (only when {@link #uniformScaleAboutClipCorner} is on),
+     * matching LWJGL's clip+scale behaviour for the select-screen stage preview. Clipped menu fonts keep
+     * normal scaling about the batch origin unless that flag is set.
+     */
+    private static boolean shouldScaleAboutClipPivot(float x, float y) {
+        if (Math.abs(x - 1f) < 1e-4f && Math.abs(y - 1f) < 1e-4f) {
+            return false;
+        }
+        return (x < 1f && y < 1f) || (x > 1f && y > 1f);
     }
     
     @Override
@@ -115,8 +148,8 @@ public class LGDXMugenDrawer extends MugenDrawer {
         if (imageContainer == null || imageContainer.getImg() == null) {
             return;
         }
-        
-        Texture texture = (Texture) imageContainer.getImg();
+
+        Texture texture = resolveTextureForDraw(imageContainer);
         if (texture == null) {
             return;
         }
@@ -126,11 +159,31 @@ public class LGDXMugenDrawer extends MugenDrawer {
             return;
         }
         batch.setColor(currentColor);
-        
+
+        Trans trans = drawProperties.getTrans();
+        boolean restoreBlend = false;
+        int prevSrc = GL20.GL_SRC_ALPHA;
+        int prevDst = GL20.GL_ONE_MINUS_SRC_ALPHA;
+        if (trans == Trans.SUB) {
+            batch.flush();
+            prevSrc = batch.getBlendSrcFunc();
+            prevDst = batch.getBlendDstFunc();
+            batch.setBlendFunction(GL20.GL_DST_COLOR, GL20.GL_SRC_ALPHA);
+            restoreBlend = true;
+        } else if (trans == Trans.ADD || trans == Trans.ADDALPHA || trans == Trans.ADD1) {
+            batch.flush();
+            prevSrc = batch.getBlendSrcFunc();
+            prevDst = batch.getBlendDstFunc();
+            batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_DST_ALPHA);
+            restoreBlend = true;
+        }
+
         float x = Math.min(drawProperties.getXLeftDst(), drawProperties.getXRightDst());
         float y = Math.min(drawProperties.getYTopDst(), drawProperties.getYBottomDst());
         float width = Math.abs(drawProperties.getXRightDst() - drawProperties.getXLeftDst());
         float height = Math.abs(drawProperties.getYBottomDst() - drawProperties.getYTopDst());
+        float sx = drawProperties.getXScaleFactor();
+        float sy = drawProperties.getYScaleFactor();
         
         int srcX = Math.min((int) drawProperties.getXLeftSrc(), (int) drawProperties.getXRightSrc());
         int srcY = Math.min((int) drawProperties.getYTopSrc(), (int) drawProperties.getYBottomSrc());
@@ -138,6 +191,21 @@ public class LGDXMugenDrawer extends MugenDrawer {
         int srcHeight = Math.abs((int) (drawProperties.getYBottomSrc() - drawProperties.getYTopSrc()));
         
         if (srcWidth == 0 || srcHeight == 0) {
+            return;
+        }
+
+        int tw = texture.getWidth();
+        int th = texture.getHeight();
+        if (srcX >= tw || srcY >= th) {
+            return;
+        }
+        if (srcX + srcWidth > tw) {
+            srcWidth = tw - srcX;
+        }
+        if (srcY + srcHeight > th) {
+            srcHeight = th - srcY;
+        }
+        if (srcWidth <= 0 || srcHeight <= 0) {
             return;
         }
 
@@ -157,14 +225,41 @@ public class LGDXMugenDrawer extends MugenDrawer {
         sprite.setOrigin(0, 0);
         sprite.setAlpha(currentAlpha * drawProperties.getAlpha());
 
+        // Match LMugenDrawer#drawImage: destination quad scales by DrawProperties factors
+        // and by AngleDrawProperties when present.
         if (drawProperties.getAngleDrawProperties() != null) {
             AngleDrawProperties angleProps = drawProperties.getAngleDrawProperties();
             sprite.setOrigin(angleProps.getXAnchor(), angleProps.getYAnchor());
             sprite.setRotation(angleProps.getAngleset());
-            sprite.setScale(angleProps.getXScale(), angleProps.getYScale());
+            sprite.setScale(angleProps.getXScale() * sx, angleProps.getYScale() * sy);
+        } else {
+            sprite.setScale(sx, sy);
         }
-        
+
         sprite.draw(batch);
+        if (restoreBlend) {
+            batch.flush();
+            batch.setBlendFunction(prevSrc, prevDst);
+        }
+    }
+
+    /**
+     * Match {@link org.lee.mugen.renderer.lwjgl.LMugenDrawer#toTexture}: {@link ImageContainer} may hold
+     * a {@link Texture} or a {@link BufferedImage} (or other types handled by {@link #getImageContainer(Object, int)}).
+     */
+    private Texture resolveTextureForDraw(ImageContainer imageContainer) {
+        Object imgObj = imageContainer.getImg();
+        if (imgObj instanceof Texture) {
+            return (Texture) imgObj;
+        }
+        ImageContainer converted = getImageContainer(imgObj, 0);
+        if (converted == null || converted.getImg() == null) {
+            return null;
+        }
+        if (converted.getImg() instanceof Texture) {
+            return (Texture) converted.getImg();
+        }
+        return null;
     }
     
     private boolean pauseBatchIfNecessary() {
@@ -241,7 +336,18 @@ public class LGDXMugenDrawer extends MugenDrawer {
         shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(currentColor);
-        shapeRenderer.rect(x, y, width, height);
+        float rw = width;
+        float rh = height;
+        if (gameWindow != null && gameWindow.getViewport() != null && x <= 0 && y <= 0) {
+            Viewport vp = gameWindow.getViewport();
+            float vw = vp.getWorldWidth();
+            float vh = vp.getWorldHeight();
+            if (rw >= vw && rh >= vh) {
+                rw = vw;
+                rh = vh;
+            }
+        }
+        shapeRenderer.rect(x, y, rw, rh);
         shapeRenderer.end();
         resumeBatchIfNecessary(wasDrawing);
     }
@@ -267,24 +373,127 @@ public class LGDXMugenDrawer extends MugenDrawer {
     public float getAlpha() {
         return currentAlpha;
     }
-    
+
+    /**
+     * Map a Mugen-world axis-aligned rectangle to OpenGL window pixels (bottom-left origin, y up), matching
+     * {@link com.badlogic.gdx.graphics.Camera#project(Vector3, float, float, float, float)} with the FitViewport
+     * screen bounds and the frame-start {@link LGDXGameWindow#getWorldProjectionSnapshot()}.
+     */
+    private void computeClipScreenBounds(float minWx, float minWy, float maxWx, float maxWy) {
+        Viewport vp = gameWindow.getViewport();
+        Matrix4 base = gameWindow.getWorldProjectionSnapshot();
+        float vpx = vp.getScreenX();
+        float vpy = vp.getScreenY();
+        float vpw = vp.getScreenWidth();
+        float vph = vp.getScreenHeight();
+
+        float minPx = Float.POSITIVE_INFINITY;
+        float maxPx = Float.NEGATIVE_INFINITY;
+        float minPy = Float.POSITIVE_INFINITY;
+        float maxPy = Float.NEGATIVE_INFINITY;
+        float[][] corners = {{minWx, minWy}, {maxWx, minWy}, {maxWx, maxWy}, {minWx, maxWy}};
+        for (float[] p : corners) {
+            clipProjTmp.set(p[0], p[1], 0);
+            clipProjTmp.prj(base);
+            float px = vpw * (clipProjTmp.x + 1f) / 2f + vpx;
+            float py = vph * (clipProjTmp.y + 1f) / 2f + vpy;
+            minPx = Math.min(minPx, px);
+            maxPx = Math.max(maxPx, px);
+            minPy = Math.min(minPy, py);
+            maxPy = Math.max(maxPy, py);
+        }
+        tmpClipScreen.x = minPx;
+        tmpClipScreen.y = minPy;
+        tmpClipScreen.width = maxPx - minPx;
+        tmpClipScreen.height = maxPy - minPy;
+    }
+
+    /** Restore FitViewport glViewport + full 320×240 ortho (matches frame start after {@link LGDXGameWindow#render}). */
+    private void restoreDefaultViewportAndCamera(SpriteBatch batch) {
+        Gdx.gl.glDisable(GL20.GL_SCISSOR_TEST);
+        if (gameWindow == null || gameWindow.getViewport() == null || gameWindow.getCamera() == null) {
+            clipActive = false;
+            clipPivotX = 0f;
+            clipPivotY = 0f;
+            return;
+        }
+        Viewport vp = gameWindow.getViewport();
+        OrthographicCamera cam = gameWindow.getCamera();
+        vp.apply(false);
+        cam.setToOrtho(true, 320, 240);
+        cam.update();
+        if (batch != null) {
+            batch.setProjectionMatrix(cam.combined);
+        }
+        clipActive = false;
+        clipPivotX = 0f;
+        clipPivotY = 0f;
+    }
+
     @Override
     public void setClip(Rectangle r) {
-        if (r != null) {
-            int x = r.getX1();
-            int y = r.getY1();
-            int width = r.getX2() - r.getX1();
-            int height = r.getY2() - r.getY1();
-            
-            // Note: LibGDX scissor test (clipping) can be used here if needed
-            // Gdx.gl.glScissor(x, gameWindow.getGameHeight() - y - height, width, height);
-            // Gdx.gl.glEnable(GL20.GL_SCISSOR_TEST);
-        } else {
-            // Disable clipping
-            // Gdx.gl.glDisable(GL20.GL_SCISSOR_TEST);
+        SpriteBatch batch = getBatch();
+        boolean wasDrawing = pauseBatchIfNecessary();
+        try {
+            if (r == null) {
+                if (clipActive) {
+                    restoreDefaultViewportAndCamera(batch);
+                }
+                clipPivotX = 0f;
+                clipPivotY = 0f;
+                uniformScaleAboutClipCorner = false;
+                return;
+            }
+            uniformScaleAboutClipCorner = false;
+            if (gameWindow == null || gameWindow.getViewport() == null || gameWindow.getCamera() == null) {
+                return;
+            }
+
+            float wx1 = r.getX1();
+            float wy1 = r.getY1();
+            float wx2 = r.getX2();
+            float wy2 = r.getY2();
+            float minWx = Math.min(wx1, wx2);
+            float maxWx = Math.max(wx1, wx2);
+            float minWy = Math.min(wy1, wy2);
+            float maxWy = Math.max(wy1, wy2);
+            float clipW = maxWx - minWx;
+            float clipH = maxWy - minWy;
+            if (clipW < 1e-3f || clipH < 1e-3f) {
+                if (clipActive) {
+                    restoreDefaultViewportAndCamera(batch);
+                }
+                return;
+            }
+
+            computeClipScreenBounds(minWx, minWy, maxWx, maxWy);
+            int sx = Math.round(tmpClipScreen.x);
+            int sy = Math.round(tmpClipScreen.y);
+            int sw = Math.round(tmpClipScreen.width);
+            int sh = Math.round(tmpClipScreen.height);
+            if (sw < 1 || sh < 1) {
+                if (clipActive) {
+                    restoreDefaultViewportAndCamera(batch);
+                }
+                return;
+            }
+
+            OrthographicCamera cam = gameWindow.getCamera();
+            HdpiUtils.glViewport(sx, sy, sw, sh);
+            cam.setToOrtho(true, clipW, clipH);
+            cam.position.set(minWx + clipW / 2f, minWy + clipH / 2f, 0);
+            cam.update();
+            if (batch != null) {
+                batch.setProjectionMatrix(cam.combined);
+            }
+            clipActive = true;
+            clipPivotX = minWx;
+            clipPivotY = minWy;
+        } finally {
+            resumeBatchIfNecessary(wasDrawing);
         }
     }
-    
+
     @Override
     public ImageContainer getImageContainer(Object imageData) {
         return getImageContainer(imageData, 0);
@@ -342,6 +551,15 @@ public class LGDXMugenDrawer extends MugenDrawer {
                 Texture texture = new Texture(pixmap);
                 pixmap.dispose();
                 LGDXImageContainer container = new LGDXImageContainer(texture, width, height);
+                imageCache.put(imageData, container);
+                return container;
+            } else if (imageData instanceof BufferedImage) {
+                BufferedImage bufferedImage = (BufferedImage) imageData;
+                Pixmap pixmap = gdxPixmapFromBufferedImage(bufferedImage);
+                Texture texture = new Texture(pixmap);
+                pixmap.dispose();
+                LGDXImageContainer container = new LGDXImageContainer(texture,
+                        bufferedImage.getWidth(), bufferedImage.getHeight());
                 imageCache.put(imageData, container);
                 return container;
             }

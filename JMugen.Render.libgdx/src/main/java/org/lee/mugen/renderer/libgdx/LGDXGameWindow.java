@@ -145,6 +145,12 @@ public class LGDXGameWindow implements GameWindow, ApplicationListener {
     /** Reset each frame — {@link LGDXMugenDrawer#scale} stacks on the batch transform matrix. */
     private final Matrix4 batchTransformIdentity = new Matrix4();
 
+    /**
+     * {@link OrthographicCamera#combined} for the full 320×240 view (same as {@link SpriteBatch} at frame start),
+     * captured before {@code setClip} mutates the camera. Used to place LWJGL-style sub-viewports.
+     */
+    private final Matrix4 worldProjectionSnapshot = new Matrix4();
+
     public LGDXGameWindow() {
         setTitle("JMugen - LibGDX");
         setResolution(640, 480);
@@ -218,6 +224,7 @@ public class LGDXGameWindow implements GameWindow, ApplicationListener {
         camera.setToOrtho(true, 320, 240);
         viewport.apply();
         batch.setProjectionMatrix(camera.combined);
+        worldProjectionSnapshot.set(camera.combined);
 
         try {
             initKeys();
@@ -305,6 +312,7 @@ public class LGDXGameWindow implements GameWindow, ApplicationListener {
         viewport.update(width, height, true);
         camera.setToOrtho(true, 320, 240);
         batch.setProjectionMatrix(camera.combined);
+        worldProjectionSnapshot.set(camera.combined);
     }
 
     @Override
@@ -331,6 +339,7 @@ public class LGDXGameWindow implements GameWindow, ApplicationListener {
                 }
 
                 batch.setProjectionMatrix(camera.combined);
+                worldProjectionSnapshot.set(camera.combined);
                 batchTransformIdentity.idt();
                 batch.setTransformMatrix(batchTransformIdentity);
                 batch.begin();
@@ -458,6 +467,11 @@ public class LGDXGameWindow implements GameWindow, ApplicationListener {
 
     public SpriteBatch getBatch() {
         return batch;
+    }
+
+    /** @see #worldProjectionSnapshot */
+    public Matrix4 getWorldProjectionSnapshot() {
+        return worldProjectionSnapshot;
     }
 
     public OrthographicCamera getCamera() {
