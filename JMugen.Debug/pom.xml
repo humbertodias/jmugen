@@ -37,6 +37,12 @@
     </dependency>
 
     <dependency>
+      <groupId>JMugen.Render.libgdx</groupId>
+      <artifactId>JMugen.Render.libgdx</artifactId>
+      <version>${jmugen.version}</version>
+    </dependency>
+
+    <dependency>
       <groupId>JMugen.Render.Lwjgl</groupId>
       <artifactId>JMugen.Render.Lwjgl</artifactId>
       <version>${jmugen.version}</version>

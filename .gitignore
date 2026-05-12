@@ -12,3 +12,4 @@ natives
 *.tar.gz
 resource/cache
 .DS_Store
+*.class

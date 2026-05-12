@@ -1,0 +1,25 @@
+# Sample render.properties configuration for LibGDX backend
+# Copy this file to your resources folder and adjust settings as needed
+
+# Renderer class - must match the LibGDX implementation
+renderClass=org.lee.mugen.renderer.libgdx.LGDXMugenDrawer
+
+# Window settings
+window.title=JMugen - LibGDX Renderer
+window.width=640
+window.height=480
+window.resizable=true
+
+# Rendering settings
+render.vsync=true
+render.fps=60
+render.idleFps=30
+
+# Graphics quality
+graphics.antialiasing=true
+graphics.textureFilter=linear
+
+# Debug settings
+debug.enabled=false
+debug.renderBounds=false
+debug.renderGrid=false
