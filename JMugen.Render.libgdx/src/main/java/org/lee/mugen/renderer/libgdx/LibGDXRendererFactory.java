@@ -7,15 +7,15 @@ import org.lee.mugen.util.Logger;
  * Centralizes renderer initialization and configuration
  */
 public class LibGDXRendererFactory {
-    
+
     private static LGDXMugenDrawer drawerInstance;
     private static LGDXGameWindow windowInstance;
     private static boolean isInitialized = false;
-    
+
     private LibGDXRendererFactory() {
         // Prevent instantiation
     }
-    
+
     /**
      * Initialize the LibGDX renderer
      * Should be called before any other methods
@@ -25,12 +25,12 @@ public class LibGDXRendererFactory {
             Logger.log("LibGDX renderer already initialized");
             return;
         }
-        
+
         try {
             // Create game window
             windowInstance = new LGDXGameWindow();
             Logger.log("LibGDX GameWindow created");
-            
+
             // Create drawer (will be instantiated properly when window is ready)
             Logger.log("LibGDX renderer initialized");
             isInitialized = true;
@@ -39,7 +39,7 @@ public class LibGDXRendererFactory {
             throw e;
         }
     }
-    
+
     /**
      * Get the MugenDrawer instance
      */
@@ -47,14 +47,14 @@ public class LibGDXRendererFactory {
         if (!isInitialized) {
             throw new IllegalStateException("LibGDX renderer not initialized. Call initialize() first.");
         }
-        
+
         if (drawerInstance == null) {
             drawerInstance = new LGDXMugenDrawer(windowInstance);
         }
-        
+
         return drawerInstance;
     }
-    
+
     /**
      * Get the GameWindow instance
      */
@@ -64,7 +64,7 @@ public class LibGDXRendererFactory {
         }
         return windowInstance;
     }
-    
+
     /**
      * Configure window properties
      */
@@ -72,11 +72,11 @@ public class LibGDXRendererFactory {
         if (!isInitialized) {
             throw new IllegalStateException("LibGDX renderer not initialized. Call initialize() first.");
         }
-        
+
         windowInstance.setTitle(title);
         windowInstance.setResolution(width, height);
     }
-    
+
     /**
      * Start the game loop
      */
@@ -84,16 +84,16 @@ public class LibGDXRendererFactory {
         if (!isInitialized) {
             throw new IllegalStateException("LibGDX renderer not initialized. Call initialize() first.");
         }
-        
+
         if (gameCallback == null) {
             throw new IllegalArgumentException("Game callback cannot be null");
         }
-        
+
         org.lee.mugen.core.Game game = (org.lee.mugen.core.Game) gameCallback;
         windowInstance.setGameWindowCallback(game);
         windowInstance.start();
     }
-    
+
     /**
      * Shutdown the renderer
      */
@@ -102,20 +102,20 @@ public class LibGDXRendererFactory {
             drawerInstance.dispose();
             drawerInstance = null;
         }
-        
+
         isInitialized = false;
         windowInstance = null;
-        
+
         Logger.log("LibGDX renderer shutdown complete");
     }
-    
+
     /**
      * Check if renderer is initialized
      */
     public static boolean isInitialized() {
         return isInitialized;
     }
-    
+
     /**
      * Get renderer configuration string
      */
@@ -123,14 +123,14 @@ public class LibGDXRendererFactory {
         StringBuilder sb = new StringBuilder();
         sb.append("=== LibGDX Renderer Configuration ===\n");
         sb.append("Status: ").append(isInitialized ? "Initialized" : "Not Initialized").append("\n");
-        
+
         if (windowInstance != null) {
             sb.append("Window Title: ").append("JMugen - LibGDX").append("\n");
             sb.append("Window Size: ").append(windowInstance.getGameWidth())
               .append("x").append(windowInstance.getGameHeight()).append("\n");
             sb.append("Initialization Complete: ").append(windowInstance.isFinishInit()).append("\n");
         }
-        
+
         return sb.toString();
     }
 }
