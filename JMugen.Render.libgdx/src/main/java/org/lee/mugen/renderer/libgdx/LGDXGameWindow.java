@@ -415,7 +415,11 @@ public class LGDXGameWindow implements GameWindow, ApplicationListener {
         if (batch != null) {
             batch.dispose();
         }
+        if (callback != null) {
+            callback.free();
+        }
         gameRunning = false;
+        System.exit(0);
     }
 
     @Override
