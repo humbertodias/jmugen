@@ -481,14 +481,13 @@ public class LGDXMugenDrawer extends MugenDrawer {
             OrthographicCamera cam = gameWindow.getCamera();
             HdpiUtils.glViewport(sx, sy, sw, sh);
             cam.setToOrtho(true, clipW, clipH);
-            cam.position.set(minWx + clipW / 2f, minWy + clipH / 2f, 0);
             cam.update();
             if (batch != null) {
                 batch.setProjectionMatrix(cam.combined);
             }
             clipActive = true;
-            clipPivotX = minWx;
-            clipPivotY = minWy;
+            clipPivotX = 0f;
+            clipPivotY = 0f;
         } finally {
             resumeBatchIfNecessary(wasDrawing);
         }
