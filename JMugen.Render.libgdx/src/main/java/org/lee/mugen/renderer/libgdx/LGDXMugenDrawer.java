@@ -50,6 +50,18 @@ public class LGDXMugenDrawer extends MugenDrawer {
     // Image cache
     private Map<Object, ImageContainer> imageCache = new HashMap<>();
 
+    // PalFx shader (shared)
+    private static org.lee.mugen.renderer.libgdx.shader.PalFxShader palFxShader =
+        null;
+
+    private org.lee.mugen.renderer.libgdx.shader.PalFxShader getPalFxShader() {
+        if (palFxShader == null) {
+            palFxShader =
+                new org.lee.mugen.renderer.libgdx.shader.PalFxShader();
+        }
+        return palFxShader;
+    }
+
     /** Projects Mugen world corners to logical screen pixels using the same matrix as {@link SpriteBatch} at frame start. */
     private final Vector3 clipProjTmp = new Vector3();
     private final com.badlogic.gdx.math.Rectangle tmpClipScreen =
@@ -179,7 +191,7 @@ public class LGDXMugenDrawer extends MugenDrawer {
             batch.flush();
             prevSrc = batch.getBlendSrcFunc();
             prevDst = batch.getBlendDstFunc();
-//            batch.setBlendFunction(GL20.GL_DST_COLOR, GL20.GL_SRC_ALPHA);
+            //            batch.setBlendFunction(GL20.GL_DST_COLOR, GL20.GL_SRC_ALPHA);
             batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE);
             restoreBlend = true;
         } else if (
@@ -188,7 +200,7 @@ public class LGDXMugenDrawer extends MugenDrawer {
             batch.flush();
             prevSrc = batch.getBlendSrcFunc();
             prevDst = batch.getBlendDstFunc();
-//            batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_DST_ALPHA);
+            //            batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_DST_ALPHA);
             batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE);
             restoreBlend = true;
         }
@@ -281,7 +293,65 @@ public class LGDXMugenDrawer extends MugenDrawer {
             sprite.setScale(sx, sy);
         }
 
+        // Palette effects (PalFx) - use shader to match LWJGL behavior
+        boolean usedPalFx = false;
+        org.lee.mugen.renderer.PalFxSub palfx = drawProperties.getPalfx();
+        org.lee.mugen.renderer.libgdx.shader.PalFxShader ps = null;
+        if (palfx != null) {
+            ps = getPalFxShader();
+            if (ps != null && ps.isCompiled()) {
+                float phase = 0f;
+                if (
+                    palfx.getSinadd() != null &&
+                    palfx.getSinadd().getPeriod() != 0
+                ) {
+                    phase = (float) ((Math.PI * palfx.getTimeActivate()) /
+                        palfx.getSinadd().getPeriod());
+                }
+                int rPlus = 0;
+                int gPlus = 0;
+                int bPlus = 0;
+                if (palfx.getSinadd() != null) {
+                    rPlus = (int) (palfx.getSinadd().getAmpl_r() *
+                        Math.sin(2 * phase));
+                    gPlus = (int) (palfx.getSinadd().getAmpl_g() *
+                        Math.sin(2 * phase));
+                    bPlus = (int) (palfx.getSinadd().getAmpl_b() *
+                        Math.sin(2 * phase));
+                }
+                org.lee.mugen.renderer.RGB ampl =
+                    new org.lee.mugen.renderer.RGB(rPlus, gPlus, bPlus, 255f);
+                org.lee.mugen.renderer.RGB bits =
+                    new org.lee.mugen.renderer.RGB(
+                        1f / 255f,
+                        1f / 255f,
+                        1f / 255f,
+                        1f / 255f
+                    );
+                org.lee.mugen.renderer.RGB addNorm = palfx.getAdd().mul(bits);
+                org.lee.mugen.renderer.RGB mulNorm = palfx.getMul().mul(bits);
+                org.lee.mugen.renderer.RGB amplNorm = ampl.mul(bits);
+
+                boolean wasDrawing = pauseBatchIfNecessary();
+                ps.apply(batch);
+                resumeBatchIfNecessary(wasDrawing);
+                ps.setUniforms(
+                    addNorm,
+                    mulNorm,
+                    amplNorm,
+                    drawProperties.getAlpha()
+                );
+                usedPalFx = true;
+            }
+        }
+
         sprite.draw(batch);
+
+        if (usedPalFx && ps != null) {
+            batch.flush();
+            ps.reset(batch);
+        }
+
         if (restoreBlend) {
             batch.flush();
             batch.setBlendFunction(prevSrc, prevDst);
