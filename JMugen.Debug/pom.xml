@@ -37,8 +37,8 @@
     </dependency>
 
     <dependency>
-      <groupId>JMugen.Render.libgdx</groupId>
-      <artifactId>JMugen.Render.libgdx</artifactId>
+      <groupId>JMugen.Render.libgdx.desktop</groupId>
+      <artifactId>JMugen.Render.libgdx.desktop</artifactId>
       <version>${jmugen.version}</version>
     </dependency>
 

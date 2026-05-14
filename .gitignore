@@ -13,3 +13,10 @@ natives
 resource/cache
 .DS_Store
 *.class
+**/target/
+**/bin/
+**/dist/
+**/tmp/
+**/resource/cache/
+**/resource/logs/
+**/resource/logs/

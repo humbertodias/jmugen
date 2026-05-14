@@ -27,7 +27,8 @@
         <module>JMugen.Render.Java</module>
         <module>JMugen.Render.jogl</module>
         <module>JMugen.Render.Lwjgl</module>
-        <module>JMugen.Render.libgdx</module>
+        <module>JMugen.Render.libgdx.core</module>
+        <module>JMugen.Render.libgdx.desktop</module>
         <module>JMugen</module>
         <module>Syntax</module>
         <!-- joglUtils module still using openGl1. so, let's skip for while -->
