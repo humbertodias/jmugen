@@ -179,7 +179,8 @@ public class LGDXMugenDrawer extends MugenDrawer {
             batch.flush();
             prevSrc = batch.getBlendSrcFunc();
             prevDst = batch.getBlendDstFunc();
-            batch.setBlendFunction(GL20.GL_DST_COLOR, GL20.GL_SRC_ALPHA);
+//            batch.setBlendFunction(GL20.GL_DST_COLOR, GL20.GL_SRC_ALPHA);
+            batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE);
             restoreBlend = true;
         } else if (
             trans == Trans.ADD || trans == Trans.ADDALPHA || trans == Trans.ADD1
@@ -187,7 +188,8 @@ public class LGDXMugenDrawer extends MugenDrawer {
             batch.flush();
             prevSrc = batch.getBlendSrcFunc();
             prevDst = batch.getBlendDstFunc();
-            batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_DST_ALPHA);
+//            batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_DST_ALPHA);
+            batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE);
             restoreBlend = true;
         }
 
