@@ -14,19 +14,11 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.lee.mugen.imageIO.PCXLoader;
-import org.lee.mugen.imageIO.PCXLoader.PCXHeader;
-import org.lee.mugen.imageIO.PCXPalette;
-import org.lee.mugen.imageIO.RawPCXImage;
 import org.lee.mugen.object.RawImage;
 import org.lee.mugen.object.Rectangle;
 import org.lee.mugen.renderer.*;
-import org.lee.mugen.util.Logger;
 
 /**
  * LibGDX implementation of MugenDrawer
@@ -49,18 +41,6 @@ public class LGDXMugenDrawer extends MugenDrawer {
 
     // Image cache
     private Map<Object, ImageContainer> imageCache = new HashMap<>();
-
-    // PalFx shader (shared)
-    private static org.lee.mugen.renderer.libgdx.core.shader.PalFxShader palFxShader =
-        null;
-
-    private org.lee.mugen.renderer.libgdx.core.shader.PalFxShader getPalFxShader() {
-        if (palFxShader == null) {
-            palFxShader =
-                new org.lee.mugen.renderer.libgdx.core.shader.PalFxShader();
-        }
-        return palFxShader;
-    }
 
     /** Projects Mugen world corners to logical screen pixels using the same matrix as {@link SpriteBatch} at frame start. */
     private final Vector3 clipProjTmp = new Vector3();
@@ -282,9 +262,9 @@ public class LGDXMugenDrawer extends MugenDrawer {
         // Palette effects (PalFx) - use shader to match LWJGL behavior
         boolean usedPalFx = false;
         org.lee.mugen.renderer.PalFxSub palfx = drawProperties.getPalfx();
-        org.lee.mugen.renderer.libgdx.core.shader.PalFxShader ps = null;
-        if (palfx != null) {
-            ps = getPalFxShader();
+        LGDXPalFxShader ps = null;
+        if (palfx != null && renderContext != null) {
+            ps = renderContext.getPalFxShader();
             if (ps != null && ps.isCompiled()) {
                 float phase = 0f;
                 if (
@@ -346,7 +326,7 @@ public class LGDXMugenDrawer extends MugenDrawer {
 
     /**
      * Match {@link org.lee.mugen.renderer.lwjgl.LMugenDrawer#toTexture}: {@link ImageContainer} may hold
-     * a {@link Texture} or a {@link BufferedImage} (or other types handled by {@link #getImageContainer(Object, int)}).
+     * a {@link Texture} or another format handled by {@link #getImageContainer(Object, int)}.
      */
     private Texture resolveTextureForDraw(ImageContainer imageContainer) {
         Object imgObj = imageContainer.getImg();
@@ -640,101 +620,58 @@ public class LGDXMugenDrawer extends MugenDrawer {
             return imageCache.get(imageData);
         }
 
-        try {
-            if (imageData instanceof RawPCXImage) {
-                RawPCXImage pcxImage = (RawPCXImage) imageData;
-                byte[] data = pcxImage.getData();
-                PCXHeader header = new PCXHeader(data);
+        if (imageData instanceof Texture) {
+            Texture texture = (Texture) imageData;
+            LGDXImageContainer container = new LGDXImageContainer(
+                texture,
+                texture.getWidth(),
+                texture.getHeight()
+            );
+            imageCache.put(imageData, container);
+            return container;
+        }
 
-                int width = header.getWidth();
-                int height = header.getHeight();
-
-                // Convert PCX data to Pixmap using the requested color bank offset
-                BufferedImage bufferedImage = PCXLoader.loadImage(
-                    BufferedImage.TYPE_INT_ARGB,
-                    new ByteArrayInputStream(data),
-                    new PCXPalette(),
-                    false,
-                    false,
-                    false,
-                    false,
-                    colors
-                );
-                Pixmap pixmap = gdxPixmapFromBufferedImage(bufferedImage);
-                Texture texture = new Texture(pixmap);
-                pixmap.dispose();
-
-                LGDXImageContainer container = new LGDXImageContainer(
-                    texture,
-                    width,
-                    height
-                );
-                imageCache.put(imageData, container);
-                return container;
-            } else if (imageData instanceof RawImage) {
-                RawImage rawImage = (RawImage) imageData;
-                int width = rawImage.getWidth();
-                int height = rawImage.getHeight();
-                Pixmap pixmap = new Pixmap(
-                    width,
-                    height,
-                    Pixmap.Format.RGBA8888
-                );
-                int[] pixels = rawImage.getData();
-                for (int y = 0; y < height; y++) {
-                    for (int x = 0; x < width; x++) {
-                        int argb = pixels[y * width + x];
-                        pixmap.drawPixel(x, y, argbToRgba(argb));
-                    }
+        if (imageData instanceof RawImage) {
+            RawImage rawImage = (RawImage) imageData;
+            int width = rawImage.getWidth();
+            int height = rawImage.getHeight();
+            Pixmap pixmap = new Pixmap(
+                width,
+                height,
+                Pixmap.Format.RGBA8888
+            );
+            int[] pixels = rawImage.getData();
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    int argb = pixels[y * width + x];
+                    pixmap.drawPixel(x, y, argbToRgba(argb));
                 }
-                Texture texture = new Texture(pixmap);
-                pixmap.dispose();
-                LGDXImageContainer container = new LGDXImageContainer(
-                    texture,
-                    width,
-                    height
-                );
-                imageCache.put(imageData, container);
-                return container;
-            } else if (imageData instanceof BufferedImage) {
-                BufferedImage bufferedImage = (BufferedImage) imageData;
-                Pixmap pixmap = gdxPixmapFromBufferedImage(bufferedImage);
-                Texture texture = new Texture(pixmap);
-                pixmap.dispose();
-                LGDXImageContainer container = new LGDXImageContainer(
-                    texture,
-                    bufferedImage.getWidth(),
-                    bufferedImage.getHeight()
-                );
+            }
+            Texture texture = new Texture(pixmap);
+            pixmap.dispose();
+            LGDXImageContainer container = new LGDXImageContainer(
+                texture,
+                width,
+                height
+            );
+            imageCache.put(imageData, container);
+            return container;
+        }
+
+        if (renderContext != null && renderContext.getImageLoader() != null) {
+            ImageContainer container = renderContext
+                .getImageLoader()
+                .getImageContainer(imageData, colors);
+            if (container != null) {
                 imageCache.put(imageData, container);
                 return container;
             }
-        } catch (IOException e) {
-            Logger.error("Error loading image container", e);
         }
 
         return null;
     }
 
-    /**
-     * Convert BufferedImage to LibGDX Pixmap
-     */
-    private Pixmap gdxPixmapFromBufferedImage(BufferedImage bufferedImage) {
-        int width = bufferedImage.getWidth();
-        int height = bufferedImage.getHeight();
-        Pixmap pixmap = new Pixmap(width, height, Pixmap.Format.RGBA8888);
-
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                int argb = bufferedImage.getRGB(x, y);
-                pixmap.drawPixel(x, y, argbToRgba(argb));
-            }
-        }
-
-        return pixmap;
-    }
-
-    private int argbToRgba(int argb) {
+    public static int argbToRgba(int argb) {
         int a = (argb >> 24) & 0xff;
         int r = (argb >> 16) & 0xff;
         int g = (argb >> 8) & 0xff;

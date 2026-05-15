@@ -5,6 +5,7 @@
 /bin/
 /dist/
 /tmp/
+/war/
 
 natives
 *.log

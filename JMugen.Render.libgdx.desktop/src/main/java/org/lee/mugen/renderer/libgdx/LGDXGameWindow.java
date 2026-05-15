@@ -20,6 +20,8 @@ import org.lee.mugen.input.CmdProcDispatcher;
 import org.lee.mugen.input.ISpriteCmdProcess;
 import org.lee.mugen.renderer.GameWindow;
 import org.lee.mugen.renderer.MugenTimer;
+import org.lee.mugen.renderer.libgdx.core.LGDXImageLoader;
+import org.lee.mugen.renderer.libgdx.core.LGDXPalFxShader;
 import org.lee.mugen.util.Logger;
 
 import java.util.ArrayList;
@@ -125,6 +127,8 @@ public class LGDXGameWindow implements GameWindow, ApplicationListener, org.lee.
     private Game callback;
 
     private LGDXMugenTimer timer;
+    private final LGDXImageLoader imageLoader = new LGDXDesktopImageLoader();
+    private final LGDXPalFxShader palFxShader = new LGDXDesktopPalFxShader();
     private final GameWindow.MouseCtrl mouse = new GameWindow.MouseCtrl();
     private final Vector3 unprojectTmp = new Vector3();
 
@@ -165,6 +169,16 @@ public class LGDXGameWindow implements GameWindow, ApplicationListener, org.lee.
     @Override
     public GameWindow getGameWindow() {
         return this;
+    }
+
+    @Override
+    public LGDXImageLoader getImageLoader() {
+        return imageLoader;
+    }
+
+    @Override
+    public LGDXPalFxShader getPalFxShader() {
+        return palFxShader;
     }
 
     @Override

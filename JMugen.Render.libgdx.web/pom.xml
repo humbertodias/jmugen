@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>JMugen.Render.libgdx.web</groupId>
+    <artifactId>JMugen.Render.libgdx.web</artifactId>
+
+    <parent>
+        <groupId>JMugen.Parent</groupId>
+        <artifactId>JMugen.Parent</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <properties>
+        <libgdx.version>1.14.0</libgdx.version>
+        <gwt.version>2.10.0</gwt.version>
+        <!-- gwt:run — embedded server (index.html); override: -Dgwt.port=… -->
+        <gwt.port>8888</gwt.port>
+        <!-- Code server UI; plugin default 9997; override: -Dgwt.codeServerPort=… -->
+        <gwt.codeServerPort>9876</gwt.codeServerPort>
+        <!-- optional JVM agent; set by profile gwt-jvm-debug (Java 8: do not use address=*:port) -->
+        <gwt.jvm.debug.args></gwt.jvm.debug.args>
+        <gwt.jvm.debug.port>5005</gwt.jvm.debug.port>
+        <gwt.jvm.debug.host>127.0.0.1</gwt.jvm.debug.host>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>JMugen.Render.libgdx.core</groupId>
+            <artifactId>JMugen.Render.libgdx.core</artifactId>
+            <version>${jmugen.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>JMugen.Common</groupId>
+            <artifactId>JMugen.Common</artifactId>
+            <version>${jmugen.version}</version>
+            <classifier>sources</classifier>
+        </dependency>
+        <dependency>
+            <groupId>JMugen.Render.libgdx.core</groupId>
+            <artifactId>JMugen.Render.libgdx.core</artifactId>
+            <version>${jmugen.version}</version>
+            <classifier>sources</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.badlogicgames.gdx</groupId>
+            <artifactId>gdx-backend-gwt</artifactId>
+            <version>${libgdx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.badlogicgames.gdx</groupId>
+            <artifactId>gdx</artifactId>
+            <version>${libgdx.version}</version>
+            <classifier>sources</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.badlogicgames.gdx</groupId>
+            <artifactId>gdx-backend-gwt</artifactId>
+            <version>${libgdx.version}</version>
+            <classifier>sources</classifier>
+        </dependency>
+        <!-- Source: https://mvnrepository.com/artifact/com.levigo/gwt-awt -->
+        <dependency>
+            <groupId>com.levigo</groupId>
+            <artifactId>gwt-awt</artifactId>
+            <version>1.0.1</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.2</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>gwt-maven-plugin</artifactId>
+                <version>${gwt.version}</version>
+                <configuration>
+                    <module>org.lee.mugen.renderer.libgdx.web.JMugenWeb</module>
+                    <modules>
+                        <module>org.lee.mugen.renderer.libgdx.web.JMugenWeb</module>
+                    </modules>
+                    <runTarget>index.html</runTarget>
+                    <!-- Same tree as gwt:compile webappDirectory; plugin copies target/classes → WEB-INF/classes here. -->
+                    <hostedWebapp>${project.build.directory}/webapp</hostedWebapp>
+                    <webappDirectory>${project.build.directory}/webapp</webappDirectory>
+                    <copyWebapp>true</copyWebapp>
+                    <port>${gwt.port}</port>
+                    <codeServerPort>${gwt.codeServerPort}</codeServerPort>
+                    <!-- Client runs as JS in the browser; PRETTY helps Chrome DevTools. JDWP only hits Java in this JVM. -->
+                    <style>PRETTY</style>
+                    <extraJvmArgs>-Xmx1024m ${gwt.jvm.debug.args}</extraJvmArgs>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

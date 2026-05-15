@@ -1,0 +1,9 @@
+/target/
+/src/main/gwt-unitCache/
+/src/main/webapp/jmugen/
+/src/main/webapp/WEB-INF/classes/
+/src/main/webapp/WEB-INF/deploy/
+/src/main/webapp/WEB-INF/lib/
+# pasta inteira de assets do módulo web
+/src/main/webapp/assets/
+/src/main/gdx-assets/

@@ -17,4 +17,12 @@ public interface LGDXRenderContext {
     Viewport getViewport();
     int getGameWidth();
     int getGameHeight();
+
+    default LGDXImageLoader getImageLoader() {
+        return null;
+    }
+
+    default LGDXPalFxShader getPalFxShader() {
+        return null;
+    }
 }

@@ -1,7 +1,6 @@
 package org.lee.mugen.renderer.libgdx.core;
 
 import org.lee.mugen.renderer.MugenTimer;
-import com.badlogic.gdx.Gdx;
 
 /**
  * Timer implementation for LibGDX
@@ -31,29 +30,15 @@ public class LGDXMugenTimer implements MugenTimer {
     @Override
     public int sleep() {
         long now = System.currentTimeMillis();
-        long sleepTime = (1000 / framerate) - (now - lastTime);
-        
-        if (sleepTime > 0) {
-            try {
-                Thread.sleep(sleepTime);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        }
-        
-        lastTime = System.currentTimeMillis();
+        int delta = (int) (now - lastTime);
+        lastTime = now;
         updateFps();
-        
-        return (int) (System.currentTimeMillis() - now);
+        return delta;
     }
     
     @Override
     public void sleep(long ms) {
-        try {
-            Thread.sleep(ms);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        // LibGDX owns the frame pacing on desktop and web.
     }
     
     @Override
