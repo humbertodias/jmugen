@@ -8,7 +8,7 @@
     <parent>
         <groupId>JMugen.Parent</groupId>
         <artifactId>JMugen.Parent</artifactId>
-        <version>${jmugen.version}</version>
+        <version>0.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 

@@ -8,7 +8,7 @@
     <parent>
         <groupId>JMugen.Parent</groupId>
         <artifactId>JMugen.Parent</artifactId>
-        <version>${jmugen.version}</version>
+        <version>0.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -19,10 +19,8 @@
         <gwt.port>8888</gwt.port>
         <!-- Code server UI; plugin default 9997; override: -Dgwt.codeServerPort=… -->
         <gwt.codeServerPort>9876</gwt.codeServerPort>
-        <!-- optional JVM agent; set by profile gwt-jvm-debug (Java 8: do not use address=*:port) -->
+        <!-- Optional JVM flags; append JDWP here for DevMode remote debug if needed (Java 8: use address=127.0.0.1:port, not *:port). -->
         <gwt.jvm.debug.args></gwt.jvm.debug.args>
-        <gwt.jvm.debug.port>5005</gwt.jvm.debug.port>
-        <gwt.jvm.debug.host>127.0.0.1</gwt.jvm.debug.host>
     </properties>
 
     <dependencies>
