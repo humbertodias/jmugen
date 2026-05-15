@@ -11,6 +11,8 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <jmugen.version>0.0.1-SNAPSHOT</jmugen.version>
+        <!-- Used by gwt:run if invoked from the reactor root without -pl (avoids missing runTarget on JMugen.Parent). -->
+        <runTarget>index.html</runTarget>
         <main.class>org.lee.mugen.test.TestMenu</main.class>
         <maven-surefire-plugin.version>3.5.5</maven-surefire-plugin.version>
         <maven-compiler-plugin.version>3.15.0</maven-compiler-plugin.version>
