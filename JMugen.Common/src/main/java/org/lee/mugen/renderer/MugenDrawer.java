@@ -1,10 +1,10 @@
 package org.lee.mugen.renderer;
 
-import java.awt.Color;
-
 import org.lee.mugen.object.Rectangle;
 
-
+/**
+ * Base drawer API (no {@code java.awt} types here so subclasses load on Android).
+ */
 public abstract class MugenDrawer {
 	
 	
@@ -31,17 +31,7 @@ public abstract class MugenDrawer {
     	    drawLine(x, y + height, x, y + 1);
     	}
     }
-    
-    
-    
-	public void setColor(Color color) {
-		setColor(color.getRed()/255f, color.getGreen()/255f, color.getBlue()/255f, color.getAlpha()/255f);
-		
-	}
-	public void draw(java.awt.Rectangle r) {
-		drawRect(r.x, r.y, r.width, r.height);
-		
-	}
+
 	public abstract void setColor(float r, float g, float b);
 	public abstract void setColor(float r, float g, float b, float a);
 	public abstract ImageContainer getImageContainer(Object imageData, int colors);

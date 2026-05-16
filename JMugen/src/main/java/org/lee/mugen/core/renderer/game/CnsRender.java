@@ -1,6 +1,5 @@
 package org.lee.mugen.core.renderer.game;
 
-import java.awt.Color;
 import java.awt.Rectangle;
 
 import org.lee.mugen.core.GameFight;
@@ -53,7 +52,7 @@ public class CnsRender implements Renderable {
 		y = stage.getStageinfo().getZoffset() + _mvY;
 		
 		if (showCns) {
-			g.setColor(Color.MAGENTA);
+			g.setColor(1f, 0f, 1f, 1f);
 			int deltaDraw = 5;
 			
 			g.drawLine(
@@ -63,17 +62,17 @@ public class CnsRender implements Renderable {
 					x + (int)sprite.getRealXPos(), y - deltaDraw + (int)sprite.getRealYPos(), 
 					x + (int)sprite.getRealXPos(), y + deltaDraw + (int)sprite.getRealYPos());
 			
-			g.setColor(Color.GREEN);
+			g.setColor(0f, 1f, 0f, 1f);
 			for (java.awt.Rectangle r: sprite.getCns2()) {
 				r.setLocation(x + r.x, y + r.y);
-	            g.draw(r);
+	            g.drawRect(r.x, r.y, r.width, r.height);
 				
 			}
 			
 			// Draw Width, height
 			if (sprite instanceof Sprite) {
 				Sprite spr = (Sprite) sprite;
-				g.setColor(Color.YELLOW);
+				g.setColor(1f, 1f, 0f, 1f);
 				int topX = (int) (isFlip? spr.getInfo().getWidth().getFront(): spr.getInfo().getWidth().getBack());
 				int bottomX = (int) (isFlip? spr.getInfo().getWidth().getBack(): spr.getInfo().getWidth().getFront());
 				int topY = (int) (spr.getInfo().getSize().getHeight());
@@ -86,17 +85,17 @@ public class CnsRender implements Renderable {
 				
 				Rectangle r = new Rectangle(topX, topY, Math.abs(bottomX - topX), Math.abs(bottomY - topY));
 				r.translate(_mvX + stage.getCamera().getWidth()/2, (stage.getStageinfo().getZoffset() + _mvY));
-				g.draw(r);
+				g.drawRect(r.x, r.y, r.width, r.height);
 				
 			}
 		}
 		
 		if (showAttackCns) {
-			g.setColor(Color.RED);
+			g.setColor(1f, 0f, 0f, 1f);
 			
 			for (java.awt.Rectangle r: sprite.getCns1()) {
 				r.setLocation(x + r.x, y + r.y);
-	            g.draw(r);
+	            g.drawRect(r.x, r.y, r.width, r.height);
 				
 			}
 		}
