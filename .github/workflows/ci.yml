@@ -49,6 +49,14 @@ jobs:
             "platforms;android-34" \
             "build-tools;28.0.3" \
             "platform-tools"
+          
+          # 
+          # Legacy SDK tools required by android-maven-plugin 
+          # 
+          cd $ANDROID_HOME
+          curl -L -o tools.zip \
+          https://dl.google.com/android/repository/tools_r25.2.5-linux.zip
+          unzip tools.zip
 
       # Switch back to Java 8 for the Maven build
       - name: Set up JDK 8
