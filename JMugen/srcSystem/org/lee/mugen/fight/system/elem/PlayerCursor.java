@@ -1,13 +1,13 @@
 package org.lee.mugen.fight.system.elem;
 
-import java.awt.Point;
+import org.lee.mugen.geom.MugenPoint;
 
 import org.lee.mugen.fight.section.Section;
 import org.lee.mugen.fight.section.elem.Type;
 import org.lee.mugen.util.BeanTools;
 
 public class PlayerCursor implements Section {
-	private Point startcell;
+	private MugenPoint startcell;
 	private Type active;
 	private Type done;
 	private Type move;
@@ -25,7 +25,7 @@ public class PlayerCursor implements Section {
 	@Override
 	public void parse(Object root, String name, String value) throws Exception {
 		if (name.equals("startcell")) {
-			startcell = (Point) BeanTools.getConvertersMap().get(Point.class).convert(value);
+			startcell = (MugenPoint) BeanTools.getConvertersMap().get(MugenPoint.class).convert(value);
 		} else if (name.startsWith("active")) {
 			if (active == null)
 				active = new Type();
@@ -45,10 +45,10 @@ public class PlayerCursor implements Section {
 		
 	}
 	
-	public Point getStartcell() {
+	public MugenPoint getStartcell() {
 		return startcell;
 	}
-	public void setStartcell(Point startcell) {
+	public void setStartcell(MugenPoint startcell) {
 		this.startcell = startcell;
 	}
 	public Type getActive() {

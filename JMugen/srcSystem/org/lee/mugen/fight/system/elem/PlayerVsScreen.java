@@ -1,6 +1,6 @@
 package org.lee.mugen.fight.system.elem;
 
-import java.awt.Point;
+import org.lee.mugen.geom.MugenPoint;
 
 import org.lee.mugen.fight.section.elem.PlayerFace;
 import org.lee.mugen.fight.section.elem.PlayerName;
@@ -10,14 +10,14 @@ import org.lee.mugen.util.BeanTools;
 
 public class PlayerVsScreen extends PlayerFace {
 	Type name;
-	Point pos = new Point();
+	MugenPoint pos = new MugenPoint();
 	int facing;
 	PointF scale = new PointF(1,1);
-	public Point getPos() {
+	public MugenPoint getPos() {
 		return pos;
 	}
 
-	public void setPos(Point pos) {
+	public void setPos(MugenPoint pos) {
 		this.pos = pos;
 	}
 
@@ -54,7 +54,7 @@ public class PlayerVsScreen extends PlayerFace {
 			this.name.setType(Type.getNext(name), this.name, value, root);
 			this.name.parse(Type.getNext(name), value);
 		} else if (name.startsWith("pos")) {
-			pos = (Point) BeanTools.getConvertersMap().get(Point.class).convert(value);
+			pos = (MugenPoint) BeanTools.getConvertersMap().get(MugenPoint.class).convert(value);
 		}  else if (name.startsWith("facing")) {
 			facing = Integer.parseInt(value);
 		} else if (name.startsWith("scale")) {

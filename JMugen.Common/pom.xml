@@ -25,13 +25,6 @@
       <version>2.22.0</version>
     </dependency>
 
-    <!-- https://mvnrepository.com/artifact/commons-beanutils/commons-beanutils -->
-    <dependency>
-      <groupId>commons-beanutils</groupId>
-      <artifactId>commons-beanutils</artifactId>
-      <version>1.11.0</version>
-    </dependency>
-
   </dependencies>
 
   <build>

@@ -1,8 +1,7 @@
 package org.lee.mugen.core.renderer.game.vsScreen;
 
-import java.awt.Point;
+import org.lee.mugen.geom.MugenPoint;
 
-import org.apache.commons.beanutils.PropertyUtils;
 import org.lee.mugen.core.GameVsScreen;
 import org.lee.mugen.core.renderer.game.fight.BaseRender;
 import org.lee.mugen.core.renderer.game.system.BackgroundRender;
@@ -20,6 +19,7 @@ import org.lee.mugen.renderer.GraphicsWrapper;
 import org.lee.mugen.renderer.ImageContainer;
 import org.lee.mugen.renderer.MugenDrawer;
 import org.lee.mugen.sprite.entity.PointF;
+import org.lee.mugen.util.BeanTools;
 
 public class VsScreeenRender extends BaseRender {
 	BackgroundRender br;
@@ -55,9 +55,9 @@ public class VsScreeenRender extends BaseRender {
 		
 		br.render();
 		
-		Point pos = vsScreen.getP1().getPos();
+		MugenPoint pos = vsScreen.getP1().getPos();
 		
-		pos = (Point) pos.clone();
+		pos = (MugenPoint) pos.clone();
 		int ifacing = (Integer) getProperty(vsScreen, 
 				"p" + 1 + ".facing");
 		boolean facing = ifacing == -1;
@@ -78,7 +78,7 @@ public class VsScreeenRender extends BaseRender {
 		
 		pos = vsScreen.getP2().getPos();
 			
-		pos = (Point) pos.clone();
+		pos = (MugenPoint) pos.clone();
 		ifacing = (Integer) getProperty(vsScreen, 
 				"p" + 2 + ".facing");
 		facing = ifacing == -1;
@@ -116,7 +116,7 @@ public class VsScreeenRender extends BaseRender {
 		render(md, vsScreen.getP2().getName().getPos(), type);
 		
 	}
-	private void render(MugenDrawer md, Point p, ImageContainer ic, boolean isFlipH, boolean isFlipV, PointF scale) {
+	private void render(MugenDrawer md, MugenPoint p, ImageContainer ic, boolean isFlipH, boolean isFlipV, PointF scale) {
 		DrawProperties dp = new DrawProperties(p.x, p.y, isFlipH, isFlipV, ic);
 		dp.setXScaleFactor(scale.getX());
 		dp.setYScaleFactor(scale.getY());
@@ -126,7 +126,7 @@ public class VsScreeenRender extends BaseRender {
 	}
 	private Object getProperty(Object o, String path) {
 		try {
-			return PropertyUtils.getNestedProperty(o, path);
+			return BeanTools.getNestedProperty(o, path);
 		} catch (Exception e) {
 			throw new IllegalArgumentException("Unknow path " + path + " for " + o.getClass());
 		} 

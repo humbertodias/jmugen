@@ -129,30 +129,30 @@ public class DebugRender implements Renderable {
 			int addX = 0;
 			MouseCtrl mouse = GraphicsWrapper.getInstance().getInstanceOfGameWindow().getMouseStatus();
 			for (String s: strSpriteInfos) {
-				if (mouse.getY() >= y && mouse.getY() < y+fp.getSize().height
+				if (mouse.getY() >= y && mouse.getY() < y+fp.getSize().y
 						&& 
-						mouse.getX() >= x && mouse.getX() < x+fp.getSize().width * s.length() 
+						mouse.getX() >= x && mouse.getX() < x+fp.getSize().x * s.length() 
 						&& mouse.isLeftPress() && s.startsWith("SpriteID")
 				) {
 					sprite.setDebugRender(!sprite.isDebugRender());
 				}
-				fp.draw(0, x, y+=fp.getSize().height, GraphicsWrapper.getInstance(), s);
+				fp.draw(0, x, y+=fp.getSize().y, GraphicsWrapper.getInstance(), s);
 				addX = Math.max(addX, s.length());
 				
 			}
 			addX = 0;
-			y += fp.getSize().height;
+			y += fp.getSize().y;
 			int yMem = y;
 			for (String s: strSpriteInfos2) {
-				fp.draw(0, x, y+=fp.getSize().height, GraphicsWrapper.getInstance(), s);
+				fp.draw(0, x, y+=fp.getSize().y, GraphicsWrapper.getInstance(), s);
 				addX = Math.max(addX, s.length());
 			}
 			
 			x += 95;
 			addX = 0;
-			y = yMem+= fp.getSize().height*4;
+			y = yMem+= fp.getSize().y*4;
 			for (String s: strSpriteInfos3) {
-				fp.draw(0, x, y+=fp.getSize().height, GraphicsWrapper.getInstance(), s);
+				fp.draw(0, x, y+=fp.getSize().y, GraphicsWrapper.getInstance(), s);
 				addX = Math.max(addX, s.length());
 			}
 			
@@ -160,7 +160,7 @@ public class DebugRender implements Renderable {
 			addX = 0;
 			y = yMem;
 			for (String s: strSpriteInfos4) {
-				fp.draw(0, x, y+=fp.getSize().height, GraphicsWrapper.getInstance(), s);
+				fp.draw(0, x, y+=fp.getSize().y, GraphicsWrapper.getInstance(), s);
 				addX = Math.max(addX, s.length());
 			}
 			
@@ -186,16 +186,16 @@ public class DebugRender implements Renderable {
 			FontProducer fp = FontParser.getFontProducer();
 			int x = 10;
 			int y = 50;
-			fp.draw(0, x, y+=fp.getSize().height*2,GraphicsWrapper.getInstance(),"F1         : Display Help");
-			fp.draw(0, x, y+=fp.getSize().height, GraphicsWrapper.getInstance(), "CTRL '+/-' : +/- FPS");
-			fp.draw(0, x, y+=fp.getSize().height, GraphicsWrapper.getInstance(), "CTRL '*'   : Reset FPS");
-			fp.draw(0, x, y+=fp.getSize().height, GraphicsWrapper.getInstance(), "Space      : Init");
-			fp.draw(0, x, y+=fp.getSize().height, GraphicsWrapper.getInstance(), "CTRL-D     : Switch Sprite Informations");
-			fp.draw(0, x, y+=fp.getSize().height, GraphicsWrapper.getInstance(), "CTRL-C     : Show Cns Box");
-			fp.draw(0, x, y+=fp.getSize().height, GraphicsWrapper.getInstance(), "CTRL-X     : Show Cns Attack Box");
+			fp.draw(0, x, y+=fp.getSize().y*2,GraphicsWrapper.getInstance(),"F1         : Display Help");
+			fp.draw(0, x, y+=fp.getSize().y, GraphicsWrapper.getInstance(), "CTRL '+/-' : +/- FPS");
+			fp.draw(0, x, y+=fp.getSize().y, GraphicsWrapper.getInstance(), "CTRL '*'   : Reset FPS");
+			fp.draw(0, x, y+=fp.getSize().y, GraphicsWrapper.getInstance(), "Space      : Init");
+			fp.draw(0, x, y+=fp.getSize().y, GraphicsWrapper.getInstance(), "CTRL-D     : Switch Sprite Informations");
+			fp.draw(0, x, y+=fp.getSize().y, GraphicsWrapper.getInstance(), "CTRL-C     : Show Cns Box");
+			fp.draw(0, x, y+=fp.getSize().y, GraphicsWrapper.getInstance(), "CTRL-X     : Show Cns Attack Box");
 
-			fp.draw(0, x, y+=fp.getSize().height, GraphicsWrapper.getInstance(), "CTRL-P     : Debug Pause");
-			fp.draw(0, x, y+=fp.getSize().height, GraphicsWrapper.getInstance(), "CTRL-A     : If Debug Pause Advance Frame By Frame");
+			fp.draw(0, x, y+=fp.getSize().y, GraphicsWrapper.getInstance(), "CTRL-P     : Debug Pause");
+			fp.draw(0, x, y+=fp.getSize().y, GraphicsWrapper.getInstance(), "CTRL-A     : If Debug Pause Advance Frame By Frame");
 			
 		}
 

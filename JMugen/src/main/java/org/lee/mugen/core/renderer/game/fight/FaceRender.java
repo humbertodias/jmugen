@@ -1,6 +1,6 @@
 package org.lee.mugen.core.renderer.game.fight;
 
-import java.awt.Point;
+import org.lee.mugen.geom.MugenPoint;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -35,7 +35,7 @@ public class FaceRender extends BaseRender {
 		Collections.sort(order);
 		Map<Integer, Type> map = p.getBg();
 		
-		Point pos = p.getPos();
+		MugenPoint pos = p.getPos();
 		for (Integer key: order) {
 			Type bg = map.get(key);
 			render(md, pos, bg);
@@ -43,7 +43,7 @@ public class FaceRender extends BaseRender {
 		if (p.getElem() != null)
 			render(md, pos, p.getElem(), id);
 	}
-	public void render(MugenDrawer md, Point pos, Type type, String id) {
+	public void render(MugenDrawer md, MugenPoint pos, Type type, String id) {
 		if (type.getLayerno() != layer)
 			return;
 		ImageSpriteSFF sff = getImageSFF(type, id);
@@ -92,7 +92,7 @@ public class FaceRender extends BaseRender {
 			return;
 		String name = GameFight.getInstance().getSpriteInstance(id).getDefinition().getInfo().getName();
 		MugenDrawer md = GraphicsWrapper.getInstance();
-		Point pos = p.getPos();
+		MugenPoint pos = p.getPos();
 		FontType font = (FontType) p.getName().getType();
 		
 		int fontSens = font.getAlignmt().getCode();

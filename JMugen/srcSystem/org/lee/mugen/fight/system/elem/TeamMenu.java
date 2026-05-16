@@ -1,11 +1,11 @@
 package org.lee.mugen.fight.system.elem;
 
-import java.awt.Point;
+import org.lee.mugen.geom.MugenPoint;
 
 import org.lee.mugen.fight.section.elem.Type;
 
 public class TeamMenu {
-	Point pos;
+	MugenPoint pos;
 	Type bg;
 	Type selftitle;
 	Type enemytitle;

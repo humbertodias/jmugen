@@ -5,5 +5,7 @@
 
     <source path="">
         <exclude name="shader/**"/>
+        <!-- Uses SoundSystem / filesystem paths; web entrypoints do not install LibGDX audio yet. -->
+        <exclude name="LGDXAudioPlayback.java"/>
     </source>
 </module>

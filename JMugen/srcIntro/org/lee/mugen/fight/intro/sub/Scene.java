@@ -1,6 +1,6 @@
 package org.lee.mugen.fight.intro.sub;
 
-import java.awt.Point;
+import org.lee.mugen.geom.MugenPoint;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,7 +21,7 @@ public class Scene implements Section {
 	private Fade fadein = new Fade();
 	private Fade fadeout = new Fade();
 	private RGB clearcolor;
-	private Point layerall$pos;
+	private MugenPoint layerall$pos;
 	private Map<Integer, Type> layers = new HashMap<Integer, Type>();
 	
 	private String bgm;
@@ -80,7 +80,7 @@ public class Scene implements Section {
 			elem.setType(Type.getNext(name), elem, value, root);
 			elem.parse(Type.getNext(name), value);
 		} else if (name.equals("layerall.pos"))	{
-			setLayerall$pos((Point) BeanTools.getConvertersMap().get(Point.class).convert(value));
+			setLayerall$pos((MugenPoint) BeanTools.getConvertersMap().get(MugenPoint.class).convert(value));
 		} else if (name.equals("end.time")) {
 			setEnd$time(Integer.parseInt(value));
 			originalEnd$time = end$time;
@@ -128,7 +128,7 @@ public class Scene implements Section {
 	public void setClearcolor(RGB clearcolor) {
 		this.clearcolor = clearcolor;
 	}
-	public Point getLayerall$pos() {
+	public MugenPoint getLayerall$pos() {
 		if (layerall$pos == null) {
 			List<Integer> keys = new ArrayList<Integer>();
 			keys.addAll(intro.getScenes().keySet());
@@ -140,7 +140,7 @@ public class Scene implements Section {
 		}
 		return layerall$pos;
 	}
-	public void setLayerall$pos(Point layerall$pos) {
+	public void setLayerall$pos(MugenPoint layerall$pos) {
 		this.layerall$pos = layerall$pos;
 	}
 	public Map<Integer, Type> getLayers() {

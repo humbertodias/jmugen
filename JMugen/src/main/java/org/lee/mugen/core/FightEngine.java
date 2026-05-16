@@ -1,7 +1,7 @@
 package org.lee.mugen.core;
 
-import java.awt.Point;
-import java.awt.Rectangle;
+import org.lee.mugen.geom.MugenPoint;
+import org.lee.mugen.geom.MugenRect;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -190,7 +190,7 @@ public class FightEngine {
 	private void processHitdefVsProjectile(HitDefSub hitdef,
 			ProjectileSprite sprite, Set<HitDefSub> removes,
 			Set<HitDefSub> notProcess) {
-//		Wrapper<Rectangle> wrap = new Wrapper<Rectangle>();
+//		Wrapper<MugenRect> wrap = new Wrapper<MugenRect>();
 
 		if (isHitdefHitAttackRec(hitdef, sprite)) {
 			// TODO
@@ -199,7 +199,7 @@ public class FightEngine {
 
 	private void processHitdefVsSpriteProtectedMode(HitDefSub hitdef,
 			Sprite sprite, Set<HitDefSub> removes, Set<HitDefSub> notProcess) {
-//		Wrapper<Rectangle> wrap = new Wrapper<Rectangle>();
+//		Wrapper<MugenRect> wrap = new Wrapper<MugenRect>();
 
 		if (isHitdefHitCollisionRec(hitdef, sprite)) {
 			Sprite spriteHitter = GameFight.getInstance().getSpriteInstance(
@@ -258,7 +258,7 @@ public class FightEngine {
 			final Sprite sprite, Set<HitDefSub> removes,
 			Set<HitDefSub> notProcess, boolean force) {
 		
-		Wrapper<Rectangle> wrap = new Wrapper<Rectangle>();
+		Wrapper<MugenRect> wrap = new Wrapper<MugenRect>();
 		if (hitdef instanceof ReversaldefSub)
 			return;
 		if (isHitdefHitCollisionRec(hitdef, sprite, wrap) || force) {
@@ -301,7 +301,7 @@ public class FightEngine {
 
 	private void processHitdefVsAttackRec(HitDefSub hitdef, Sprite sprite,
 			Set<HitDefSub> removes, Set<HitDefSub> notProcess) {
-//		Wrapper<Rectangle> wrap = new Wrapper<Rectangle>();
+//		Wrapper<MugenRect> wrap = new Wrapper<MugenRect>();
 
 		boolean isHitdefHitAttackRec = isHitdefHitAttackRec(hitdef, sprite);
 		if (hitdef instanceof ReversaldefSub 
@@ -402,7 +402,7 @@ public class FightEngine {
 	private void processProjectileVsProjectile(ProjectileSub hitdef,
 			ProjectileSprite sprite, Set<HitDefSub> removes,
 			Set<HitDefSub> notProcess) {
-//		Wrapper<Rectangle> wrap = new Wrapper<Rectangle>();
+//		Wrapper<MugenRect> wrap = new Wrapper<MugenRect>();
 
 		if (isHitdefHitAttackRec(hitdef, sprite)) {
 			// TODO Projectile Life
@@ -451,7 +451,7 @@ public class FightEngine {
 	private void processProjectileVsSpriteProtectedMode(ProjectileSub hitdef,
 			Sprite sprite, Set<HitDefSub> removes, Set<HitDefSub> notProcess) {
 		
-//		Wrapper<Rectangle> wrap = new Wrapper<Rectangle>();
+//		Wrapper<MugenRect> wrap = new Wrapper<MugenRect>();
 
 		if (isHitdefHitCollisionRec(hitdef, sprite)) {
 
@@ -513,7 +513,7 @@ public class FightEngine {
 	private void processProjectileVsAttackRec(ProjectileSub hitdef,
 			Sprite sprite, Set<HitDefSub> removes, Set<HitDefSub> notProcess) {
 		
-		Wrapper<Rectangle> wrap = new Wrapper<Rectangle>();
+		Wrapper<MugenRect> wrap = new Wrapper<MugenRect>();
 
 		if (isHitdefHitAttackRec(hitdef, sprite, wrap)) {
 			// TODO
@@ -523,7 +523,7 @@ public class FightEngine {
 	private void processProjectileVsCollisionRec(ProjectileSub hitdef,
 			Sprite sprite, Set<HitDefSub> removes, Set<HitDefSub> notProcess) {
 
-//		Wrapper<Rectangle> wrap = new Wrapper<Rectangle>();
+//		Wrapper<MugenRect> wrap = new Wrapper<MugenRect>();
 		if (isHitdefHitCollisionRec(hitdef, sprite)) {
 			long time = GameFight.getInstance().getGameState().getGameTime();
 			hitdef.setLastTimeHitSomething(time);
@@ -904,7 +904,7 @@ public class FightEngine {
 	private void drawSparkHit(final HitDefSub hitdef, Sprite sprite) {
 		drawSparkHit(hitdef, sprite, null);
 	}
-	private void drawSparkHit(final HitDefSub hitdef, Sprite sprite, Rectangle union) {
+	private void drawSparkHit(final HitDefSub hitdef, Sprite sprite, MugenRect union) {
 		if (hitdef.getAttr().isAttrType(AttrType.T))
 			return;
 		if (hitdef.getSparkno() == null)// && hitdef.getSparkno().getAction() < 0)
@@ -1024,14 +1024,14 @@ public class FightEngine {
 	// ////////////////////////////////////////////
 	public static float getXDistatnce(AbstractSprite sprOne,
 			AbstractSprite sprTwo) {
-		return (float) Point.distance(sprOne.getRealXPos(), 0, sprTwo
+		return (float) MugenPoint.distance(sprOne.getRealXPos(), 0, sprTwo
 				.getRealXPos(), 0);
 
 	}
 
 	public static float getDistatnce(AbstractSprite sprOne,
 			AbstractSprite sprTwo) {
-		return (float) Point.distance(sprOne.getRealXPos(), sprOne.getRealYPos(), sprTwo
+		return (float) MugenPoint.distance(sprOne.getRealXPos(), sprOne.getRealYPos(), sprTwo
 				.getRealXPos(), sprTwo.getRealYPos());
 
 	}
@@ -1040,7 +1040,7 @@ public class FightEngine {
 		if (stateTwo >= 120 && stateTwo <= 155 && stateTwo == 140)
 			return;
 		if (sprTwo.getInfo().getMovetype() != MoveType.H) {
-//			Wrapper<Rectangle> wrap = new Wrapper<Rectangle>();
+//			Wrapper<MugenRect> wrap = new Wrapper<MugenRect>();
 
 			if (isHitdefHitCollisionRec(hitdef, sprTwo) //{
 				 || getXDistatnce(hitdef.getSpriteHitter(), sprTwo) <= 160)
@@ -1081,11 +1081,11 @@ public class FightEngine {
 	}
 
 	public static boolean isHitdefHitCollisionRec(HitDefSub hitdef,
-			AbstractSprite sprite, Wrap<Rectangle> outUnion) {
+			AbstractSprite sprite, Wrap<MugenRect> outUnion) {
 		boolean isTouch = false;
-		List<Rectangle> rectangles = hitdef.getSpriteHitter().getCns1();
-		for (Rectangle rAttack : rectangles) {
-			for (Rectangle rCln2 : sprite.getCns2()) {
+		List<MugenRect> rectangles = hitdef.getSpriteHitter().getCns1();
+		for (MugenRect rAttack : rectangles) {
+			for (MugenRect rCln2 : sprite.getCns2()) {
 				if (rAttack.intersects(rCln2)) {
 					if (outUnion != null) {
 						outUnion.setValue(rAttack.intersection(rCln2));
@@ -1103,10 +1103,10 @@ public class FightEngine {
 	}
 
 	public static boolean isHitdefHitAttackRec(HitDefSub hitdef,
-			AbstractSprite sprite, Wrap<Rectangle> outUnion) {
+			AbstractSprite sprite, Wrap<MugenRect> outUnion) {
 		boolean isTouch = false;
-		for (Rectangle rAttack : hitdef.getSpriteHitter().getCns1()) {
-			for (Rectangle rCln1 : sprite.getCns1()) {
+		for (MugenRect rAttack : hitdef.getSpriteHitter().getCns1()) {
+			for (MugenRect rCln1 : sprite.getCns1()) {
 				if (rAttack.intersects(rCln1)) {
 					if (outUnion != null) {
 						outUnion.setValue(rAttack.intersection(rCln1));

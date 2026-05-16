@@ -1,6 +1,6 @@
 package org.lee.mugen.sprite.entity;
 
-import java.awt.Point;
+import org.lee.mugen.geom.MugenPoint;
 
 import org.lee.mugen.core.GameFight;
 import org.lee.mugen.fight.section.Fightdef;
@@ -14,10 +14,10 @@ public class AnimTypeSprite extends AbstractSprite {
 
 	Type type;
 	PointF pos;
-	Point start;
-	public AnimTypeSprite(Type type, Point start) {
+	MugenPoint start;
+	public AnimTypeSprite(Type type, MugenPoint start) {
 		this.type = type;
-		this.start = (Point) start.clone();
+		this.start = (MugenPoint) start.clone();
 		
 	}
 	

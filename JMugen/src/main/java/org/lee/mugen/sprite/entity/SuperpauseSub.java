@@ -1,6 +1,6 @@
 package org.lee.mugen.sprite.entity;
 
-import java.awt.Point;
+import org.lee.mugen.geom.MugenPoint;
 import java.io.Serializable;
 
 import org.lee.mugen.sprite.character.Sprite;
@@ -37,7 +37,7 @@ public class SuperpauseSub implements Serializable {
 	private Sparkno anim;
 	private boolean isUseSpriteAnim;
 	private SndGrpNum sound;
-	private Point pos;
+	private MugenPoint pos;
 	private int movetime;
 	private int[] darken;
 	private float p2defmul;
@@ -69,10 +69,10 @@ public class SuperpauseSub implements Serializable {
 	public void setP2defmul(float p2defmul) {
 		this.p2defmul = p2defmul;
 	}
-	public Point getPos() {
+	public MugenPoint getPos() {
 		return pos;
 	}
-	public void setPos(Point pos) {
+	public void setPos(MugenPoint pos) {
 		this.pos = pos;
 	}
 	public int getPoweradd() {

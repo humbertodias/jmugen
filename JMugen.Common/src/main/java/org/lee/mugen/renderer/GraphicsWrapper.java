@@ -7,7 +7,10 @@ public class GraphicsWrapper {
 	
 	private static MugenDrawer instanceOfMugenDrawer;
 	public static void init() throws Exception {
-		String className = ResourceBundleHelper.getBundle("render").getString("renderClass");
+		String className = System.getProperty("jmugen.renderClass");
+		if (className == null || className.isEmpty()) {
+			className = ResourceBundleHelper.getBundle("render").getString("renderClass");
+		}
 		instanceOfMugenDrawer = (MugenDrawer) Class.forName(className).newInstance();
 	}
 	

@@ -1,6 +1,6 @@
 package org.lee.mugen.core.renderer.game.system;
 
-import java.awt.Point;
+import org.lee.mugen.geom.MugenPoint;
 
 import org.lee.mugen.core.GameFight;
 import org.lee.mugen.core.GameMenu;
@@ -48,7 +48,7 @@ public class TitleInfoRender extends BaseRender {
 			md.setAlpha(0);
 		}
 		
-		Point pos = (Point) menu.getPos().clone();
+		MugenPoint pos = (MugenPoint) menu.getPos().clone();
 			
 		ItemName itemName = menu.getItemname();
 		String[] strs = itemName.getList();
@@ -65,7 +65,7 @@ public class TitleInfoRender extends BaseRender {
 						pos.x + box.getX2(), 
 						pos.y + (-box.getY1() + box.getY2()) * count));
 		pos.y += add;
-		pos = new Point();
+		pos = new MugenPoint();
 		pos.y += menu.getWindow$margins$y().x;
 		pos.x = -box.getX1();
 		pos.y += add;

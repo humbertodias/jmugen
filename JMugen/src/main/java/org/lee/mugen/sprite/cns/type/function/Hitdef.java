@@ -1,6 +1,6 @@
 package org.lee.mugen.sprite.cns.type.function;
 
-import java.awt.Rectangle;
+import org.lee.mugen.geom.MugenRect;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,8 +37,8 @@ public class Hitdef extends StateCtrlFunction {
 
 	public static boolean isPlayerHitOnes(AbstractSprite one, AbstractSprite two) {
 		boolean isTouch = false;
-		for (Rectangle rAttack: one.getCns1()) {
-			for (Rectangle rCln2: two.getCns2()) {
+		for (MugenRect rAttack: one.getCns1()) {
+			for (MugenRect rCln2: two.getCns2()) {
 				if (rAttack.intersects(rCln2)) {
 					isTouch = true;
 					break;

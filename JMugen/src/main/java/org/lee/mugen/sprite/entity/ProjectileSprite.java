@@ -1,7 +1,7 @@
 package org.lee.mugen.sprite.entity;
 
 
-import java.awt.Point;
+import org.lee.mugen.geom.MugenPoint;
 
 import org.lee.mugen.core.GameFight;
 import org.lee.mugen.sprite.base.AbstractSprite;
@@ -155,8 +155,8 @@ x positif s'éloigne du centre de l'écran alors qu'un offset x négatif s'en ra
 		
 		// remove by Projedgebound
 		Camera cam = GameFight.getInstance().getStage().getCamera();
-		Point pt = new Point((int)getRealXPos() + cam.getX(), (int)getRealYPos() + cam.getY());
-		remove = remove || projectileSub.getProjedgebound() + Math.pow(320*320 + 240*240, 0.5)< pt.distance(new Point(cam.getX(), cam.getY()));
+		MugenPoint pt = new MugenPoint((int)getRealXPos() + cam.getX(), (int)getRealYPos() + cam.getY());
+		remove = remove || projectileSub.getProjedgebound() + Math.pow(320*320 + 240*240, 0.5)< pt.distance(new MugenPoint(cam.getX(), cam.getY()));
 		
 		// process calculation
 		projectileSub.addProjremovetime(-1);

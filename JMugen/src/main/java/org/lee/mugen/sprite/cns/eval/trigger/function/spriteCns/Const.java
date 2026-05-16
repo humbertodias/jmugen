@@ -3,12 +3,12 @@ package org.lee.mugen.sprite.cns.eval.trigger.function.spriteCns;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.beanutils.PropertyUtils;
 import org.lee.mugen.core.GameFight;
 import org.lee.mugen.parser.type.Valueable;
 import org.lee.mugen.sprite.character.Sprite;
 import org.lee.mugen.sprite.character.SpriteCns;
 import org.lee.mugen.sprite.cns.eval.function.SpriteCnsTriggerFunction;
+import org.lee.mugen.util.BeanTools;
 /**
  * 
  * @author Dr Wong
@@ -100,7 +100,7 @@ public class Const extends SpriteCnsTriggerFunction {
 			if (specialCaseToGoodProperty.containsKey(prop)) {
 				prop = specialCaseToGoodProperty.get(prop);
 			}
-			res = PropertyUtils.getProperty(spriteInfo, prop);
+			res = BeanTools.getNestedProperty(spriteInfo, prop);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new IllegalArgumentException(params[0].getValue(spriteId) + " not exist");

@@ -177,7 +177,7 @@ public class AirParser {
     private void parseClsn(
     		String line, 
     		StringTokenizer strToken, 
-    		Wrapper<Rectangle[]> clsnWrap, 
+    		Wrapper<org.lee.mugen.object.Rectangle[]> clsnWrap, 
     		Pattern clsnHeadPattern,
     		Pattern clsnRectPattern) throws IOException {
 
@@ -188,7 +188,7 @@ public class AirParser {
     	}
     	
     	int rectCount = Integer.parseInt(matcher.group(1));
-    	Rectangle[] clsn = new Rectangle[rectCount];
+    	org.lee.mugen.object.Rectangle[] clsn = new org.lee.mugen.object.Rectangle[rectCount];
         
         for (int i = 0; i < clsn.length; i++) {
         	line = getLine(strToken);
@@ -218,9 +218,8 @@ public class AirParser {
             int width = Math.abs(xTopLeft) + Math.abs(xTopRight);
             int height = Math.abs(yTopLeft - yTopRight);
 			
-            java.awt.Rectangle jr = new java.awt.Rectangle(xTopLeft, yTopLeft, width, height);
-            clsn[i/*index*/] = new Rectangle(x1, y1, x2, y2);
-//            clsn[i/*index*/] = jr;
+            org.lee.mugen.object.Rectangle jr = new org.lee.mugen.object.Rectangle(x1, y1, x2, y2);
+            clsn[i/*index*/] = jr;
         }
         clsnWrap.setValue(clsn);
     }

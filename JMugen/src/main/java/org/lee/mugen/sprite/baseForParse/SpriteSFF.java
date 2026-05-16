@@ -11,7 +11,7 @@ import java.util.Set;
 
 import org.lee.mugen.imageIO.PCXPalette;
 import org.lee.mugen.imageIO.RawPCXImage;
-import org.lee.mugen.imageIO.PCXLoader.PCXHeader;
+import org.lee.mugen.imageIO.PCXHeader;
 import org.lee.mugen.renderer.DeferedImageLoader;
 import org.lee.mugen.renderer.ImageContainer;
 import org.lee.mugen.sff.SffReader;

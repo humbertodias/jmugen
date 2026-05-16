@@ -1,11 +1,11 @@
 package org.lee.mugen.fight.section.elem;
 
-import java.awt.Point;
+import org.lee.mugen.geom.MugenPoint;
 
 import org.lee.mugen.util.BeanTools;
 
 public class PlayerWinIcon extends SimpleElement {
-	Point iconoffset = new Point();
+	MugenPoint iconoffset = new MugenPoint();
 	Type counter;
 	Type n; // Win by normal
 	Type h; // Win by Hyper
@@ -20,7 +20,7 @@ public class PlayerWinIcon extends SimpleElement {
 	public void parse(Object root, String name, String value) {
 		super.parse(root, name, value);
 		if (name.equalsIgnoreCase("iconoffset")) {
-			iconoffset = (Point) BeanTools.getConvertersMap().get(Point.class).convert(value);
+			iconoffset = (MugenPoint) BeanTools.getConvertersMap().get(MugenPoint.class).convert(value);
 		} else if (name.startsWith("counter.")) {
 			if (counter == null) {
 				counter = new Type();
@@ -81,10 +81,10 @@ public class PlayerWinIcon extends SimpleElement {
 		}
 	}
 	
-	public Point getIconoffset() {
+	public MugenPoint getIconoffset() {
 		return iconoffset;
 	}
-	public void setIconoffset(Point iconoffset) {
+	public void setIconoffset(MugenPoint iconoffset) {
 		this.iconoffset = iconoffset;
 	}
 	public Type getCounter() {

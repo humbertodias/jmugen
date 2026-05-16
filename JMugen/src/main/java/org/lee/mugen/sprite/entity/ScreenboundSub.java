@@ -1,11 +1,11 @@
 package org.lee.mugen.sprite.entity;
 
-import java.awt.Point;
+import org.lee.mugen.geom.MugenPoint;
 import java.io.Serializable;
 
 public class ScreenboundSub implements Serializable {
 	private int time;
-	private Point movecamera = new Point(1,1);
+	private MugenPoint movecamera = new MugenPoint(1,1);
 	private int value = 0;
 	public int getTime() {
 		return time;
@@ -13,10 +13,10 @@ public class ScreenboundSub implements Serializable {
 	public void setTime(int time) {
 		this.time = time;
 	}
-	public Point getMovecamera() {
+	public MugenPoint getMovecamera() {
 		return movecamera;
 	}
-	public void setMovecamera(Point movecamera) {
+	public void setMovecamera(MugenPoint movecamera) {
 		this.movecamera = movecamera;
 	}
 	public int getValue() {

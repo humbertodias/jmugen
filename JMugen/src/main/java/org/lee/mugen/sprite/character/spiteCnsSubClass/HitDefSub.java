@@ -1,6 +1,6 @@
 package org.lee.mugen.sprite.character.spiteCnsSubClass;
 
-import java.awt.Point;
+import org.lee.mugen.geom.MugenPoint;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -464,11 +464,11 @@ Le second caractère doit être soit
 		XYPos.setSound(maxdist, params);
 	}	
 //	  snap = x_pos, y_pos (int)
-	private Point snap;
-	public Point getSnap() {
+	private MugenPoint snap;
+	public MugenPoint getSnap() {
 		return snap;
 	}
-	public void setSnap(Point params) {
+	public void setSnap(MugenPoint params) {
 		snap = params;
 	}		
 //	  p1sprpriority = drawing_priority (int)

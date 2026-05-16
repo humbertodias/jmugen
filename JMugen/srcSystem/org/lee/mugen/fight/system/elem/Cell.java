@@ -1,13 +1,12 @@
 package org.lee.mugen.fight.system.elem;
 
-import java.awt.Dimension;
-
+import org.lee.mugen.geom.MugenPoint;
 import org.lee.mugen.fight.section.Section;
 import org.lee.mugen.fight.section.elem.Type;
 import org.lee.mugen.util.BeanTools;
 
 public class Cell implements Section {
-	private Dimension size;
+	private MugenPoint size;
 	private int spacing;
 	private Type bg;
 	private Type random;
@@ -17,7 +16,7 @@ public class Cell implements Section {
 	public void parse(Object root, String name, String value) throws Exception {
 		if (name.equals("size")) {
 			int[] dim = (int[]) BeanTools.getConvertersMap().get(int[].class).convert(value);
-			size = new Dimension(dim[0], dim[1]);
+			size = new MugenPoint(dim[0], dim[1]);
 		} else if (name.equals("spacing")) {
 			spacing = Integer.parseInt(value);
 		} else if (name.startsWith("bg")) {
@@ -36,11 +35,11 @@ public class Cell implements Section {
 		
 	}
 	
-	public Dimension getSize() {
+	public MugenPoint getSize() {
 		return size;
 	}
 
-	public void setSize(Dimension size) {
+	public void setSize(MugenPoint size) {
 		this.size = size;
 	}
 

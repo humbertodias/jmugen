@@ -26,7 +26,61 @@ import org.lee.mugen.util.Logger;
  *
  */
 public final class SoundSystem {
-    
+
+	private static volatile AudioPlayback audioPlayback;
+
+	public static void installAudioPlayback(AudioPlayback playback) {
+		AudioPlayback old = audioPlayback;
+		audioPlayback = playback;
+		if (old != null && old != playback) {
+			try {
+				old.shutdown();
+			} catch (Exception e) {
+				Logger.error("Previous AudioPlayback shutdown failed: %s", e);
+			}
+		}
+	}
+
+	public static AudioPlayback getAudioPlayback() {
+		return audioPlayback;
+	}
+
+	/**
+	 * Android / LibGDX: call from window {@code dispose()} to stop music and release native audio.
+	 */
+	public static void clearAudioPlayback() {
+		installAudioPlayback(null);
+	}
+
+	/**
+	 * Android and some JREs have no {@code javax.sound.sampled}. Probed once; can be forced off with
+	 * system property {@code jmugen.disableJavaSound=true}.
+	 */
+	private static volatile int javaSoundAvailable = -1;
+
+	private static boolean isJavaSoundPlaybackAvailable() {
+		if (javaSoundAvailable != -1) {
+			return javaSoundAvailable == 1;
+		}
+		synchronized (SoundSystem.class) {
+			if (javaSoundAvailable != -1) {
+				return javaSoundAvailable == 1;
+			}
+			if ("true".equalsIgnoreCase(System.getProperty("jmugen.disableJavaSound"))) {
+				javaSoundAvailable = 0;
+				return false;
+			}
+			try {
+				Class.forName("javax.sound.sampled.AudioSystem");
+				javaSoundAvailable = 1;
+				return true;
+			} catch (Throwable t) {
+				javaSoundAvailable = 0;
+				return false;
+			}
+		}
+	}
+
     
     public static final class SoundBackGround implements Runnable {
         
@@ -60,6 +114,13 @@ public final class SoundSystem {
          * @return
          */        
         public static boolean isStop() {
+			AudioPlayback ext = SoundSystem.getAudioPlayback();
+			if (ext != null) {
+				return ext.isBackgroundStopped();
+			}
+			if (soundsys == null) {
+				return true;
+			}
             return soundsys.stop;
         }
 
@@ -73,6 +134,15 @@ public final class SoundSystem {
                 Logger.log("Music %s not exist", path);
                 return;
             }
+			AudioPlayback ext = SoundSystem.getAudioPlayback();
+			if (ext != null) {
+				ext.playMusic(path);
+				return;
+			}
+			if (!isJavaSoundPlaybackAvailable()) {
+				Logger.log("JavaSound not available; skip music %s", path);
+				return;
+			}
 
             soundsys = new SoundBackGround(path);
             soundsys.setloop(true);
@@ -82,15 +152,34 @@ public final class SoundSystem {
             ts.start();
         }
         public static void setVolume(final float volume) {
+			AudioPlayback ext = SoundSystem.getAudioPlayback();
+			if (ext != null) {
+				ext.setMusicVolume(volume);
+				return;
+			}
+			if (soundsys == null || soundsys.getSrcDataLine() == null) {
+				return;
+			}
         	FloatControl control = (FloatControl) soundsys.getSrcDataLine().getControl(FloatControl.Type.VOLUME);
         	control.setValue(volume);
         }
         public static float getVolume() {
+			AudioPlayback ext = SoundSystem.getAudioPlayback();
+			if (ext != null) {
+				return ext.getMusicVolume();
+			}
+			if (soundsys == null || soundsys.getSrcDataLine() == null) {
+				return 1f;
+			}
         	FloatControl control = (FloatControl) soundsys.getSrcDataLine().getControl(FloatControl.Type.VOLUME);
         	return control.getValue();
         }
         
         public static void stopMusic() {
+			AudioPlayback ext = SoundSystem.getAudioPlayback();
+			if (ext != null) {
+				ext.stopMusic();
+			}
         	if (soundsys != null)
         		soundsys.stopPlay();
         }
@@ -318,9 +407,17 @@ public final class SoundSystem {
 	}
     public static class Sfx {
     	public static void playSnd(final byte[] sound) {
+			if (SoundSystem.getAudioPlayback() != null) {
+				SoundSystem.getAudioPlayback().playSfx(sound);
+				return;
+			}
     		playSnd(sound, true);
     	}
 		public static void playSnd(final byte[] sound, final AtomicBoolean isPlaying) {
+			if (SoundSystem.getAudioPlayback() != null) {
+				SoundSystem.getAudioPlayback().playSfx(sound, isPlaying);
+				return;
+			}
 			Runnable r = new Runnable() {
 				public void run() {
 					try {
@@ -337,6 +434,10 @@ public final class SoundSystem {
 			
 		}
     	public static void playSnd(final byte[] sound, boolean async) {
+			if (SoundSystem.getAudioPlayback() != null) {
+				SoundSystem.getAudioPlayback().playSfx(sound);
+				return;
+			}
     		if (async) {
     			Runnable r = new Runnable() {
 					public void run() {
@@ -358,6 +459,9 @@ public final class SoundSystem {
     	}
 
         private static void playAudio(byte[] data) throws UnsupportedAudioFileException, IOException {
+			if (!isJavaSoundPlaybackAvailable() || data == null) {
+				return;
+			}
         	AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new ByteArrayInputStream(data));
             AudioFormat audioFormat = audioInputStream.getFormat();
             DataLine.Info info = new DataLine.Info( SourceDataLine.class, audioFormat );

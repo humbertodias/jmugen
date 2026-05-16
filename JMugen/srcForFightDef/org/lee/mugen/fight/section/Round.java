@@ -1,6 +1,6 @@
 package org.lee.mugen.fight.section;
 
-import java.awt.Point;
+import org.lee.mugen.geom.MugenPoint;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -189,7 +189,7 @@ public class Round extends SimpleElement implements Section, Cloneable {
 	
 	Match match = new Match();
 	Start start = new Start();
-	Point pos = new Point();
+	MugenPoint pos = new MugenPoint();
 	Sub round = new Sub();
 	Map<Integer, Type> rounds = new HashMap<Integer, Type>();
 	Type fight;
@@ -315,10 +315,10 @@ public class Round extends SimpleElement implements Section, Cloneable {
 	public void setStart(Start start) {
 		this.start = start;
 	}
-	public Point getPos() {
+	public MugenPoint getPos() {
 		return pos;
 	}
-	public void setPos(Point pos) {
+	public void setPos(MugenPoint pos) {
 		this.pos = pos;
 	}
 	public Sub getRound() {

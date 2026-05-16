@@ -1,0 +1,10 @@
+// Run from this directory: gradle -b sync-assets.gradle syncMugenGameAssets
+// Copies repo data/ into src/main/assets/data (same layout as Maven copy-resources).
+
+def moduleDir = file('.').canonicalPath
+
+task syncMugenGameAssets(type: Copy) {
+    description = 'Copy ../data into src/main/assets/data for Android Studio'
+    from file("${moduleDir}/../data")
+    into file("${moduleDir}/src/main/assets/data")
+}

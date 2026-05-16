@@ -1,6 +1,6 @@
 package org.lee.mugen.sprite.entity;
 
-import java.awt.Point;
+import org.lee.mugen.geom.MugenPoint;
 
 import org.lee.mugen.renderer.RGB;
 import org.lee.mugen.sprite.character.Sprite;
@@ -87,7 +87,7 @@ public class ExplodSub {
 	private int id;
 
 //	pos = x_pos, y_pos (entier)
-	private Point pos = new Point(0, 0);
+	private MugenPoint pos = new MugenPoint(0, 0);
 	
 	private Postype postype = Postype.p1;
 
@@ -198,11 +198,11 @@ public class ExplodSub {
 		this.pausemovetime = pausemovetime;
 	}
 
-	public Point getPos() {
+	public MugenPoint getPos() {
 		return pos;
 	}
 
-	public void setPos(Point pos) {
+	public void setPos(MugenPoint pos) {
 		this.pos = pos;
 	}
 

@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
-import org.lee.mugen.imageIO.PCXLoader;
+import org.lee.mugen.imageIO.PCXConstants;
 import org.lee.mugen.imageIO.PCXPalette;
 import org.lee.mugen.io.IOUtils;
 import org.lee.mugen.io.LittleEndianDataInputStream;
@@ -112,7 +112,7 @@ public class SffReader {
 
         byte[] prevPalette = isForceUSeDefPal? useThisPal: new byte[PCXPalette.PALETTE_SIZE];
 
-        byte[] bytes = new byte[PCXLoader.HEADER_SIZE];
+        byte[] bytes = new byte[PCXConstants.HEADER_SIZE];
         if (subFileHead.subFileLen > 0) {
         	br.read(bytes);
             subFileHead.pcxFile.pcxStream.write(bytes);
@@ -194,7 +194,7 @@ public class SffReader {
 
         byte[] prevPalette = isForceUSeDefPal? useThisPal: new byte[PCXPalette.PALETTE_SIZE];
 
-        byte[] bytes = new byte[PCXLoader.HEADER_SIZE];
+        byte[] bytes = new byte[PCXConstants.HEADER_SIZE];
         if (subFileHead.subFileLen > 0) {
         	br.read(bytes);
 

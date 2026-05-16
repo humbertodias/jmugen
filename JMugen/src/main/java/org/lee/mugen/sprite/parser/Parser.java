@@ -24,9 +24,21 @@ import org.lee.mugen.sprite.cns.eval.operator.CnsOperatorsDef;
 import org.lee.mugen.util.BeanTools;
 
 public class Parser {
-	private static final File[] SEARCH_DIR_FOR = new File[] {
-		new File("."), new File("resource"), new File(JMugenConstant.RESOURCE + "data"), new File("data")
-	};
+	/**
+	 * Bases for relative paths (MUGEN checks cwd, then data/, etc.). Includes {@code RESOURCE + "data"}
+	 * (inner {@code data/} with fight.def assets) and plain {@code RESOURCE} (outer tree: {@code font/},
+	 * {@code chars/}, …) so {@code font/jg.fnt} in fight.def resolves when fonts live next to inner
+	 * {@code data/} as in the bundled Android layout.
+	 */
+	private static File[] searchDirFor() {
+		return new File[] {
+			new File("."),
+			new File("resource"),
+			new File(JMugenConstant.RESOURCE + "data"),
+			new File(JMugenConstant.RESOURCE),
+			new File("data")
+		};
+	}
 	public static String getExistFile(String filename) {
 		File result = new File(filename);
 		
@@ -34,13 +46,13 @@ public class Parser {
 			return result.getAbsolutePath();
 		}
 		
-		for (File base: SEARCH_DIR_FOR) {
+		for (File base : searchDirFor()) {
 			result = new File(base, filename);
 			if (result.exists()) {
 				return result.getAbsolutePath();
 			}
 		}
-		throw new IllegalArgumentException("File not exist");
+		throw new IllegalArgumentException("File not exist: " + filename);
 	}
 	public static String getExistFile(File currentDir, String filename) {
 		File result = new File(currentDir, filename);
@@ -49,13 +61,13 @@ public class Parser {
 			return result.getAbsolutePath();
 		}
 		
-		for (File base: SEARCH_DIR_FOR) {
+		for (File base : searchDirFor()) {
 			result = new File(base, filename);
 			if (result.exists()) {
 				return result.getAbsolutePath();
 			}
 		}
-		throw new IllegalArgumentException("File not exist");
+		throw new IllegalArgumentException("File not exist: " + filename);
 	}
 	public static interface AccessorParser {
 

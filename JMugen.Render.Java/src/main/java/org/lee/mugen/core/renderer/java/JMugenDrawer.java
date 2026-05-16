@@ -9,9 +9,9 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
+import org.lee.mugen.imageIO.PCXHeader;
 import org.lee.mugen.imageIO.PCXLoader;
 import org.lee.mugen.imageIO.RawPCXImage;
-import org.lee.mugen.imageIO.PCXLoader.PCXHeader;
 import org.lee.mugen.object.Rectangle;
 import org.lee.mugen.renderer.AngleDrawProperties;
 import org.lee.mugen.renderer.DrawProperties;

@@ -1,6 +1,6 @@
 package org.lee.mugen.fight.system.elem;
 
-import java.awt.Point;
+import org.lee.mugen.geom.MugenPoint;
 
 import org.lee.mugen.fight.section.elem.Type;
 import org.lee.mugen.fight.system.MugenSystem;
@@ -9,7 +9,7 @@ import org.lee.mugen.util.BeanTools;
 public class Item extends Type {
 	MugenSystem ms;
 	
-	Point spacing = new Point();
+	MugenPoint spacing = new MugenPoint();
 	Type active;
 	Type active2;
 	Type cursor;
@@ -22,7 +22,7 @@ public class Item extends Type {
 	public void parse(String name, String value) {
 		super.parse(name, value);
 		if (name.equalsIgnoreCase("spacing")) {
-			spacing = (Point) BeanTools.getConvertersMap().get(Point.class).convert(value);
+			spacing = (MugenPoint) BeanTools.getConvertersMap().get(MugenPoint.class).convert(value);
 		} else if (name.startsWith("active.")) {
 			if (active == null)
 				active = new Type();
@@ -38,7 +38,7 @@ public class Item extends Type {
 		}
 	}
 	
-	public Point getSpacing() {
+	public MugenPoint getSpacing() {
 		return spacing;
 	}
 

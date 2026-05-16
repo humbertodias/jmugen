@@ -1,6 +1,6 @@
 package org.lee.mugen.sprite.entity;
 
-import java.awt.Point;
+import org.lee.mugen.geom.MugenPoint;
 import java.io.Serializable;
 
 /**
@@ -47,7 +47,7 @@ public class PointF implements Cloneable, Serializable {
 		
 		
 	}
-	public PointF(Point pt) {
+	public PointF(MugenPoint pt) {
 		x = pt.x;
 		y = pt.y;
 		

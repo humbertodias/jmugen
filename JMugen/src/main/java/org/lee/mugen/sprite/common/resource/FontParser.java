@@ -1,6 +1,5 @@
 package org.lee.mugen.sprite.common.resource;
 
-import java.awt.Dimension;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -10,6 +9,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import org.lee.mugen.core.JMugenConstant;
+import org.lee.mugen.geom.MugenPoint;
 import org.lee.mugen.imageIO.PCXPalette;
 import org.lee.mugen.imageIO.RawPCXImage;
 import org.lee.mugen.io.LittleEndianDataInputStream;
@@ -70,17 +70,17 @@ public class FontParser {
 		for (GroupText grp: grpsText) {
 			if (grp.getSection().equalsIgnoreCase("def")) {
 				String[] strsSize = grp.getKeyValues().get("size").replaceAll(" ", "").split(",");
-				fontProducer.setSize(new Dimension(Integer.parseInt(strsSize[0]), Integer.parseInt(strsSize[1])));
+				fontProducer.setSize(new MugenPoint(Integer.parseInt(strsSize[0]), Integer.parseInt(strsSize[1])));
 				
 				String[] strsSpacing = grp.getKeyValues().get("spacing").replaceAll(" ", "").split(",");
-				fontProducer.setSpacing(new Dimension(Integer.parseInt(strsSpacing[0]), strsSpacing.length > 1?Integer.parseInt(strsSpacing[1]):0));
+				fontProducer.setSpacing(new MugenPoint(Integer.parseInt(strsSpacing[0]), strsSpacing.length > 1?Integer.parseInt(strsSpacing[1]):0));
 				
 				String strColors = grp.getKeyValues().get("colors");
 				//TODO
 				fontProducer.setColors(Integer.parseInt(strColors));
 				
 				String[] strsOffset = grp.getKeyValues().get("offset").replaceAll(" ", "").split(",");
-				fontProducer.setOffset(new Dimension(Integer.parseInt(strsOffset[0]), Integer.parseInt(strsOffset[1])));
+				fontProducer.setOffset(new MugenPoint(Integer.parseInt(strsOffset[0]), Integer.parseInt(strsOffset[1])));
 				
 				String strType = grp.getKeyValues().get("type");
 				fontProducer.setType(strType);
@@ -101,7 +101,7 @@ public class FontParser {
 						c = tokens[0].charAt(0);
 					}
 					if (fontProducer.getType().equalsIgnoreCase("Fixed")) {
-						fontProducer.getMap().put(c, new Desc((count + (count > 0? fontProducer.getSpacing().width: 0)) * fontProducer.getSize().width, fontProducer.getSize().width));
+						fontProducer.getMap().put(c, new Desc((count + (count > 0? fontProducer.getSpacing().x: 0)) * fontProducer.getSize().x, fontProducer.getSize().x));
 					} else if (fontProducer.getType().equalsIgnoreCase("Variable")) {
 						
 						fontProducer.getMap().put(c, new Desc(Integer.parseInt(tokens[1]), Integer.parseInt(tokens[2])));

@@ -1,7 +1,7 @@
 package org.lee.mugen.fight.system.elem;
 
-import java.awt.Point;
-import java.awt.Rectangle;
+import org.lee.mugen.geom.MugenPoint;
+import org.lee.mugen.geom.MugenRect;
 
 import org.lee.mugen.fight.section.Section;
 import org.lee.mugen.sprite.entity.PointF;
@@ -11,10 +11,10 @@ public class StageDisplay implements Section {
 
 	
 	boolean enable;
-	Point pos;
-	java.awt.Rectangle rectangle;
+	MugenPoint pos;
+	MugenRect rectangle;
 	PointF scale;
-	Point camera;
+	MugenPoint camera;
 	
 	
 	public boolean isEnable() {
@@ -27,22 +27,22 @@ public class StageDisplay implements Section {
 	}
 
 
-	public Point getPos() {
+	public MugenPoint getPos() {
 		return pos;
 	}
 
 
-	public void setPos(Point pos) {
+	public void setPos(MugenPoint pos) {
 		this.pos = pos;
 	}
 
 
-	public java.awt.Rectangle getRectangle() {
+	public MugenRect getRectangle() {
 		return rectangle;
 	}
 
 
-	public void setRectangle(java.awt.Rectangle rectangle) {
+	public void setRectangle(MugenRect rectangle) {
 		this.rectangle = rectangle;
 	}
 
@@ -57,12 +57,12 @@ public class StageDisplay implements Section {
 	}
 
 
-	public Point getCamera() {
+	public MugenPoint getCamera() {
 		return camera;
 	}
 
 
-	public void setCamera(Point camera) {
+	public void setCamera(MugenPoint camera) {
 		this.camera = camera;
 	}
 
@@ -72,13 +72,13 @@ public class StageDisplay implements Section {
 		if (name.equals("enable")) {
 			enable = Integer.parseInt(value) != 0;
 		} else if (name.equals("pos")) {
-			pos = (Point) BeanTools.getConvertersMap().get(Point.class).convert(value);
+			pos = (MugenPoint) BeanTools.getConvertersMap().get(MugenPoint.class).convert(value);
 		} else if (name.equals("rectangle")) {
-			rectangle = (Rectangle) BeanTools.getConvertersMap().get(Rectangle.class).convert(value);
+			rectangle = (MugenRect) BeanTools.getConvertersMap().get(MugenRect.class).convert(value);
 		} else if (name.equals("scale")) {
 			scale = (PointF) BeanTools.getConvertersMap().get(PointF.class).convert(value);
 		} else if (name.equals("camera")) {
-			camera = (Point) BeanTools.getConvertersMap().get(Point.class).convert(value);
+			camera = (MugenPoint) BeanTools.getConvertersMap().get(MugenPoint.class).convert(value);
 		}
 	}
 

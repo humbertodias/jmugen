@@ -1,6 +1,6 @@
 package org.lee.mugen.core.physics;
 
-import java.awt.Rectangle;
+import org.lee.mugen.geom.MugenRect;
 
 import org.lee.mugen.core.GameFight;
 import org.lee.mugen.sprite.character.Sprite;
@@ -74,11 +74,11 @@ public class PhysicsEngime {
 		
 	}
 
-	private static Rectangle getGlobalClsn2ect(Sprite spr) {
-		Rectangle rectangle = null;
-		for (java.awt.Rectangle rec: spr.getCns2()) {
+	private static MugenRect getGlobalClsn2ect(Sprite spr) {
+		MugenRect rectangle = null;
+		for (MugenRect rec: spr.getCns2()) {
 			if (rectangle == null) {
-				rectangle = new Rectangle(rec);
+				rectangle = new MugenRect(rec);
 				
 			} else {
 				rectangle.add(rec);
@@ -107,7 +107,7 @@ public class PhysicsEngime {
 		return rectangle;
 	}
 	
-	private static Rectangle getGlobalWidthRect(Sprite spr) {
+	private static MugenRect getGlobalWidthRect(Sprite spr) {
 		if (spr.getInfo().getYPos() < 0 && getGlobalClsn2ect(spr) == null) {
 			return getGlobalClsn2ect(spr);
 		}
@@ -115,7 +115,7 @@ public class PhysicsEngime {
 		return getRectEdge(spr);
 	}
 	
-	private static void correctRectangle(Rectangle r) {
+	private static void correctRectangle(MugenRect r) {
 		if (r.width < 0) {
 			r.x = r.x - r.width;
 			r.width = -r.width;
@@ -146,18 +146,18 @@ public class PhysicsEngime {
 		
 
 		if (sprOne.getInfo().getPhysics() == Physics.A && sprTwo.getInfo().getPhysics() == Physics.A) {
-			Rectangle r1 = getGlobalClsn2ect(sprOne);
-			Rectangle r2 = getGlobalClsn2ect(sprTwo);
+			MugenRect r1 = getGlobalClsn2ect(sprOne);
+			MugenRect r2 = getGlobalClsn2ect(sprTwo);
 			
 			if (sprOne.getInfo().getPhysics() != Physics.A) {
 				r1 = getGlobalWidthRect(sprOne);
-				Rectangle tmp = getGlobalClsn2ect(sprOne);
+				MugenRect tmp = getGlobalClsn2ect(sprOne);
 				r1.y = tmp.y;
 				r1.height = tmp.height;
 			}
 			if (sprTwo.getInfo().getPhysics() != Physics.A) {
 				r2 = getGlobalWidthRect(sprTwo);
-				Rectangle tmp = getGlobalClsn2ect(sprTwo);
+				MugenRect tmp = getGlobalClsn2ect(sprTwo);
 				r2.y = tmp.y;
 				r2.height = tmp.height;
 			}
@@ -178,13 +178,13 @@ public class PhysicsEngime {
 			r2 = getGlobalClsn2ect(sprTwo);
 			if (sprOne.getInfo().getPhysics() != Physics.A) {
 				r1 = getGlobalWidthRect(sprOne);
-				Rectangle tmp = getGlobalClsn2ect(sprOne);
+				MugenRect tmp = getGlobalClsn2ect(sprOne);
 				r1.y = tmp.y;
 				r1.height = tmp.height;
 			}
 			if (sprTwo.getInfo().getPhysics() != Physics.A) {
 				r2 = getGlobalWidthRect(sprTwo);
-				Rectangle tmp = getGlobalClsn2ect(sprTwo);
+				MugenRect tmp = getGlobalClsn2ect(sprTwo);
 				r2.y = tmp.y;
 				r2.height = tmp.height;
 			}
@@ -195,18 +195,18 @@ public class PhysicsEngime {
 			}
 			checkGoodPositionInScreen(sprOne);
 		} else {
-			Rectangle r1 = getGlobalWidthRect(sprOne);
-			Rectangle r2 = getGlobalWidthRect(sprTwo);
+			MugenRect r1 = getGlobalWidthRect(sprOne);
+			MugenRect r2 = getGlobalWidthRect(sprTwo);
 			
 			if (sprOne.getInfo().getPhysics() == Physics.A) {
 				r1 = getGlobalWidthRect(sprOne);
-				Rectangle tmp = getGlobalClsn2ect(sprOne);
+				MugenRect tmp = getGlobalClsn2ect(sprOne);
 				r1.y = tmp.y;
 				r1.height = tmp.height;
 			}
 			if (sprTwo.getInfo().getPhysics() == Physics.A) {
 				r2 = getGlobalWidthRect(sprTwo);
-				Rectangle tmp = getGlobalClsn2ect(sprTwo);
+				MugenRect tmp = getGlobalClsn2ect(sprTwo);
 				r2.y = tmp.y;
 				r2.height = tmp.height;
 			}
@@ -226,13 +226,13 @@ public class PhysicsEngime {
 			r2 = getGlobalWidthRect(sprTwo);
 			if (sprOne.getInfo().getPhysics() == Physics.A) {
 				r1 = getGlobalWidthRect(sprOne);
-				Rectangle tmp = getGlobalClsn2ect(sprOne);
+				MugenRect tmp = getGlobalClsn2ect(sprOne);
 				r1.y = tmp.y;
 				r1.height = tmp.height;
 			}
 			if (sprTwo.getInfo().getPhysics() == Physics.A) {
 				r2 = getGlobalWidthRect(sprTwo);
-				Rectangle tmp = getGlobalClsn2ect(sprTwo);
+				MugenRect tmp = getGlobalClsn2ect(sprTwo);
 				r2.y = tmp.y;
 				r2.height = tmp.height;
 			}
@@ -247,7 +247,7 @@ public class PhysicsEngime {
 
 	}
 
-	private static Rectangle getRectEdge(Sprite spr) {
+	private static MugenRect getRectEdge(Sprite spr) {
 
 		boolean isFlip = spr.isFlip();
 		Stage stage = GameFight.getInstance().getStage();
@@ -270,7 +270,7 @@ public class PhysicsEngime {
 		topY = (int) (spr.getRealYPos() - topY);
 		bottomY = (int) (spr.getRealYPos());
 
-		Rectangle r = new Rectangle(topX, topY, Math.abs(bottomX - topX), Math
+		MugenRect r = new MugenRect(topX, topY, Math.abs(bottomX - topX), Math
 				.abs(bottomY - topY));
 		r.translate((int) (_mvX + stage.getCamera().getWidth() / 2),
 				(int) (stage.getStageinfo().getZoffset() + _mvY));
@@ -283,7 +283,7 @@ public class PhysicsEngime {
 				sprOne.getCns2().size() == 0) {
 			return;
 		}
-		Rectangle r1 = getRectEdge(sprOne);
+		MugenRect r1 = getRectEdge(sprOne);
 		if (r1.x < 0) {
 			sprOne.getInfo().addXPos(-r1.x);
 		} else if (r1.x + r1.width > 320 || r1.x > 320) {
@@ -294,7 +294,7 @@ public class PhysicsEngime {
 	public static boolean isOutOfScreeen(Sprite sprOne, float xVelToAdd) {
 		if (sprOne.getInfo().getScreenbound().isScreenbound())
 			return false;
-		Rectangle r1 = getRectEdge(sprOne);
+		MugenRect r1 = getRectEdge(sprOne);
 		if (r1 == null)
 			return false;
 		if (!(r1.x + xVelToAdd <= 0 || r1.x + r1.width + xVelToAdd >= 320)) {

@@ -1,6 +1,6 @@
 package org.lee.mugen.fight.system.elem;
 
-import java.awt.Point;
+import org.lee.mugen.geom.MugenPoint;
 
 import org.lee.mugen.fight.section.Section;
 import org.lee.mugen.fight.section.elem.Type;
@@ -12,11 +12,11 @@ import org.lee.mugen.util.BeanTools;
 public class Menu implements Section {
 	MugenSystem ms;
 	
-	private Point pos;
+	private MugenPoint pos;
 	private Item item;
 	private ItemName itemname;
 	
-	private Point window$margins$y;
+	private MugenPoint window$margins$y;
 	private int window$visibleitems;
 	private int boxcursor$visible;
 	private Rectangle boxcursor$coords;
@@ -35,13 +35,13 @@ public class Menu implements Section {
 			item.setType(Type.getNext(name), item, value, ms);
 			item.parse(Type.getNext(name), value);
 		} else if (name.equals("pos")) {
-			pos = (Point) BeanTools.getConvertersMap().get(Point.class).convert(value);
+			pos = (MugenPoint) BeanTools.getConvertersMap().get(MugenPoint.class).convert(value);
 		} else if (name.startsWith("itemname")) {
 			if (itemname == null)
 				itemname = new ItemName();
 			itemname.parse(root, Type.getNext(name), value);
 		} else if (name.equals("window.margins.y")) {
-			window$margins$y = (Point) BeanTools.getConvertersMap().get(Point.class).convert(value);
+			window$margins$y = (MugenPoint) BeanTools.getConvertersMap().get(MugenPoint.class).convert(value);
 		} else if (name.equals("window.visibleitems")) {
 			window$visibleitems = Integer.parseInt(value);
 			
@@ -61,10 +61,10 @@ public class Menu implements Section {
 			cancel$snd = (SndGrpNum) BeanTools.getConvertersMap().get(SndGrpNum.class).convert(value);
 		}
 	}
-	public Point getPos() {
+	public MugenPoint getPos() {
 		return pos;
 	}
-	public void setPos(Point pos) {
+	public void setPos(MugenPoint pos) {
 		this.pos = pos;
 	}
 	public Item getItem() {
@@ -79,10 +79,10 @@ public class Menu implements Section {
 	public void setItemname(ItemName itemname) {
 		this.itemname = itemname;
 	}
-	public Point getWindow$margins$y() {
+	public MugenPoint getWindow$margins$y() {
 		return window$margins$y;
 	}
-	public void setWindow$margins$y(Point window$margins$y) {
+	public void setWindow$margins$y(MugenPoint window$margins$y) {
 		this.window$margins$y = window$margins$y;
 	}
 	public int getWindow$visibleitems() {

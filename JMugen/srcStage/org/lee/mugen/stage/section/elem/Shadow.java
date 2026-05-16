@@ -1,6 +1,6 @@
 package org.lee.mugen.stage.section.elem;
 
-import java.awt.Point;
+import org.lee.mugen.geom.MugenPoint;
 
 import org.lee.mugen.fight.section.Section;
 import org.lee.mugen.renderer.RGB;
@@ -40,7 +40,7 @@ public class Shadow implements Section {
 	// shadow fading away as the player gets farther away from the
 	// ground. If omitted, defaults to no level effects (shadow is
 	// always fully visible).
-	private Point fade$range = new Point();
+	private MugenPoint fade$range = new MugenPoint();
 
 	private int reflect = 0;
 
@@ -54,7 +54,7 @@ public class Shadow implements Section {
 		} else if (name.equals("yscale")) {
 			yscale = Float.parseFloat(value);
 		} else if (name.equals("fade.range")) {
-			fade$range = (Point) BeanTools.getConvertersMap().get(Point.class).convert(value);
+			fade$range = (MugenPoint) BeanTools.getConvertersMap().get(MugenPoint.class).convert(value);
 		} else if (name.equals("reflect")) {
 			reflect = Integer.parseInt(value);
 		}
@@ -100,11 +100,11 @@ public class Shadow implements Section {
 		this.parent = parent;
 	}
 
-	public Point getFade$range() {
+	public MugenPoint getFade$range() {
 		return fade$range;
 	}
 
-	public void setFade$range(Point fade$range) {
+	public void setFade$range(MugenPoint fade$range) {
 		this.fade$range = fade$range;
 	}
 

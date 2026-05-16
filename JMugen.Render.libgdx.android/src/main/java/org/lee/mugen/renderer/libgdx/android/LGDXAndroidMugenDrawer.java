@@ -11,6 +11,7 @@ public class LGDXAndroidMugenDrawer extends org.lee.mugen.renderer.libgdx.core.L
 
     public LGDXAndroidMugenDrawer(LGDXAndroidGameWindow gameWindow) {
         super(gameWindow);
+        LibGDXAndroidRendererFactory.notifyDrawerCreated(this);
     }
 
     private static LGDXAndroidGameWindow factoryWindow() {

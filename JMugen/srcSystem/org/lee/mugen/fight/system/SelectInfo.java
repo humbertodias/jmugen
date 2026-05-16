@@ -1,6 +1,6 @@
 package org.lee.mugen.fight.system;
 
-import java.awt.Point;
+import org.lee.mugen.geom.MugenPoint;
 
 import org.lee.mugen.fight.intro.entity.Fade;
 import org.lee.mugen.fight.section.Section;
@@ -24,7 +24,7 @@ public class SelectInfo implements Section {
 	int rows;
 	int columns;
 	int wrapping;
-	Point pos;
+	MugenPoint pos;
 	boolean showemptyboxes;
 	boolean moveoveremptyboxes;
 	Cell cell;
@@ -57,7 +57,7 @@ public class SelectInfo implements Section {
 		} else if (name.equals("wrapping")) {
 			wrapping = Integer.parseInt(value);
 		} else if (name.equals("pos")) {
-			pos = (Point) BeanTools.getConvertersMap().get(Point.class).convert(value);
+			pos = (MugenPoint) BeanTools.getConvertersMap().get(MugenPoint.class).convert(value);
 		} else if (name.equals("showemptyboxes")) {
 			showemptyboxes = Integer.parseInt(value) != 0;
 		} else if (name.equals("moveoveremptyboxes")) {
@@ -166,13 +166,13 @@ public class SelectInfo implements Section {
 
 
 
-	public Point getPos() {
+	public MugenPoint getPos() {
 		return pos;
 	}
 
 
 
-	public void setPos(Point pos) {
+	public void setPos(MugenPoint pos) {
 		this.pos = pos;
 	}
 

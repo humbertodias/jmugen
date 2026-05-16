@@ -1,13 +1,13 @@
 package org.lee.mugen.fight.system.elem;
 
-import java.awt.Point;
+import org.lee.mugen.geom.MugenPoint;
 
 import org.lee.mugen.fight.section.Section;
 import org.lee.mugen.fight.section.elem.Type;
 import org.lee.mugen.util.BeanTools;
 
 public class Stage implements Section {
-	private Point pos;
+	private MugenPoint pos;
 	
 	private Type move;
 	private Type done;
@@ -16,7 +16,7 @@ public class Stage implements Section {
 	@Override
 	public void parse(Object root, String name, String value) throws Exception {
 		if (name.equals("pos")) {
-			pos = (Point) BeanTools.getConvertersMap().get(Point.class).convert(value);
+			pos = (MugenPoint) BeanTools.getConvertersMap().get(MugenPoint.class).convert(value);
 		} else if (name.startsWith("move.")) {
 			if (move == null)
 				move = new Type();
@@ -40,10 +40,10 @@ public class Stage implements Section {
 		}
 		
 	}
-	public Point getPos() {
+	public MugenPoint getPos() {
 		return pos;
 	}
-	public void setPos(Point pos) {
+	public void setPos(MugenPoint pos) {
 		this.pos = pos;
 	}
 	public Type getMove() {

@@ -1,6 +1,6 @@
 package org.lee.mugen.core.renderer.game.fight;
 
-import java.awt.Point;
+import org.lee.mugen.geom.MugenPoint;
 
 import org.lee.mugen.core.GameFight;
 import org.lee.mugen.core.GameState;
@@ -39,7 +39,7 @@ public class TimeRender extends BaseRender {
 		if (counter.getLayerno() != layer)
 			return;
 		FontType font = (FontType) counter.getType();
-		Point pos = GameFight.getInstance().getFightdef().getTime().getPos();
+		MugenPoint pos = GameFight.getInstance().getFightdef().getTime().getPos();
 		Integer fontIdx = font.getFontno();
 		
 		Integer fontSens = font.getAlignmt().getCode();

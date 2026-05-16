@@ -11,7 +11,6 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 
-import org.lee.mugen.imageIO.PCXLoader;
 import org.lee.mugen.imageIO.RawPCXImage;
 import org.lee.mugen.object.RawImage;
 import org.lee.mugen.renderer.GraphicsWrapper;

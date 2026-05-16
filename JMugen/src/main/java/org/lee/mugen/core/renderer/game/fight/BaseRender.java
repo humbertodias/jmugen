@@ -1,6 +1,6 @@
 package org.lee.mugen.core.renderer.game.fight;
 
-import java.awt.Point;
+import org.lee.mugen.geom.MugenPoint;
 
 import org.lee.mugen.core.GameFight;
 import org.lee.mugen.fight.section.Fightdef;
@@ -79,15 +79,15 @@ public class BaseRender implements Renderable {
 		return null;
 	}
 	
-	public void render(MugenDrawer md, Point pos, Type type) {
+	public void render(MugenDrawer md, MugenPoint pos, Type type) {
 		this.render(md, pos, type, 1f);
 	}
-	public void render(MugenDrawer md, Point pos, Type type, float alpha) {
+	public void render(MugenDrawer md, MugenPoint pos, Type type, float alpha) {
 		
 		if (type.getLayerno() != layer)
 			return;
 		if (pos == null)
-			pos = new Point();
+			pos = new MugenPoint();
 		float xScale = 1;
 		float yScale = 1;
 		

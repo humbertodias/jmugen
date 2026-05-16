@@ -1,19 +1,17 @@
 package org.lee.mugen.imageIO;
 
-import java.awt.Dimension;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.image.IndexColorModel;
 import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.lee.mugen.io.LittleEndianDataInputStream;
-
 public class PCXLoader {
-	public static final int HEADER_SIZE = 128;
+
+	/** @deprecated use {@link PCXConstants#HEADER_SIZE} */
+	@Deprecated
+	public static final int HEADER_SIZE = PCXConstants.HEADER_SIZE;
 
 	public static BufferedImage loadImageColorIndexed(InputStream file, PCXPalette pal,
 			boolean isPalUse, boolean isUseColorKey, int colorDepth)
@@ -29,7 +27,7 @@ public class PCXLoader {
 
 		int width = header.getWidth();
 		int height = header.getHeight();
-		in.skip(128);
+		in.skip(PCXConstants.HEADER_SIZE);
 		IndexColorModel icm = new IndexColorModel(8, 256,
 				pal.r, pal.g,pal.b, 0);
 		BufferedImage image = new BufferedImage(width, height,
@@ -130,58 +128,6 @@ public class PCXLoader {
 			return true;
 		} else
 			return false;
-	}
-
-	/**
-	 * The header data block
-	 */
-	public static class PCXHeader {
-		public byte manufacturer;
-		public byte version;
-		public byte encoding;
-		public byte bitsPerPixel;
-		public int xmin;
-		public int ymin;
-		public int xmax;
-		public int ymax;
-		public int hdpi;
-		public int vdpi;
-		public byte[] colormap = new byte[48];
-		public byte reserved;
-		public byte planes;
-		public int bytesPerLine;
-
-		public PCXHeader(byte[] data) throws IOException {
-			LittleEndianDataInputStream in = new LittleEndianDataInputStream(
-					new DataInputStream((new ByteArrayInputStream(data))));
-			manufacturer = (byte) in.read();
-			version = (byte) in.read();
-			encoding = (byte) in.read();
-			bitsPerPixel = (byte) in.read();
-			xmin = in.readUnsignedShort();
-			ymin = in.readUnsignedShort();
-			xmax = in.readUnsignedShort();
-			ymax = in.readUnsignedShort();
-			hdpi = in.readUnsignedShort();
-			vdpi = in.readUnsignedShort();
-			in.read(colormap);
-			reserved = (byte) in.read();
-			planes = (byte) in.read();
-			bytesPerLine = in.readUnsignedShort();
-
-			in.close();
-		}
-		public Dimension getDimension() {
-			int width = xmax - xmin + 1;
-			int height = ymax - ymin + 1;
-			return new Dimension(width, height);
-		}
-		public int getWidth() {
-			return xmax - xmin + 1;
-		}
-		public int getHeight() {
-			return ymax - ymin + 1;
-		}
 	}
 
 }

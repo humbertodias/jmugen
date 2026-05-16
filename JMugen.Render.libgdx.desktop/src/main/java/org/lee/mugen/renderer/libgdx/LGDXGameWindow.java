@@ -14,12 +14,14 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import org.lee.mugen.ResourceBundleHelper;
 import org.lee.mugen.core.AbstractGameFight;
-import org.lee.mugen.core.Game;
 import org.lee.mugen.core.AbstractGameFight.DebugAction;
+import org.lee.mugen.core.Game;
+import org.lee.mugen.core.sound.SoundSystem;
 import org.lee.mugen.input.CmdProcDispatcher;
 import org.lee.mugen.input.ISpriteCmdProcess;
 import org.lee.mugen.renderer.GameWindow;
 import org.lee.mugen.renderer.MugenTimer;
+import org.lee.mugen.renderer.libgdx.core.LGDXAudioPlayback;
 import org.lee.mugen.renderer.libgdx.core.LGDXImageLoader;
 import org.lee.mugen.renderer.libgdx.core.LGDXPalFxShader;
 import org.lee.mugen.util.Logger;
@@ -246,6 +248,8 @@ public class LGDXGameWindow implements GameWindow, ApplicationListener, org.lee.
         batch.setProjectionMatrix(camera.combined);
         worldProjectionSnapshot.set(camera.combined);
 
+        SoundSystem.installAudioPlayback(new LGDXAudioPlayback());
+
         try {
             initKeys();
         } catch (IllegalArgumentException | SecurityException | IllegalAccessException | NoSuchFieldException e) {
@@ -432,6 +436,7 @@ public class LGDXGameWindow implements GameWindow, ApplicationListener, org.lee.
 
     @Override
     public void dispose() {
+        SoundSystem.clearAudioPlayback();
         if (batch != null) {
             batch.dispose();
         }

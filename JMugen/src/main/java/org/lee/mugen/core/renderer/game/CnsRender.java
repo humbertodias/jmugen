@@ -1,6 +1,6 @@
 package org.lee.mugen.core.renderer.game;
 
-import java.awt.Rectangle;
+import org.lee.mugen.geom.MugenRect;
 
 import org.lee.mugen.core.GameFight;
 import org.lee.mugen.renderer.GraphicsWrapper;
@@ -63,7 +63,7 @@ public class CnsRender implements Renderable {
 					x + (int)sprite.getRealXPos(), y + deltaDraw + (int)sprite.getRealYPos());
 			
 			g.setColor(0f, 1f, 0f, 1f);
-			for (java.awt.Rectangle r: sprite.getCns2()) {
+			for (MugenRect r: sprite.getCns2()) {
 				r.setLocation(x + r.x, y + r.y);
 	            g.drawRect(r.x, r.y, r.width, r.height);
 				
@@ -83,7 +83,7 @@ public class CnsRender implements Renderable {
 				topY = (int) (sprite.getRealYPos() - topY);
 				bottomY = (int) (sprite.getRealYPos());
 				
-				Rectangle r = new Rectangle(topX, topY, Math.abs(bottomX - topX), Math.abs(bottomY - topY));
+				MugenRect r = new MugenRect(topX, topY, Math.abs(bottomX - topX), Math.abs(bottomY - topY));
 				r.translate(_mvX + stage.getCamera().getWidth()/2, (stage.getStageinfo().getZoffset() + _mvY));
 				g.drawRect(r.x, r.y, r.width, r.height);
 				
@@ -93,7 +93,7 @@ public class CnsRender implements Renderable {
 		if (showAttackCns) {
 			g.setColor(1f, 0f, 0f, 1f);
 			
-			for (java.awt.Rectangle r: sprite.getCns1()) {
+			for (MugenRect r: sprite.getCns1()) {
 				r.setLocation(x + r.x, y + r.y);
 	            g.drawRect(r.x, r.y, r.width, r.height);
 				

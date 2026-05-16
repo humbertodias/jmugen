@@ -1,10 +1,10 @@
 package org.lee.mugen.sprite.cns.eval.trigger.function.spriteCns;
 
-import org.apache.commons.beanutils.PropertyUtils;
 import org.lee.mugen.core.GameFight;
 import org.lee.mugen.parser.type.Valueable;
 import org.lee.mugen.sprite.character.Sprite;
 import org.lee.mugen.sprite.cns.eval.function.SpriteCnsTriggerFunction;
+import org.lee.mugen.util.BeanTools;
 
 /**
  * 
@@ -21,7 +21,7 @@ public class Beaninfo extends SpriteCnsTriggerFunction {
 	public Object getValue(String spriteId,Valueable... params) {
 		final Sprite sprite = GameFight.getInstance().getSpriteInstance(spriteId);
 		try {
-			Object o = PropertyUtils.getNestedProperty(sprite, params[0].getValue(spriteId).toString());
+			Object o = BeanTools.getNestedProperty(sprite, params[0].getValue(spriteId).toString());
 			return o;
 		} catch (Exception e) {
 			e.printStackTrace();

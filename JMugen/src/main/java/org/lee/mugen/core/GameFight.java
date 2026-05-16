@@ -1215,7 +1215,7 @@ public class GameFight implements AbstractGameFight {
 			int x = 10;
 			int y = 10;
 			for (String s: strSpriteInfos) {
-				fp.draw(0, x, y+=fp.getSize().height, GraphicsWrapper.getInstance(), s);
+				fp.draw(0, x, y+=fp.getSize().y, GraphicsWrapper.getInstance(), s);
 				addX = Math.max(addX, s.length());
 			}
 			aTime++;

@@ -1,6 +1,6 @@
 package org.lee.mugen.fight.section.elem;
 
-import java.awt.Point;
+import org.lee.mugen.geom.MugenPoint;
 
 
 
@@ -76,8 +76,8 @@ public class PlayerLifebar extends Bar {
 	}
 	public void init() {
 		super.init();
-		getRangeFront().x = (Point) getRange().x.clone();
-		getRangeMid().x = (Point) getRange().x.clone();
+		getRangeFront().x = (MugenPoint) getRange().x.clone();
+		getRangeMid().x = (MugenPoint) getRange().x.clone();
 		if (mid != null)
 			mid.init();
 		if (front != null)

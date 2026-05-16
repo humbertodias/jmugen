@@ -1,6 +1,6 @@
 package org.lee.mugen.sprite.cns.type.function;
 
-import java.awt.Point;
+import org.lee.mugen.geom.MugenPoint;
 
 import org.lee.mugen.core.GameFight;
 import org.lee.mugen.core.renderer.game.ImageRender;
@@ -11,12 +11,12 @@ import org.lee.mugen.sprite.common.resource.FontParser;
 public class DisplayToScreen extends StateCtrlFunction {
 	public static class DisplayToScreenSub {
 		String value;
-		Point pos = new Point();
+		MugenPoint pos = new MugenPoint();
 		int time = 1;
-		public Point getPos() {
+		public MugenPoint getPos() {
 			return pos;
 		}
-		public void setPos(Point pos) {
+		public void setPos(MugenPoint pos) {
 			this.pos = pos;
 		}
 		public int getTime() {

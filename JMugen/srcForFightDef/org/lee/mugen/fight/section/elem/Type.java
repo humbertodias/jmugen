@@ -1,6 +1,6 @@
 package org.lee.mugen.fight.section.elem;
 
-import java.awt.Point;
+import org.lee.mugen.geom.MugenPoint;
 
 import org.lee.mugen.fight.section.elem.FontType.ALIGNMT;
 import org.lee.mugen.sprite.entity.PointF;
@@ -21,8 +21,8 @@ public class Type implements Cloneable {
 	}
 
 	CommonType type;
-	Point offset = new Point();
-	Point pos = new Point();
+	MugenPoint offset = new MugenPoint();
+	MugenPoint pos = new MugenPoint();
 	
 	@Override
 	public Object clone() {
@@ -31,9 +31,9 @@ public class Type implements Cloneable {
 			if (type != null)
 				clone.type = (CommonType) type.clone();
 			if (offset != null)
-				clone.offset = (Point) offset.clone();
+				clone.offset = (MugenPoint) offset.clone();
 			if (pos != null)
-				clone.pos = (Point) pos.clone();
+				clone.pos = (MugenPoint) pos.clone();
 			if (snd != null)
 				clone.snd = (SndType) snd.clone();
 			if (scale != null)
@@ -73,11 +73,11 @@ public class Type implements Cloneable {
 	}
 	
 	
-	public Point getOffset() {
+	public MugenPoint getOffset() {
 		return offset;
 	}
 
-	public void setOffset(Point offset) {
+	public void setOffset(MugenPoint offset) {
 		this.offset = offset;
 	}
 
@@ -144,9 +144,9 @@ public class Type implements Cloneable {
 			getType().parse(name, value);
 		}
 		if (name.equalsIgnoreCase("pos")) {
-			pos = (Point) BeanTools.getConvertersMap().get(Point.class).convert(value);
+			pos = (MugenPoint) BeanTools.getConvertersMap().get(MugenPoint.class).convert(value);
 		} else if (name.equalsIgnoreCase("offset")) {
-			offset = (Point) BeanTools.getConvertersMap().get(Point.class).convert(value);
+			offset = (MugenPoint) BeanTools.getConvertersMap().get(MugenPoint.class).convert(value);
 		} else if (name.equalsIgnoreCase("starttime")) {
 			setStarttime((Integer) BeanTools.getConvertersMap().get(Integer.class).convert(value));
 			originalStarttime = getStarttime();
@@ -176,10 +176,10 @@ public class Type implements Cloneable {
 	}
 
 
-	public Point getPos() {
+	public MugenPoint getPos() {
 		return pos;
 	}
-	public void setPos(Point pos) {
+	public void setPos(MugenPoint pos) {
 		this.pos = pos;
 	}
 	public float getAlpha() {

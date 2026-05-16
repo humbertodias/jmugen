@@ -1,6 +1,6 @@
 package org.lee.mugen.background;
 
-import java.awt.Point;
+import org.lee.mugen.geom.MugenPoint;
 import java.io.Serializable;
 import java.util.HashMap;
 
@@ -32,11 +32,11 @@ public class BG implements Cloneable, Serializable {
 
 	public class Sin implements Serializable {
 
-		public void setX(Point p) {
+		public void setX(MugenPoint p) {
 			sinXAmp = p.x;
 			sinXTime = p.y;
 		}
-		public void setY(Point p) {
+		public void setY(MugenPoint p) {
 			sinYAmp = p.x;
 			sinYTime = p.y;
 		}
@@ -100,7 +100,7 @@ public class BG implements Cloneable, Serializable {
 	// yscalestart = ? Starting y-scale (float, in percent) (def: 100)
 	private float yscalestart;
 
-	private Point width = new Point();
+	private MugenPoint width = new MugenPoint();
 
 	
 	private PointF pos = new PointF();
@@ -392,11 +392,11 @@ public class BG implements Cloneable, Serializable {
 		this.xscale = xscale;
 	}
 
-	public Point getWidth() {
+	public MugenPoint getWidth() {
 		return width;
 	}
 
-	public void setWidth(Point width) {
+	public void setWidth(MugenPoint width) {
 		this.width = width;
 	}
 

@@ -1,10 +1,8 @@
 package org.lee.mugen.core.renderer.game.select;
 
-import java.awt.Dimension;
-import java.awt.Point;
+import org.lee.mugen.geom.MugenPoint;
 import java.util.Iterator;
 
-import org.apache.commons.beanutils.PropertyUtils;
 import org.lee.mugen.core.gameSelect.GameSelect;
 import org.lee.mugen.core.gameSelect.SelectionController;
 import org.lee.mugen.core.renderer.game.fight.BaseRender;
@@ -23,6 +21,7 @@ import org.lee.mugen.renderer.GraphicsWrapper;
 import org.lee.mugen.renderer.ImageContainer;
 import org.lee.mugen.renderer.MugenDrawer;
 import org.lee.mugen.renderer.RGB;
+import org.lee.mugen.util.BeanTools;
 import org.lee.mugen.sprite.entity.PointF;
 
 public class SelectRender extends BaseRender {
@@ -60,15 +59,15 @@ public class SelectRender extends BaseRender {
 		
 		///// Cell
 		Cell cell = selectInfo.getCell();
-		Dimension cellSize = cell.getSize();
+		MugenPoint cellSize = cell.getSize();
 		int spacing = cell.getSpacing();
 		int row = selectInfo.getRows();
 		int col = selectInfo.getColumns();
-		Point pos = selectInfo.getPos();
+		MugenPoint pos = selectInfo.getPos();
 
 		for (int c = 0; c < col; c++) {
 			for (int r = 0; r < row; r++) {
-				render(md, new Point(pos.x + c * cellSize.width + c * spacing, pos.y + r * cellSize.height + r * spacing), cell.getBg());
+				render(md, new MugenPoint(pos.x + c * cellSize.x + c * spacing, pos.y + r * cellSize.y + r * spacing), cell.getBg());
 			}
 		}
 		
@@ -78,8 +77,8 @@ public class SelectRender extends BaseRender {
 		
 		for (int r = 0; r < row; r++) {
 			for (int c = 0; c < col; c++) {
-				Point p = new Point(pos.x + c * cellSize.width + c * spacing, pos.y + r * cellSize.height + r * spacing);
-				Point currentPos = new Point(r,c);
+				MugenPoint p = new MugenPoint(pos.x + c * cellSize.x + c * spacing, pos.y + r * cellSize.y + r * spacing);
+				MugenPoint currentPos = new MugenPoint(r,c);
 				
 				if (iterCharacter.hasNext()) {
 					String character = iterCharacter.next();
@@ -129,9 +128,9 @@ public class SelectRender extends BaseRender {
 			if (name == null) {
 			} else if (characters.getBigPortrait(name) != null) {
 
-				pos = (Point) getProperty(selectInfo, 
+				pos = (MugenPoint) getProperty(selectInfo, 
 						"p" + posName + ".face.offset");
-				pos = (Point) pos.clone();
+				pos = (MugenPoint) pos.clone();
 				int ifacing = (Integer) getProperty(selectInfo, 
 						"p" + posName + ".face.facing");
 				boolean facing = ifacing == -1;
@@ -205,17 +204,17 @@ public class SelectRender extends BaseRender {
 
 	private Object getProperty(Object o, String path) {
 		try {
-			return PropertyUtils.getNestedProperty(o, path);
+			return BeanTools.getNestedProperty(o, path);
 		} catch (Exception e) {
 			throw new IllegalArgumentException("Unknown path " + path + " for " + o.getClass());
 		} 
 	}
 
-	private void render(MugenDrawer md, Point p, ImageContainer ic) {
+	private void render(MugenDrawer md, MugenPoint p, ImageContainer ic) {
 		render(md, p, ic, false, false, new PointF(1,1));
 		
 	}
-	private void render(MugenDrawer md, Point p, ImageContainer ic, boolean isFlipH, boolean isFlipV, PointF scale) {
+	private void render(MugenDrawer md, MugenPoint p, ImageContainer ic, boolean isFlipH, boolean isFlipV, PointF scale) {
 		DrawProperties dp = new DrawProperties(p.x, p.y, isFlipH, isFlipV, ic);
 		dp.setXScaleFactor(scale.getX());
 		dp.setYScaleFactor(scale.getY());

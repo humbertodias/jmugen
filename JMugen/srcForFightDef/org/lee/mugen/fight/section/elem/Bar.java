@@ -1,18 +1,18 @@
 package org.lee.mugen.fight.section.elem;
 
-import java.awt.Point;
+import org.lee.mugen.geom.MugenPoint;
 
 import org.lee.mugen.util.BeanTools;
 
 public class Bar extends SimpleElement {
 	public static class Range {
-		Point x = new Point();
+		MugenPoint x = new MugenPoint();
 
-		public Point getX() {
+		public MugenPoint getX() {
 			return x;
 		}
 
-		public void setX(Point x) {
+		public void setX(MugenPoint x) {
 			this.x = x;
 		}
 		
@@ -32,7 +32,7 @@ public class Bar extends SimpleElement {
 	public void parse(Object root, String name, String value) {
 		super.parse(root, name, value);
 		if (name.equalsIgnoreCase("range.x")) {
-			Point rangeX = (Point) BeanTools.getConvertersMap().get(Point.class).convert(value);
+			MugenPoint rangeX = (MugenPoint) BeanTools.getConvertersMap().get(MugenPoint.class).convert(value);
 			getRange().setX(rangeX);
 		}
 		

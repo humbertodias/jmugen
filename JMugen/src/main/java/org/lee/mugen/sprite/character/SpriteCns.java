@@ -1,6 +1,6 @@
 package org.lee.mugen.sprite.character;
 
-import java.awt.Rectangle;
+import org.lee.mugen.geom.MugenRect;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -348,7 +348,7 @@ public class SpriteCns implements Cloneable, Serializable {
 		return edge;
 	}
 
-	public Rectangle getSizeRect() {
+	public MugenRect getSizeRect() {
 		int topX = (int) (isFlip ? getWidth().getFront() : getWidth().getBack());
 		int bottomX = (int) (isFlip ? getWidth().getBack() : getWidth()
 				.getFront());
@@ -360,7 +360,7 @@ public class SpriteCns implements Cloneable, Serializable {
 		topY = (int) (getYPos() + topY);
 		bottomY = (int) (getYPos() - bottomY);
 
-		return new Rectangle(topX, (int) (topY + getSize().getHeight()), Math
+		return new MugenRect(topX, (int) (topY + getSize().getHeight()), Math
 				.abs(bottomX - topX),
 				(int) (Math.abs(bottomY - topY) - getSize().getHeight()));
 	}

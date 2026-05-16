@@ -1,9 +1,9 @@
 package org.lee.mugen.sprite.common.resource;
 
-import java.awt.Dimension;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.lee.mugen.geom.MugenPoint;
 import org.lee.mugen.imageIO.RawPCXImage;
 import org.lee.mugen.renderer.DrawProperties;
 import org.lee.mugen.renderer.GraphicsWrapper;
@@ -14,10 +14,10 @@ public class FontProducer {
 
 	private String name;
 	
-	private Dimension size;
-	private Dimension spacing;
+	private MugenPoint size;
+	private MugenPoint spacing;
 	private int colors;
-	private Dimension offset;
+	private MugenPoint offset;
 	private String type;
 
 	private Map<Integer, ImageContainer> fontBankMap = new HashMap<Integer, ImageContainer>();
@@ -50,9 +50,9 @@ public class FontProducer {
 			if (desc != null) {
 				len += desc.width;
 			} else {
-				len += size.width;
+				len += size.x;
 			}
-			len += spacing.width;
+			len += spacing.x;
 		}
 		return len;
 	}
@@ -100,19 +100,19 @@ public class FontProducer {
 		this.name = name;
 	}
 
-	public Dimension getSize() {
+	public MugenPoint getSize() {
 		return size;
 	}
 
-	public void setSize(Dimension size) {
+	public void setSize(MugenPoint size) {
 		this.size = size;
 	}
 
-	public Dimension getSpacing() {
+	public MugenPoint getSpacing() {
 		return spacing;
 	}
 
-	public void setSpacing(Dimension spacing) {
+	public void setSpacing(MugenPoint spacing) {
 		this.spacing = spacing;
 	}
 
@@ -124,11 +124,11 @@ public class FontProducer {
 		this.colors = colors;
 	}
 
-	public Dimension getOffset() {
+	public MugenPoint getOffset() {
 		return offset;
 	}
 
-	public void setOffset(Dimension offset) {
+	public void setOffset(MugenPoint offset) {
 		this.offset = offset;
 	}
 
@@ -151,7 +151,7 @@ public class FontProducer {
 	public void drawLeftToRight(int x, int y, MugenDrawer md, String s, int bankno, float alpha) {
 		String[] lines = s.split("\n");
 		int width = getMaxWidth(lines);
-		int height = lines.length * (size.height + (lines.length > 1? spacing.height: 0));
+		int height = lines.length * (size.y + (lines.length > 1? spacing.y: 0));
 		
 		for (String line: lines) {
 			char[] str = line.toCharArray();
@@ -159,19 +159,19 @@ public class FontProducer {
 			for (char c: str) {
 				Desc pt = map.get(c);
 				if (pt == null) {
-					xposTemp += size.width + spacing.width;
+					xposTemp += size.x + spacing.x;
 					continue;
 				}
 				DrawProperties dp = new DrawProperties(
-						xposTemp, xposTemp + pt.width, y, y - size.height, 
-						pt.x , pt.x + pt.width, size.height, 0, 
+						xposTemp, xposTemp + pt.width, y, y - size.y, 
+						pt.x , pt.x + pt.width, size.y, 0, 
 						false, false,
 						getImageByBankno(bankno));
 				dp.setAlpha(alpha);
 				md.draw(dp);
-				xposTemp += (pt.width + spacing.width);
+				xposTemp += (pt.width + spacing.x);
 			}
-			y += size.height + spacing.height;
+			y += size.y + spacing.y;
 		}
 		
 	}
@@ -180,7 +180,7 @@ public class FontProducer {
 	public void drawRightToLeft(int x, int y, MugenDrawer md, String s, int bankno, float alpha) {
 		String[] lines = s.split("\n");
 		int width = getMaxWidth(lines);
-		int height = lines.length * (size.height + (lines.length > 1? spacing.height: 0));
+		int height = lines.length * (size.y + (lines.length > 1? spacing.y: 0));
 		x -= width;
 		for (String line: lines) {
 			char[] str = line.toCharArray();
@@ -188,19 +188,19 @@ public class FontProducer {
 			for (char c: str) {
 				Desc pt = map.get(c);
 				if (pt == null) {
-					xposTemp += size.width + spacing.width;
+					xposTemp += size.x + spacing.x;
 					continue;
 				}
 				DrawProperties dp = new DrawProperties(
-						xposTemp, xposTemp + pt.width, y, y - size.height, 
-						pt.x , pt.x + pt.width, size.height, 0, 
+						xposTemp, xposTemp + pt.width, y, y - size.y, 
+						pt.x , pt.x + pt.width, size.y, 0, 
 						false, false,
 						getImageByBankno(bankno));
 				dp.setAlpha(alpha);
 				md.draw(dp);
-				xposTemp += (pt.width + spacing.width);
+				xposTemp += (pt.width + spacing.x);
 			}
-			y += size.height + spacing.height;
+			y += size.y + spacing.y;
 		}
 		
 	}
@@ -211,7 +211,7 @@ public class FontProducer {
 			s = "";
 		String[] lines = s.split("\n");
 		int width = getMaxWidth(lines);
-		int height = lines.length * (size.height + (lines.length > 1? spacing.height: 0));
+		int height = lines.length * (size.y + (lines.length > 1? spacing.y: 0));
 		x -= width/2;
 		for (String line: lines) {
 			char[] str = line.toCharArray();
@@ -219,19 +219,19 @@ public class FontProducer {
 			for (char c: str) {
 				Desc pt = map.get(c);
 				if (pt == null) {
-					xposTemp += size.width + spacing.width;
+					xposTemp += size.x + spacing.x;
 					continue;
 				}
 				DrawProperties dp = new DrawProperties(
-						xposTemp, xposTemp + pt.width, y, y - size.height, 
-						pt.x , pt.x + pt.width, size.height, 0, 
+						xposTemp, xposTemp + pt.width, y, y - size.y, 
+						pt.x , pt.x + pt.width, size.y, 0, 
 						false, false,
 						getImageByBankno(bankno));
 				dp.setAlpha(alpha);
 				md.draw(dp);
-				xposTemp += (pt.width + spacing.width);
+				xposTemp += (pt.width + spacing.x);
 			}
-			y += size.height + spacing.height;
+			y += size.y + spacing.y;
 		}
 		
 	}

@@ -1,7 +1,7 @@
 package org.lee.mugen.stage.section.elem;
 
 
-import java.awt.Rectangle;
+import org.lee.mugen.geom.MugenRect;
 import java.util.Random;
 import java.util.regex.Matcher;
 
@@ -154,8 +154,8 @@ public class Camera implements Section {
 
 	private Random r = new Random();
 	private Shake envShake = new Shake();
-	public Rectangle getCameraView() {
-		return new Rectangle(x, y, width, height);
+	public MugenRect getCameraView() {
+		return new MugenRect(x, y, width, height);
 	}
 	
 	public int getX() {

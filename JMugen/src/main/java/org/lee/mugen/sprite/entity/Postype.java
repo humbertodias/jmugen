@@ -1,6 +1,6 @@
 package org.lee.mugen.sprite.entity;
 
-import java.awt.Point;
+import org.lee.mugen.geom.MugenPoint;
 
 import org.lee.mugen.core.GameFight;
 import org.lee.mugen.sprite.base.AbstractSprite;
@@ -11,7 +11,7 @@ import org.lee.mugen.stage.Stage;
 public enum Postype {
 	p1, p2, front, back, left, right;
 
-	public PointF computePos(AbstractSprite p1, AbstractSprite p2, Point offset, int facing) {
+	public PointF computePos(AbstractSprite p1, AbstractSprite p2, MugenPoint offset, int facing) {
 		return computePos(p1, p2, new PointF(offset), facing);
 	} 
 	

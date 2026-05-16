@@ -1,6 +1,6 @@
 package org.lee.mugen.sprite.base;
 
-import java.awt.Rectangle;
+import org.lee.mugen.geom.MugenRect;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,7 +21,7 @@ public abstract class AbstractSprite implements Serializable {
 	public static Fightfx getMugenFightfx() {
 		return GameFight.getInstance().getFightdef().getFiles().getFightfx();
 	}
-	public static List<Rectangle> replaceCns(AbstractSprite spr, int xAxis,
+	public static List<MugenRect> replaceCns(AbstractSprite spr, int xAxis,
 			int yAxis, org.lee.mugen.object.Rectangle[] rects) {
 
 		boolean isFlip = spr.isFlip();
@@ -29,7 +29,7 @@ public abstract class AbstractSprite implements Serializable {
 		PointF pos = spr.getPosToDraw();
 		boolean isMirrorH = spr.getSprAnimMng().getCurrentImageSprite()
 				.isMirrorH();
-		List<Rectangle> result = new ArrayList<Rectangle>();
+		List<MugenRect> result = new ArrayList<MugenRect>();
 		int sprWidth = 0;
 		if (spr.getCurrentImage() != null) {
 			sprWidth = spr.getCurrentImage().getWidth();
@@ -60,7 +60,7 @@ public abstract class AbstractSprite implements Serializable {
 			width = width * spr.getXScale();
 			float height = Math.abs(yTopLeft - yTopRight);
 			height = height * spr.getYScale();
-			java.awt.Rectangle jr = new java.awt.Rectangle(
+			MugenRect jr = new MugenRect(
 					Math.round(xTopLeft), Math.round(yTopLeft), Math
 							.round(width), Math.round(height));
 			
@@ -90,7 +90,7 @@ public abstract class AbstractSprite implements Serializable {
 
 	protected transient SpriteSFF spriteSFF;
 
-	protected List<Rectangle> getCns(org.lee.mugen.object.Rectangle[] rects) {
+	protected List<MugenRect> getCns(org.lee.mugen.object.Rectangle[] rects) {
 		ImageSpriteSFF img = getCurrentImageSpriteSFF();
 
 		int xAxis = img == null? 0: img.getXAxis();
@@ -98,7 +98,7 @@ public abstract class AbstractSprite implements Serializable {
 		return AbstractSprite.replaceCns(this, xAxis, yAxis, rects);
 	}
 
-	public List<Rectangle> getCns1() {
+	public List<MugenRect> getCns1() {
 		AnimElement imgSpr = getSprAnimMng().getCurrentImageSprite();
 		if (imgSpr == null)
 			return Collections.EMPTY_LIST;
@@ -107,7 +107,7 @@ public abstract class AbstractSprite implements Serializable {
 
 	}
 
-	public List<Rectangle> getCns2() {
+	public List<MugenRect> getCns2() {
 		AnimElement imgSpr = getSprAnimMng().getCurrentImageSprite();
 		return getCns(imgSpr.getCollisionsRec());
 

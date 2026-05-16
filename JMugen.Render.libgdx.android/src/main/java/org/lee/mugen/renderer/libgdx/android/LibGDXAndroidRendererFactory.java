@@ -30,6 +30,13 @@ public final class LibGDXAndroidRendererFactory {
         return drawerInstance;
     }
 
+    /** Called from {@link LGDXAndroidMugenDrawer} when constructed via {@link org.lee.mugen.renderer.GraphicsWrapper}. */
+    static void notifyDrawerCreated(LGDXAndroidMugenDrawer drawer) {
+        if (drawerInstance == null && drawer != null) {
+            drawerInstance = drawer;
+        }
+    }
+
     public static LGDXAndroidGameWindow getGameWindow() {
         ensureInitialized();
         return windowInstance;

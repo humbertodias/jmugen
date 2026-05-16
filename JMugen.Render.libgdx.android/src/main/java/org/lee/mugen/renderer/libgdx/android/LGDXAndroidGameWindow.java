@@ -11,32 +11,114 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+import org.lee.mugen.ResourceBundleHelper;
+import org.lee.mugen.core.AbstractGameFight;
+import org.lee.mugen.core.AbstractGameFight.DebugAction;
 import org.lee.mugen.core.Game;
+import org.lee.mugen.core.sound.SoundSystem;
+import org.lee.mugen.input.CmdProcDispatcher;
 import org.lee.mugen.input.ISpriteCmdProcess;
 import org.lee.mugen.renderer.GameWindow;
 import org.lee.mugen.renderer.MugenTimer;
 import org.lee.mugen.renderer.libgdx.core.GDXKeyMapper;
 import org.lee.mugen.renderer.libgdx.core.LGDXImageLoader;
 import org.lee.mugen.renderer.libgdx.core.LGDXMugenTimer;
+import org.lee.mugen.renderer.libgdx.core.LGDXAudioPlayback;
 import org.lee.mugen.renderer.libgdx.core.LGDXPalFxShader;
 import org.lee.mugen.renderer.libgdx.core.LGDXRenderContext;
 
 /**
- * Android LibGDX game window: same render/update loop as {@code LGDXWebGameWindow} without GWT hooks.
+ * Android LibGDX game window: same render/update/input wiring as {@code LGDXGameWindow} without LWJGL.
  */
 public class LGDXAndroidGameWindow implements GameWindow, ApplicationListener, LGDXRenderContext {
 
-    private static class SprCmdProcessListenerAction {
+    private static class CmdProcessListener {
+        boolean[] areKeysPress;
+        int[] keys;
+
+        boolean[] getAreKeysPress() {
+            return areKeysPress;
+        }
+
+        int[] getKeys() {
+            return keys;
+        }
+
+        void setKeys(int[] keys) {
+            this.keys = keys;
+            areKeysPress = new boolean[keys.length];
+        }
+    }
+
+    private static class SprCmdProcessListenerAction extends CmdProcessListener {
         private final ISpriteCmdProcess scp;
-        private final int[] keys;
-        private final boolean[] areKeysPress;
 
         SprCmdProcessListenerAction(ISpriteCmdProcess scp) {
             this.scp = scp;
-            this.keys = scp.getKeys();
-            this.areKeysPress = new boolean[keys.length];
+            keys = scp.getKeys();
+            areKeysPress = new boolean[keys.length];
+        }
+
+        ISpriteCmdProcess getScp() {
+            return scp;
+        }
+    }
+
+    private class DebugEventManager {
+        private final Map<DebugAction, int[]> actionKeyMap = new HashMap<>();
+        private final Map<DebugAction, Boolean> actionPressMap = new HashMap<>();
+
+        DebugEventManager() {
+            addAction(DebugAction.SWITCH_PLAYER_DEBUG_INFO, new int[]{GDXKeyMapper.KEY_LCONTROL, GDXKeyMapper.KEY_D});
+            addAction(DebugAction.EXPLOD_DEBUG_INFO, new int[]{GDXKeyMapper.KEY_LCONTROL, GDXKeyMapper.KEY_E});
+            addAction(DebugAction.INIT_PLAYER, new int[]{GDXKeyMapper.KEY_SPACE});
+            addAction(DebugAction.SHOW_HIDE_CNS, new int[]{GDXKeyMapper.KEY_LCONTROL, GDXKeyMapper.KEY_C});
+            addAction(DebugAction.SHOW_HIDE_ATTACK_CNS, new int[]{GDXKeyMapper.KEY_LCONTROL, GDXKeyMapper.KEY_X});
+            addAction(DebugAction.INCREASE_FPS, new int[]{GDXKeyMapper.KEY_LCONTROL, GDXKeyMapper.KEY_ADD}, true);
+            addAction(DebugAction.DECREASE_FPS, new int[]{GDXKeyMapper.KEY_LCONTROL, GDXKeyMapper.KEY_SUBTRACT}, true);
+            addAction(DebugAction.RESET_FPS, new int[]{GDXKeyMapper.KEY_LCONTROL, GDXKeyMapper.KEY_MULTIPLY});
+            addAction(DebugAction.DEBUG_PAUSE, new int[]{GDXKeyMapper.KEY_LCONTROL, GDXKeyMapper.KEY_P});
+            addAction(DebugAction.PAUSE_PLUS_ONE_FRAME, new int[]{GDXKeyMapper.KEY_LCONTROL, GDXKeyMapper.KEY_A});
+            addAction(DebugAction.DISPLAY_HELP, new int[]{GDXKeyMapper.KEY_F1});
+        }
+
+        private void addAction(DebugAction action, int[] keys) {
+            addAction(action, keys, false);
+        }
+
+        private void addAction(DebugAction action, int[] keys, boolean isAllowKeyRepeat) {
+            actionKeyMap.put(action, keys);
+            if (!isAllowKeyRepeat) {
+                actionPressMap.put(action, false);
+            }
+        }
+
+        public void process(Game cb) {
+            for (DebugAction action : actionKeyMap.keySet()) {
+                boolean isAllKeyOk = true;
+                for (int key : actionKeyMap.get(action)) {
+                    isAllKeyOk = isAllKeyOk && isKeyDown(key);
+                }
+                if (isAllKeyOk && actionPressMap.get(action) == null) {
+                    if (cb instanceof AbstractGameFight) {
+                        ((AbstractGameFight) cb).onDebugAction(action);
+                    }
+                    continue;
+                }
+                if (isAllKeyOk) {
+                    actionPressMap.put(action, true);
+                } else if (Boolean.TRUE.equals(actionPressMap.get(action))) {
+                    actionPressMap.put(action, false);
+                    if (cb instanceof AbstractGameFight) {
+                        ((AbstractGameFight) cb).onDebugAction(action);
+                    }
+                }
+            }
         }
     }
 
@@ -52,8 +134,10 @@ public class LGDXAndroidGameWindow implements GameWindow, ApplicationListener, L
     private final Vector3 unprojectTmp = new Vector3();
     private final Matrix4 batchTransformIdentity = new Matrix4();
     private final Matrix4 worldProjectionSnapshot = new Matrix4();
+    private final List<CmdProcessListener> cmdProcess = new LinkedList<>();
     private final List<SprCmdProcessListenerAction> spriteCmdProcess = new LinkedList<>();
     private final List<MugenKeyListener> mugenKeyListeners = new ArrayList<>();
+    private final DebugEventManager debugEventManager = new DebugEventManager();
 
     private SpriteBatch batch;
     private OrthographicCamera camera;
@@ -64,6 +148,10 @@ public class LGDXAndroidGameWindow implements GameWindow, ApplicationListener, L
     public LGDXAndroidGameWindow() {
         setTitle("JMugen - LibGDX Android");
         setResolution(640, 480);
+    }
+
+    private boolean isKeyDown(int key) {
+        return Gdx.input.isKeyPressed(key);
     }
 
     @Override
@@ -134,6 +222,15 @@ public class LGDXAndroidGameWindow implements GameWindow, ApplicationListener, L
             return;
         }
 
+        SoundSystem.installAudioPlayback(new LGDXAudioPlayback());
+
+        try {
+            initKeys();
+        } catch (IllegalArgumentException | SecurityException | IllegalAccessException | NoSuchFieldException e) {
+            Gdx.app.error("JMugenAndroid", "initKeys failed", e);
+            throw new RuntimeException(e);
+        }
+
         try {
             callback.init(this);
             finishInit = true;
@@ -141,6 +238,71 @@ public class LGDXAndroidGameWindow implements GameWindow, ApplicationListener, L
             Gdx.app.error("JMugenAndroid", "Error initializing Android game", e);
             throw new RuntimeException("Failed to initialize Android game callback", e);
         }
+    }
+
+    private void initKeys() throws IllegalAccessException, NoSuchFieldException {
+        ResourceBundle bundle = ResourceBundleHelper.getBundle("keys");
+        {
+            CmdProcessListener cmdProcessListener = new CmdProcessListener();
+            cmdProcessListener.setKeys(new int[]{
+                GDXKeyMapper.KEY_ESCAPE, GDXKeyMapper.KEY_F1, GDXKeyMapper.KEY_F2, GDXKeyMapper.KEY_F3,
+                GDXKeyMapper.KEY_F4, GDXKeyMapper.KEY_F5, GDXKeyMapper.KEY_F6, GDXKeyMapper.KEY_F7,
+                GDXKeyMapper.KEY_F8, GDXKeyMapper.KEY_F9, GDXKeyMapper.KEY_F10, GDXKeyMapper.KEY_F11, GDXKeyMapper.KEY_F12
+            });
+            cmdProcess.add(cmdProcessListener);
+        }
+
+        CmdProcDispatcher cd1 = new CmdProcDispatcher(
+            keyField(bundle, "P1.UP"), keyField(bundle, "P1.DOWN"), keyField(bundle, "P1.LEFT"), keyField(bundle, "P1.RIGHT"),
+            keyField(bundle, "P1.A"), keyField(bundle, "P1.B"), keyField(bundle, "P1.C"),
+            keyField(bundle, "P1.X"), keyField(bundle, "P1.Y"), keyField(bundle, "P1.Z"),
+            keyField(bundle, "P1.ABC"), keyField(bundle, "P1.XYZ"));
+        CmdProcDispatcher.getSpriteDispatcherMap().put("1", cd1);
+        {
+            CmdProcessListener cmdProcessListener = new CmdProcessListener();
+            cmdProcessListener.setKeys(cd1.getKeys());
+            cmdProcess.add(cmdProcessListener);
+        }
+
+        CmdProcDispatcher cd2 = new CmdProcDispatcher(
+            keyField(bundle, "P2.UP"), keyField(bundle, "P2.DOWN"), keyField(bundle, "P2.LEFT"), keyField(bundle, "P2.RIGHT"),
+            keyField(bundle, "P2.A"), keyField(bundle, "P2.B"), keyField(bundle, "P2.C"),
+            keyField(bundle, "P2.X"), keyField(bundle, "P2.Y"), keyField(bundle, "P2.Z"),
+            keyField(bundle, "P2.ABC"), keyField(bundle, "P2.XYZ"));
+        CmdProcDispatcher.getSpriteDispatcherMap().put("2", cd2);
+        {
+            CmdProcessListener cmdProcessListener = new CmdProcessListener();
+            cmdProcessListener.setKeys(cd2.getKeys());
+            cmdProcess.add(cmdProcessListener);
+        }
+
+        CmdProcDispatcher cd3 = new CmdProcDispatcher(
+            keyField(bundle, "P3.UP"), keyField(bundle, "P3.DOWN"), keyField(bundle, "P3.LEFT"), keyField(bundle, "P3.RIGHT"),
+            keyField(bundle, "P3.A"), keyField(bundle, "P3.B"), keyField(bundle, "P3.C"),
+            keyField(bundle, "P3.X"), keyField(bundle, "P3.Y"), keyField(bundle, "P3.Z"),
+            keyField(bundle, "P3.ABC"), keyField(bundle, "P3.XYZ"));
+        CmdProcDispatcher.getSpriteDispatcherMap().put("3", cd3);
+        {
+            CmdProcessListener cmdProcessListener = new CmdProcessListener();
+            cmdProcessListener.setKeys(cd3.getKeys());
+            cmdProcess.add(cmdProcessListener);
+        }
+
+        CmdProcDispatcher cd4 = new CmdProcDispatcher(
+            keyField(bundle, "P4.UP"), keyField(bundle, "P4.DOWN"), keyField(bundle, "P4.LEFT"), keyField(bundle, "P4.RIGHT"),
+            keyField(bundle, "P4.A"), keyField(bundle, "P4.B"), keyField(bundle, "P4.C"),
+            keyField(bundle, "P4.X"), keyField(bundle, "P4.Y"), keyField(bundle, "P4.Z"),
+            keyField(bundle, "P4.ABC"), keyField(bundle, "P4.XYZ"));
+        CmdProcDispatcher.getSpriteDispatcherMap().put("4", cd4);
+        {
+            CmdProcessListener cmdProcessListener = new CmdProcessListener();
+            cmdProcessListener.setKeys(cd4.getKeys());
+            cmdProcess.add(cmdProcessListener);
+        }
+    }
+
+    private static int keyField(ResourceBundle bundle, String key) throws NoSuchFieldException, IllegalAccessException {
+        return GDXKeyMapper.class.getDeclaredField("KEY_" + bundle.getString(key).toUpperCase()).getInt(null);
     }
 
     @Override
@@ -156,6 +318,10 @@ public class LGDXAndroidGameWindow implements GameWindow, ApplicationListener, L
 
     @Override
     public void render() {
+        if (finishInit && callback != null && gameRunning) {
+            keyManagementExecute();
+        }
+
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
@@ -163,7 +329,6 @@ public class LGDXAndroidGameWindow implements GameWindow, ApplicationListener, L
             return;
         }
 
-        keyManagementExecute();
         viewport.apply();
 
         try {
@@ -195,17 +360,38 @@ public class LGDXAndroidGameWindow implements GameWindow, ApplicationListener, L
     }
 
     private void keyManagementExecute() {
-        for (SprCmdProcessListenerAction action : spriteCmdProcess) {
-            for (int i = 0; i < action.keys.length; ++i) {
-                int key = action.keys[i];
-                if (!action.areKeysPress[i] && Gdx.input.isKeyPressed(key)) {
-                    action.areKeysPress[i] = true;
-                    action.scp.keyPressed(key);
-                    notifyKeyListeners(key, true);
-                } else if (action.areKeysPress[i] && !Gdx.input.isKeyPressed(key)) {
-                    action.areKeysPress[i] = false;
-                    action.scp.keyReleased(key);
-                    notifyKeyListeners(key, false);
+        if (callback == null) {
+            return;
+        }
+        debugEventManager.process(callback);
+
+        for (CmdProcessListener cmd : cmdProcess) {
+            boolean[] areKeysPress = cmd.getAreKeysPress();
+            int[] keys = cmd.getKeys();
+            for (int i = 0; i < keys.length; ++i) {
+                if (!areKeysPress[i] && isKeyDown(keys[i])) {
+                    areKeysPress[i] = true;
+                    notifyKeyListeners(keys[i], true);
+                } else if (areKeysPress[i] && !isKeyDown(keys[i])) {
+                    areKeysPress[i] = false;
+                    notifyKeyListeners(keys[i], false);
+                }
+            }
+        }
+
+        for (SprCmdProcessListenerAction sa : spriteCmdProcess) {
+            boolean[] areKeysPress = sa.getAreKeysPress();
+            int[] keys = sa.getKeys();
+            ISpriteCmdProcess scp = sa.getScp();
+            for (int i = 0; i < keys.length; ++i) {
+                if (!areKeysPress[i] && isKeyDown(keys[i])) {
+                    areKeysPress[i] = true;
+                    scp.keyPressed(keys[i]);
+                    notifyKeyListeners(keys[i], true);
+                } else if (areKeysPress[i] && !isKeyDown(keys[i])) {
+                    areKeysPress[i] = false;
+                    scp.keyReleased(keys[i]);
+                    notifyKeyListeners(keys[i], false);
                 }
             }
         }
@@ -227,6 +413,7 @@ public class LGDXAndroidGameWindow implements GameWindow, ApplicationListener, L
 
     @Override
     public void dispose() {
+        SoundSystem.clearAudioPlayback();
         if (batch != null) {
             batch.dispose();
             batch = null;

@@ -1,6 +1,6 @@
 package org.lee.mugen.core.renderer.game.fight;
 
-import java.awt.Point;
+import org.lee.mugen.geom.MugenPoint;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -35,7 +35,7 @@ public class LifeBarRender extends BaseRender {
 		drawProperties.setPalfx(thisCustompalFx);
 		super.draw(md, drawProperties);
 	}
-	protected void render(MugenDrawer md, Point pos, Type type, int x, int x2) {
+	protected void render(MugenDrawer md, MugenPoint pos, Type type, int x, int x2) {
 		if (type.getLayerno() != layer)
 			return;
 		ImageSpriteSFF sff = getImageSFF(type);
@@ -103,7 +103,7 @@ public class LifeBarRender extends BaseRender {
 			Collections.sort(order);
 			Map<Integer, Type> map = plb.getBg();
 			
-			Point pos = plb.getPos();
+			MugenPoint pos = plb.getPos();
 			for (Integer key: order) {
 				Type bg = map.get(key);
 				render(md, pos, bg);
@@ -126,7 +126,7 @@ public class LifeBarRender extends BaseRender {
 			Collections.sort(order);
 			Map<Integer, Type> map = plb.getBg();
 			
-			Point pos = plb.getPos();
+			MugenPoint pos = plb.getPos();
 			for (Integer key: order) {
 				Type bg = map.get(key);
 				render(md, pos, bg);

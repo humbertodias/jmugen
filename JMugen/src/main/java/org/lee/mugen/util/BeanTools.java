@@ -1,20 +1,18 @@
 package org.lee.mugen.util;
 
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.beans.IntrospectionException;
-import java.beans.PropertyDescriptor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.commons.beanutils.PropertyUtils;
 import org.lee.mugen.background.BG;
+import org.lee.mugen.geom.MugenPoint;
+import org.lee.mugen.geom.MugenRect;
 import org.lee.mugen.parser.type.Valueable;
 import org.lee.mugen.renderer.RGB;
 import org.lee.mugen.renderer.Trans;
@@ -50,9 +48,9 @@ public class BeanTools {
 
 	private static Map<Class, Converter> convertersMap = new HashMap<Class, Converter>();
 
-	private static Converter<Rectangle> rectangleConverter = new Converter<Rectangle>() {
+	private static Converter<MugenRect> mugenRectConverter = new Converter<MugenRect>() {
 
-		public Rectangle convert(Object o) {
+		public MugenRect convert(Object o) {
 			if (o instanceof String) {
 				String[] params = o.toString().replaceAll(" ", "").split(",");
 				int x = Integer.parseInt(params[0]);
@@ -60,7 +58,7 @@ public class BeanTools {
 				int width = Integer.parseInt(params[2]);
 				int height = Integer.parseInt(params[3]);
 
-				Rectangle result = new Rectangle();
+				MugenRect result = new MugenRect();
 				result.x = x;
 				result.y = y;
 				result.width = width;
@@ -73,7 +71,7 @@ public class BeanTools {
 				int width = ((Number) params[2]).intValue();
 				int height = ((Number) params[3]).intValue();
 
-				Rectangle result = new Rectangle();
+				MugenRect result = new MugenRect();
 				result.x = x;
 				result.y = y;
 				result.width = width;
@@ -452,19 +450,19 @@ public class BeanTools {
 	};
 	
 	
-	// Point
-	private static Converter<Point> pointConverter = new Converter<Point>() {
+	// MugenPoint
+	private static Converter<MugenPoint> pointConverter = new Converter<MugenPoint>() {
 
-		public Point convert(Object o) {
+		public MugenPoint convert(Object o) {
 			if (o instanceof String) {
 				String[] value = ((String) o).replaceAll(" ", "").split(",");
-				return new Point(Integer.parseInt(value[0]), Integer.parseInt(value[1]));
+				return new MugenPoint(Integer.parseInt(value[0]), Integer.parseInt(value[1]));
 			} else if (o.getClass().isArray()) {
 				Object[] objects = (Object[]) o;
-				Point pt = new Point(((Number) objects[0]).intValue(), ((Number) objects[1]).intValue());
+				MugenPoint pt = new MugenPoint(((Number) objects[0]).intValue(), ((Number) objects[1]).intValue());
 				return pt;
 			} else if (o instanceof Number) {
-				return new Point(((Number)o).intValue(), 0);
+				return new MugenPoint(((Number)o).intValue(), 0);
 			}
 			throw new IllegalArgumentException("Not supported checkwhat is excatly");
 		}
@@ -862,7 +860,7 @@ public class BeanTools {
 		
 		
 		convertersMap.put(org.lee.mugen.object.Rectangle.class, mugenRectangleConverter);
-		convertersMap.put(Rectangle.class, rectangleConverter);
+		convertersMap.put(MugenRect.class, mugenRectConverter);
 		convertersMap.put(Sinadd.class, sinaddClassConverter);
 		convertersMap.put(BG.Type.class, bg$TypeClassConverter);
 //		convertersMap.put(ReversalAttrClass.class, reversalAttrClassConverter);
@@ -894,7 +892,7 @@ public class BeanTools {
 		convertersMap.put(PointF.class, pointfConverter);
 		
 		//
-		convertersMap.put(Point.class, pointConverter);
+		convertersMap.put(MugenPoint.class, pointConverter);
 		//
 		convertersMap.put(Float[].class, floatArrayConverter);
 		convertersMap.put(float[].class, floatPrimiArrayConverter);
@@ -922,13 +920,108 @@ public class BeanTools {
 		return convertersMap;
 	}
 	private static Pattern LIST_PARTTERN_BEAN = Pattern.compile(".*(\\d+)");
-	
-	
-	
+
+	/**
+	 * Reads one segment (no {@code '.'}) from a bean or {@link Map}. Android-safe
+	 * replacement for Apache Commons {@code PropertyUtils.getProperty}.
+	 */
+	public static Object getSimpleProperty(Object bean, String name)
+			throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+		if (bean == null) {
+			throw new IllegalArgumentException("bean is null for property '" + name + "'");
+		}
+		if (bean instanceof Map) {
+			return ((Map<?, ?>) bean).get(name);
+		}
+		Method read = findReadMethod(bean.getClass(), name);
+		if (read != null) {
+			return read.invoke(bean);
+		}
+		Field f = findDeclaredField(bean.getClass(), name);
+		if (f != null) {
+			return f.get(bean);
+		}
+		throw new NoSuchMethodException("No read accessor for property '" + name + "' on " + bean.getClass().getName());
+	}
+
+	/**
+	 * Walks a dotted path using JavaBeans-style getters (and {@link Map} keys).
+	 * Replacement for {@code PropertyUtils.getNestedProperty} without {@code java.beans}.
+	 */
+	public static Object getNestedProperty(Object bean, String path)
+			throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+		if (path == null || path.isEmpty()) {
+			return bean;
+		}
+		int i = path.indexOf('.');
+		if (i < 0) {
+			return getSimpleProperty(bean, path);
+		}
+		String head = path.substring(0, i);
+		String tail = path.substring(i + 1);
+		Object next = getSimpleProperty(bean, head);
+		return getNestedProperty(next, tail);
+	}
+
+	private static Method findReadMethod(Class<?> clazz, String name) {
+		if (name.length() == 0) {
+			return null;
+		}
+		String cap = Character.toUpperCase(name.charAt(0)) + name.substring(1);
+		String getName = "get" + cap;
+		String isName = "is" + cap;
+		for (Method m : clazz.getMethods()) {
+			if (m.getParameterCount() != 0 || m.getReturnType() == void.class) {
+				continue;
+			}
+			if (m.getName().equals(getName) || m.getName().equals(isName)) {
+				return m;
+			}
+		}
+		return null;
+	}
+
+	private static Field findDeclaredField(Class<?> start, String name) {
+		for (Class<?> c = start; c != null && c != Object.class; c = c.getSuperclass()) {
+			try {
+				Field f = c.getDeclaredField(name);
+				f.setAccessible(true);
+				return f;
+			} catch (NoSuchFieldException e) {
+				// continue
+			}
+		}
+		return null;
+	}
+
+	private static Method findWriteMethod(Class<?> clazz, String acces) {
+		String setterName = "set" + Character.toUpperCase(acces.charAt(0)) + acces.substring(1);
+		List<Method> matches = new ArrayList<Method>();
+		for (Method m : clazz.getMethods()) {
+			if (setterName.equals(m.getName()) && m.getParameterCount() == 1) {
+				matches.add(m);
+			}
+		}
+		if (matches.isEmpty()) {
+			return null;
+		}
+		if (matches.size() == 1) {
+			return matches.get(0);
+		}
+		for (Method m : matches) {
+			Class<?> pt = m.getParameterTypes()[0];
+			if (convertersMap.containsKey(pt)) {
+				return m;
+			}
+		}
+		matches.sort(Comparator.comparing(m -> m.getParameterTypes()[0].getName()));
+		return matches.get(0);
+	}
+
 	public static void setObject(Object bean, String acces, Object value)
 			throws SecurityException, NoSuchMethodException,
 			IllegalArgumentException, IllegalAccessException,
-			InvocationTargetException, IntrospectionException {
+			InvocationTargetException {
 		int index = acces.indexOf('.');
 		if (index != -1) {
 			String newBean = acces.substring(0, index);
@@ -939,7 +1032,7 @@ public class BeanTools {
 				int idxList = Integer.parseInt(capture);
 				String newBeanTemp = newBean.substring(0, newBean.length() - capture.length());
 				try {
-					Object o = PropertyUtils.getProperty(bean, newBeanTemp);
+					Object o = getSimpleProperty(bean, newBeanTemp);
 					if (o instanceof Map) {
 						Map map = (Map) o;
 						o = map.get(idxList);
@@ -952,40 +1045,28 @@ public class BeanTools {
 				} catch (Exception e) {
 //					e.printStackTrace();
 				}
-			} 
-			Object o = PropertyUtils.getProperty(bean, newBean);
-			setObject(o, target, value);
-				
-		} else {
-			PropertyDescriptor pd = null;
-			Matcher m = LIST_PARTTERN_BEAN.matcher(acces);
-			if (m.find()) {
-				String capture = m.group(1);
-				int idxList = Integer.parseInt(capture);
-				String newBeanTemp = acces.substring(0, acces.length() - capture.length());
-			} 
-			pd = PropertyUtils.getPropertyDescriptor(bean, acces);
-			if (pd == null)
-				System.err.println(acces);
-			Class aClass = pd.getPropertyType();
-			Method mW = pd.getWriteMethod();
-			if (mW == null) {
-				mW = getMethod(bean.getClass(), acces, pd.getPropertyType());
 			}
+			Object o = getSimpleProperty(bean, newBean);
+			setObject(o, target, value);
+
+		} else {
+			Method mW = findWriteMethod(bean.getClass(), acces);
 			if (mW == null) {
 				mW = getMethod(bean.getClass(), acces);
 			}
-			if (mW == null)
+			if (mW == null) {
 				System.err.println("Error for getMethod " + acces + " of class : " + bean.getClass().getName());
-			aClass = mW.getParameterTypes()[0];
+				return;
+			}
+			Class aClass = mW.getParameterTypes()[0];
 			Converter converter = convertersMap.get(aClass);
-			if (converter == null){
+			if (converter == null) {
 				System.err.println("Error for get Convertor " + acces + " of class : " + bean.getClass().getName());
 				return;
 			}
-			Object o = converter.convert(value); //use spriteId for dynamic value
+			Object o = converter.convert(value); // use spriteId for dynamic value
 			mW.invoke(bean, o);
-			o = converter.convert(value); 
+			o = converter.convert(value);
 		}
 	}
 		

@@ -1,6 +1,6 @@
 package org.lee.mugen.sprite.cns.eval.trigger.function.spriteCns;
 
-import java.awt.Rectangle;
+import org.lee.mugen.geom.MugenRect;
 import java.util.List;
 
 import org.lee.mugen.core.GameFight;
@@ -35,15 +35,15 @@ public class P2bodydist extends SpriteCnsTriggerFunction {
 			}
 		}
 //		Area shapeOne = new Area();
-//		for (Rectangle r: sprOne.getCns2())
+//		for (MugenRect r: sprOne.getCns2())
 //			shapeOne.add(new Area(r));
 //		
 //		Area shapeTwo = new Area();
-//		for (Rectangle r: sprTwo.getCns2())
+//		for (MugenRect r: sprTwo.getCns2())
 //			shapeTwo.add(new Area(r));
 //		
-//		Rectangle rOne = shapeOne.getBounds();
-//		Rectangle rTwo = shapeTwo.getBounds();
+//		MugenRect rOne = shapeOne.getBounds();
+//		MugenRect rTwo = shapeTwo.getBounds();
 //		
 //		if (rOne.x < rTwo.x) {
 //			float result = (float) (rTwo.getX() - (rOne.getX() + rOne.getWidth()));
@@ -52,8 +52,8 @@ public class P2bodydist extends SpriteCnsTriggerFunction {
 //			float result = (float) (rOne.getX() - (rTwo.getX() + rTwo.getWidth()));
 //			return result < 0? 0: result;
 //		}
-		Rectangle one = sprOne.getInfo().getSizeRect();
-		Rectangle two = sprTwo.getInfo().getSizeRect();
+		MugenRect one = sprOne.getInfo().getSizeRect();
+		MugenRect two = sprTwo.getInfo().getSizeRect();
 		int xOne = sprOne.getInfo().isFlip()? one.x: one.x + one.width;
 		int xTwo = sprTwo.getInfo().isFlip()? two.x: two.x + two.width;
 		return Math.abs(xOne - xTwo);

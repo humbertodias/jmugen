@@ -18,6 +18,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>JMugen</groupId>
+            <artifactId>JMugen</artifactId>
+            <version>${jmugen.version}</version>
+        </dependency>
+        <dependency>
             <groupId>JMugen.Render.libgdx.core</groupId>
             <artifactId>JMugen.Render.libgdx.core</artifactId>
             <version>${jmugen.version}</version>

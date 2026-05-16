@@ -1,6 +1,6 @@
 package org.lee.mugen.sprite.entity;
 
-import java.awt.Point;
+import org.lee.mugen.geom.MugenPoint;
 
 import org.lee.mugen.sprite.character.Sprite;
 import org.lee.mugen.sprite.character.spiteCnsSubClass.constante.Size;
@@ -65,7 +65,7 @@ public class HelperSub {
 	private String helpertype = "normal";
 	private String name;
 	private int id;
-	private Point pos = new Point();
+	private MugenPoint pos = new MugenPoint();
 	private Postype postype = Postype.p1;
 	private int facing;
 	private int stateno;
@@ -132,10 +132,10 @@ public class HelperSub {
 	public void setPausemovetime(int pausemovetime) {
 		this.pausemovetime = pausemovetime;
 	}
-	public Point getPos() {
+	public MugenPoint getPos() {
 		return pos;
 	}
-	public void setPos(Point pos) {
+	public void setPos(MugenPoint pos) {
 		this.pos = pos;
 	}
 	public Postype getPostype() {

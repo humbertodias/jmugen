@@ -2,7 +2,7 @@ package org.lee.mugen.sprite.character;
 
 import static org.lee.mugen.util.Logger.log;
 
-import java.awt.Rectangle;
+import org.lee.mugen.geom.MugenRect;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -214,7 +214,7 @@ public class Sprite extends AbstractSprite implements Cloneable, Serializable {
 	}
 
 	@Override
-	public List<Rectangle> getCns1() {
+	public List<MugenRect> getCns1() {
 		AnimElement imgSpr = getSprAnimMng().getCurrentImageSprite();
 		if (imgSpr == null) {
 			
@@ -225,7 +225,7 @@ public class Sprite extends AbstractSprite implements Cloneable, Serializable {
 
 	}
 	@Override
-	public List<Rectangle> getCns2() {
+	public List<MugenRect> getCns2() {
 		AnimElement imgSpr = getSprAnimMng().getCurrentImageSprite();
 		if (imgSpr == null)
 			return Collections.emptyList();

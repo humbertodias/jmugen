@@ -1,6 +1,6 @@
 package org.lee.mugen.core.renderer.game.fight;
 
-import java.awt.Point;
+import org.lee.mugen.geom.MugenPoint;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -39,7 +39,7 @@ public class PowerBarRender extends LifeBarRender {
 			Collections.sort(order);
 			Map<Integer, Type> map = plb.getBg();
 			
-			Point pos = plb.getPos();
+			MugenPoint pos = plb.getPos();
 			for (Integer key: order) {
 				Type bg = map.get(key);
 				render(md, pos, bg);
@@ -65,7 +65,7 @@ public class PowerBarRender extends LifeBarRender {
 			Collections.sort(order);
 			Map<Integer, Type> map = plb.getBg();
 			
-			Point pos = plb.getPos();
+			MugenPoint pos = plb.getPos();
 			for (Integer key: order) {
 				Type bg = map.get(key);
 				render(md, pos, bg);

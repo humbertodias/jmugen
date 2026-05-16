@@ -18,6 +18,9 @@
         <android.maven.plugin.version>4.6.0</android.maven.plugin.version>
         <android.compile.sdk>34</android.compile.sdk>
         <gdx.backend.unpack.dir>${project.build.directory}/unpacked-libs/cbg_gdx-backend-android_${libgdx.version}</gdx.backend.unpack.dir>
+        <!-- Repo layout: ../data from this module (sibling of JMugen.Render.libgdx.android), not ../../ -->
+        <mugen.data.source>${project.basedir}/../data</mugen.data.source>
+        <android.assets.dir>${project.basedir}/src/main/assets</android.assets.dir>
     </properties>
 
     <repositories>
@@ -34,6 +37,23 @@
             <groupId>JMugen.Render.libgdx.core</groupId>
             <artifactId>JMugen.Render.libgdx.core</artifactId>
             <version>${jmugen.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>JMugen</groupId>
+            <artifactId>JMugen</artifactId>
+            <version>${jmugen.version}</version>
+            <exclusions>
+                <!-- mp3spi pulls soundlibs jlayer; vorbisspi pulls javazoom jlayer — same javazoom.jl.* types, D8 duplicate. -->
+                <exclusion>
+                    <groupId>javazoom</groupId>
+                    <artifactId>jlayer</artifactId>
+                </exclusion>
+                <!-- vorbisspi and mp3spi both ship javazoom.spi.PropertiesContainer; keep mp3 only for dex. -->
+                <exclusion>
+                    <groupId>com.googlecode.soundlibs</groupId>
+                    <artifactId>vorbisspi</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- AAR for resources/dex; unpacked classes.jar is on javac classpath. Transitive androidx.core is
              declared without <type>aar</type> in LibGDX's POM, so Maven resolves a non-existent :jar from Central.
@@ -101,17 +121,36 @@
             <artifactId>commons-io</artifactId>
             <version>2.8.0</version>
         </dependency>
-        <dependency>
-            <groupId>commons-beanutils</groupId>
-            <artifactId>commons-beanutils</artifactId>
-            <version>1.9.4</version>
-        </dependency>
     </dependencies>
 
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>
         <!-- LibGDX natives ship as jars (classifier natives-*); android-maven-plugin only packs type "so" or AAR jni/libs. -->
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.3.1</version>
+                <executions>
+                    <execution>
+                        <id>stage-mugen-data-into-android-assets</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${android.assets.dir}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${mugen.data.source}</directory>
+                                    <targetPath>data</targetPath>
+                                    <filtering>false</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
@@ -190,6 +229,7 @@
                         <debug>true</debug>
                     </sign>
                     <nativeLibrariesDirectory>${project.build.directory}/jni-libs</nativeLibrariesDirectory>
+                    <assetsDirectory>${android.assets.dir}</assetsDirectory>
                 </configuration>
             </plugin>
         </plugins>

@@ -1,6 +1,6 @@
 package org.lee.mugen.core.gameSelect;
 
-import java.awt.Point;
+import org.lee.mugen.geom.MugenPoint;
 import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -96,7 +96,7 @@ public class GameSelect implements Game {
 		return nextMode;
 	}
 
-	public String getSelectedSprite(Point p) {
+	public String getSelectedSprite(MugenPoint p) {
 		int row = MugenSystem.getInstance().getSelectInfo().getRows();
 		int col = MugenSystem.getInstance().getSelectInfo().getColumns();
 		Characters characters = MugenSystem.getInstance().getFiles().getSelect().getCharacters();

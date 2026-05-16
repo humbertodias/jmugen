@@ -1,18 +1,18 @@
 package org.lee.mugen.fight.section.elem;
 
-import java.awt.Point;
+import org.lee.mugen.geom.MugenPoint;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.lee.mugen.util.BeanTools;
 
 public class SimpleElement {
-	Point pos;
+	MugenPoint pos;
 	Map<Integer, Type> bg = new HashMap<Integer, Type>();
-	public Point getPos() {
+	public MugenPoint getPos() {
 		return pos;
 	}
-	public void setPos(Point pos) {
+	public void setPos(MugenPoint pos) {
 		this.pos = pos;
 	}
 	public Map<Integer, Type> getBg() {
@@ -24,7 +24,7 @@ public class SimpleElement {
 	
 	public void parse(Object root, String name, String value) {
 		if (name.equalsIgnoreCase("pos") || name.equalsIgnoreCase("offset")) {
-			pos = (Point) BeanTools.getConvertersMap().get(Point.class).convert(value);
+			pos = (MugenPoint) BeanTools.getConvertersMap().get(MugenPoint.class).convert(value);
 		} else if (name.startsWith("bg")) {
 			String sNum = name.substring(2, name.indexOf("."));
 			int num = 0;

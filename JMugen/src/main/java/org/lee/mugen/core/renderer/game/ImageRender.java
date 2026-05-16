@@ -1,6 +1,6 @@
 package org.lee.mugen.core.renderer.game;
 
-import java.awt.Point;
+import org.lee.mugen.geom.MugenPoint;
 
 import org.lee.mugen.renderer.GraphicsWrapper;
 import org.lee.mugen.renderer.Renderable;
@@ -10,7 +10,7 @@ public class ImageRender implements Renderable {
 	private String str;
 	private FontProducer fp;
 	private int time;
-	private Point point;
+	private MugenPoint point;
 	private int sens;
 	
 	public int getSens() {
@@ -19,13 +19,13 @@ public class ImageRender implements Renderable {
 	public void setSens(int sens) {
 		this.sens = sens;
 	}
-	public ImageRender(String str, FontProducer fp, Point point, int time) {
+	public ImageRender(String str, FontProducer fp, MugenPoint point, int time) {
 		this.str = str;
 		this.fp = fp;
 		this.time = time;
 		this.point = point;
 	}
-	public ImageRender(String str, FontProducer fp, Point point, int time, int sens) {
+	public ImageRender(String str, FontProducer fp, MugenPoint point, int time, int sens) {
 		this.str = str;
 		this.fp = fp;
 		this.time = time;

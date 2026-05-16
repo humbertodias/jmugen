@@ -1,8 +1,7 @@
 package org.lee.mugen.core.gameSelect;
 
-import java.awt.Point;
+import org.lee.mugen.geom.MugenPoint;
 
-import org.apache.commons.beanutils.PropertyUtils;
 import org.lee.mugen.core.sound.SoundSystem;
 import org.lee.mugen.fight.section.elem.SndType;
 import org.lee.mugen.fight.section.elem.Type;
@@ -10,6 +9,7 @@ import org.lee.mugen.fight.system.MugenSystem;
 import org.lee.mugen.input.CmdProcDispatcher;
 import org.lee.mugen.renderer.GraphicsWrapper;
 import org.lee.mugen.renderer.GameWindow.MugenKeyListener;
+import org.lee.mugen.util.BeanTools;
 
 public class SelectionController implements MugenKeyListener {
 	private static final int P1_SELECTED = 1;
@@ -21,7 +21,7 @@ public class SelectionController implements MugenKeyListener {
 	private static int shareState = 0;
 	private static int shareIndexOfStage = 0;
 	private String id;
-	private final Point position = new Point();
+	private final MugenPoint position = new MugenPoint();
 	private GameSelect gs;
 	
 	
@@ -32,7 +32,7 @@ public class SelectionController implements MugenKeyListener {
 		this.gs = gs;
 	}
 	public SelectionController(GameSelect gs, String id,
-			Point startcell) {
+			MugenPoint startcell) {
 		this(gs, id, startcell.x, startcell.y);
 	}
 	//
@@ -168,7 +168,7 @@ public class SelectionController implements MugenKeyListener {
 	private void addToPosition(int x, int y) {
 		int row = MugenSystem.getInstance().getSelectInfo().getRows();
 		int col = MugenSystem.getInstance().getSelectInfo().getColumns();
-		Point original = (Point) position.clone();
+		MugenPoint original = (MugenPoint) position.clone();
 		position.x += x;
 		position.y += y;
 		if (position.x < 0)
@@ -190,7 +190,7 @@ public class SelectionController implements MugenKeyListener {
 	}
 	private static Object getProperty(Object o, String path) {
 		try {
-			return PropertyUtils.getNestedProperty(o, path);
+			return BeanTools.getNestedProperty(o, path);
 		} catch (Exception e) {
 			throw new IllegalArgumentException("Unknown path " + path + " for " + o.getClass());
 		} 
@@ -273,7 +273,7 @@ public class SelectionController implements MugenKeyListener {
 	public String getId() {
 		return id;
 	}
-	public Point getPosition() {
+	public MugenPoint getPosition() {
 		return position;
 	}
 

@@ -1,6 +1,6 @@
 package org.lee.mugen.core.renderer.game;
 
-import java.awt.Rectangle;
+import org.lee.mugen.geom.MugenRect;
 
 import org.lee.mugen.core.FightEngine;
 import org.lee.mugen.core.GameFight;
@@ -26,7 +26,7 @@ public class SparkRender {
 		private static Fightfx getFightfx() {
 			return GameFight.getInstance().getFightdef().getFiles().getFightfx();
 		}
-		public static AbstractSprite getInstanceOfSparkSpriteFor(HitDefSub hitdef, Sprite spriteHitted, final Rectangle union) {
+		public static AbstractSprite getInstanceOfSparkSpriteFor(HitDefSub hitdef, Sprite spriteHitted, final MugenRect union) {
 			if (instance == null)
 				throw new IllegalStateException("You have to init this before");
 
