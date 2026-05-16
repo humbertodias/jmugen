@@ -2,7 +2,7 @@ package org.lee.mugen.object;
 
 import java.io.Serializable;
 
-public class Rectangle implements Cloneable, Serializable {
+public class Rectangle implements Serializable {
 	public Rectangle(int x1, int y1, int x2, int y2) {
 		this.x1 = x1;
 		this.y1 = y1;
@@ -52,13 +52,8 @@ public class Rectangle implements Cloneable, Serializable {
 		this.x2 == r.x2 &&
 		this.y2 == r.y2;
 	}
-	@Override
-	public Object clone() {
-		try {
-			return super.clone();
-			
-		} catch (Exception e) {
-			throw new IllegalStateException();
-		}
+	/** Same bounds, new instance (GWT does not emulate Object.clone). */
+	public Rectangle copy() {
+		return new Rectangle(x1, y1, x2, y2);
 	}
 }

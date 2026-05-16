@@ -142,11 +142,8 @@ public class GameMenu implements Game {
 			int index = getMenu().getItemname().getCurrentIndex();
 			switch (index) {
 			case ItemName.arcade:
-				next = GameSelect.getInstance();
-				GameSelect.getInstance().setTilte("arcade");
-				break;
 			case ItemName.versus:
-				notImplemented();
+				next = GameSelect.getInstance();
 				break;
 			
 			case ItemName.teamarcade:

@@ -1,12 +1,47 @@
 ## Run
 
-### Without `install` (recommended)
+### If Maven says `Could not find artifact JMugen.Render.libgdx.core` (or `…:jar:sources`)
 
-Run Maven from the **repository root** (aggregator `pom.xml`). `-am` (*also make*) builds every module the web module needs (`core`, `Common`, …) in one reactor session, so nothing has to be published to `~/.m2` first.
+That happens when only the **web** project is built (IDE run, `cd JMugen.Render.libgdx.web && mvn …`, or `-f` that web `pom.xml` **before** sibling modules exist in `~/.m2`). Those `JMugen.*` JARs are **not** published to Maven Central; they must be built in the **same reactor** from the repo root, or **installed** once.
+
+From the **repository root**:
 
 ```bash
 cd /path/to/jmugen
-mvn -pl JMugen.Render.libgdx.web -am gwt:run
+mvn -pl JMugen.Render.libgdx.web -am package -DskipTests
+```
+
+To allow builds that use **only** the web `pom.xml` path afterward:
+
+```bash
+mvn -pl JMugen.Render.libgdx.web -am install -DskipTests
+```
+
+### Without `install` (recommended)
+
+Run Maven from the **repository root** (aggregator `pom.xml`).
+
+**Why two commands:** for a multi-module build, Maven runs `gwt:run` on **every** project in the reactor. The first project is always the root `JMugen.Parent` (`packaging` `pom`). That POM does not configure GWT, so `RunMojo` fails with *The parameters 'runTarget' … are missing or invalid*. Passing `--resume-from` (`-rf`) the web module shrinks the reactor to `JMugen.Render.libgdx.web` only, so `gwt:run` is not applied to the aggregator.
+
+**Compile dependencies** (`-am` = *also make*; no GWT on the root POM here):
+
+```bash
+cd /path/to/jmugen
+mvn -pl JMugen.Render.libgdx.web -am package -DskipTests
+```
+
+**GWT Super Dev / DevMode** (reactor = web module only):
+
+```bash
+mvn -pl JMugen.Render.libgdx.web -rf :JMugen.Render.libgdx.web gwt:run
+```
+
+After the first `package`, you can re-run only the second line while iterating. Plain `mvn gwt:run` from the repo root is not useful for the same reason as `-am gwt:run` without `-rf`.
+
+**Stale GWT sources:** the module compiles Java from dependency **`-sources`** JARs (e.g. `JMugen.Common`). If you change `JMugen.Common` but the code server still reports old line numbers or errors you already fixed on disk, rebuild those artifacts so the JAR under `JMugen.Common/target/` (and `~/.m2` after `install`) updates, then use **Recompile** in the code server UI or restart `gwt:run`:
+
+```bash
+mvn -pl JMugen.Render.libgdx.web -am clean package -DskipTests
 ```
 
 ### Avoid running only the web `pom.xml`
@@ -32,7 +67,8 @@ If you still see an old parent resolution error, clear the local group cache and
 
 ```bash
 rm -rf ~/.m2/repository/JMugen
-mvn -pl JMugen.Render.libgdx.web -am gwt:run
+mvn -pl JMugen.Render.libgdx.web -am package -DskipTests
+mvn -pl JMugen.Render.libgdx.web -rf :JMugen.Render.libgdx.web gwt:run
 ```
 
 ### Ports
@@ -60,6 +96,6 @@ http://127.0.0.1:9876/
 
 ## Current state
 
-The GWT host page starts the LibGDX/GWT backend and shows a small smoke scene through the shared `JMugen.Render.libgdx.core` drawer.
+`LGDXWebApplication` runs **`LGDXWebSmokeGame`** (drawer + cena de teste). **`GameMenu`** (jogo completo) ainda **não compila no GWT**: o módulo `JMugen` falha com centenas de erros (`FileInputStream`, `clone()`, classes fora do `JMugenCommon.gwt.xml`, etc.). Quando `org.lee.mugen.JMugen` estiver limpo para GWT, descomenta `<inherits name="org.lee.mugen.JMugen"/>` em `JMugenWeb.gwt.xml`, repõe as dependências `JMugen` no `pom.xml` e troca o callback para `GameMenu.getInstance()`.
 
-The full JMugen game is not wired into the browser runtime yet. Remaining work includes the web platform layer for assets, audio, and filesystem-style loading that still depends on desktop APIs such as `FileInputStream` and `javax.sound`.
+`LGDXWebPlatform` (dados Gdx, `MugenDataStreams`, drawer) fica pronto para esse passo. Os ficheiros do jogo copiam-se de `../data` para `target/gdx-assets/data/` no `package`.

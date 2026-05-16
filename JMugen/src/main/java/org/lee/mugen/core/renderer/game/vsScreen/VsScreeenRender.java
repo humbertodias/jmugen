@@ -57,7 +57,7 @@ public class VsScreeenRender extends BaseRender {
 		
 		MugenPoint pos = vsScreen.getP1().getPos();
 		
-		pos = (MugenPoint) pos.clone();
+		pos = pos.copy();
 		int ifacing = (Integer) getProperty(vsScreen, 
 				"p" + 1 + ".facing");
 		boolean facing = ifacing == -1;
@@ -78,7 +78,7 @@ public class VsScreeenRender extends BaseRender {
 		
 		pos = vsScreen.getP2().getPos();
 			
-		pos = (MugenPoint) pos.clone();
+		pos = pos.copy();
 		ifacing = (Integer) getProperty(vsScreen, 
 				"p" + 2 + ".facing");
 		facing = ifacing == -1;

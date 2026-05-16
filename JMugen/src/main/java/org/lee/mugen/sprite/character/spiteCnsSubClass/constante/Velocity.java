@@ -14,8 +14,8 @@ public class Velocity implements Cloneable, Serializable {
 		@Override
 		protected Object clone() throws CloneNotSupportedException {
 			Move m = (Move) super.clone();
-			m.fwd = (PointF) fwd.clone();
-			m.back = (PointF) back.clone();
+			m.fwd = fwd.copy();
+			m.back = back.copy();
 			
 			return m;
 		}
@@ -79,7 +79,7 @@ public class Velocity implements Cloneable, Serializable {
 		@Override
 		protected Object clone() throws CloneNotSupportedException {
 			JumpMove jm = (JumpMove) super.clone();
-			jm.neu = (PointF) neu.clone();
+			jm.neu = neu.copy();
 			return jm;
 		}
 		public JumpMove() {}

@@ -24,7 +24,7 @@ public class SpriteDef implements Serializable {
 	private Files files = new Files();
 	private Arcade arcade = new Arcade();
 	private List<GroupText> cnsGroups;
-	private static final Pattern MULTIPLE_OUT_BEAN = Pattern.compile("(^.*pal|^.*st)([0-9]*)$", Pattern.CASE_INSENSITIVE);
+	private static final Pattern MULTIPLE_OUT_BEAN = org.lee.mugen.util.MugenPatterns.compileInsensitive("(^.*pal|^.*st)([0-9]*)$");
 	public static SpriteDef parseSpriteDef(String def)
 			throws Exception {
 

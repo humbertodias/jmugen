@@ -1,6 +1,6 @@
 package org.lee.mugen.fight.section.elem;
 
-public abstract class CommonType implements Cloneable {
+public abstract class CommonType {
 	public abstract void parse(String name, String value);
 	public static CommonType buildType(String type, Object root) {
 		CommonType result = null;
@@ -17,14 +17,7 @@ public abstract class CommonType implements Cloneable {
 		// TODO Auto-generated method stub
 		
 	}
-	@Override
-	public Object clone() {
-		try {
-			return super.clone();
-		} catch (CloneNotSupportedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			throw new IllegalStateException(e);
-		}
+	public CommonType copy() {
+		return this;
 	}
 }

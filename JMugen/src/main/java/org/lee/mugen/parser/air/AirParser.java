@@ -1,7 +1,9 @@
 package org.lee.mugen.parser.air;
 
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+
+import org.lee.mugen.io.MugenDataStreams;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -51,21 +53,21 @@ public class AirParser {
     	_FLOAT_REGEX + " *, *" +  _FOUR_NUMBER_COMMA_REGEX + "(?: *, *((?:h?v?)|(?:v?h?)))?(?: *, *(\\w*)?)?" + ",*" + ".*";//_END;
     
     
-    public static final Pattern _AIR_DATA_PATTERN = Pattern.compile(_AIR_DATA_REGEX, Pattern.CASE_INSENSITIVE);
+    public static final Pattern _AIR_DATA_PATTERN = org.lee.mugen.util.MugenPatterns.compileInsensitive(_AIR_DATA_REGEX);
 
 
     
-	private static final Pattern grpActionPattern = Pattern.compile(_GRP_ACTION_REGEX, Pattern.CASE_INSENSITIVE);
+	private static final Pattern grpActionPattern = org.lee.mugen.util.MugenPatterns.compileInsensitive(_GRP_ACTION_REGEX);
 
 	
-	private static final Pattern P_COMMENT_OR_EMPTY_REGEX = Pattern.compile(_COMMENT_OR_EMPTY_REGEX, Pattern.CASE_INSENSITIVE);
-	private static final Pattern P_CLSN1DEFAULT_REGEX = Pattern.compile(_CLSN1DEFAULT_REGEX, Pattern.CASE_INSENSITIVE);
-	private static final Pattern P_CLSN2DEFAULT_REGEX = Pattern.compile(_CLSN2DEFAULT_REGEX, Pattern.CASE_INSENSITIVE);
-	private static final Pattern P_CLSN1_REGEX = Pattern.compile(_CLSN1_REGEX, Pattern.CASE_INSENSITIVE);
-	private static final Pattern P_CLSN2_REGEX = Pattern.compile(_CLSN2_REGEX, Pattern.CASE_INSENSITIVE);
-	private static final Pattern P_CLSN1_RECT_REGEX = Pattern.compile(_CLSN1_RECT_REGEX, Pattern.CASE_INSENSITIVE);
-	private static final Pattern P_CLSN2_RECT_REGEX = Pattern.compile(_CLSN2_RECT_REGEX, Pattern.CASE_INSENSITIVE);
-	private static final Pattern P_LOOP_START_REGEX = Pattern.compile(_LOOP_START_REGEX, Pattern.CASE_INSENSITIVE);
+	private static final Pattern P_COMMENT_OR_EMPTY_REGEX = org.lee.mugen.util.MugenPatterns.compileInsensitive(_COMMENT_OR_EMPTY_REGEX);
+	private static final Pattern P_CLSN1DEFAULT_REGEX = org.lee.mugen.util.MugenPatterns.compileInsensitive(_CLSN1DEFAULT_REGEX);
+	private static final Pattern P_CLSN2DEFAULT_REGEX = org.lee.mugen.util.MugenPatterns.compileInsensitive(_CLSN2DEFAULT_REGEX);
+	private static final Pattern P_CLSN1_REGEX = org.lee.mugen.util.MugenPatterns.compileInsensitive(_CLSN1_REGEX);
+	private static final Pattern P_CLSN2_REGEX = org.lee.mugen.util.MugenPatterns.compileInsensitive(_CLSN2_REGEX);
+	private static final Pattern P_CLSN1_RECT_REGEX = org.lee.mugen.util.MugenPatterns.compileInsensitive(_CLSN1_RECT_REGEX);
+	private static final Pattern P_CLSN2_RECT_REGEX = org.lee.mugen.util.MugenPatterns.compileInsensitive(_CLSN2_RECT_REGEX);
+	private static final Pattern P_LOOP_START_REGEX = org.lee.mugen.util.MugenPatterns.compileInsensitive(_LOOP_START_REGEX);
 
 	/*
 
@@ -87,7 +89,16 @@ public class AirParser {
     public AirParser() {
 	}
     public AirParser(String sFilename) throws IOException {
-    	this(Parser.getGroupText(Parser.getText(new FileInputStream(sFilename))));
+    	this(openGroupText(sFilename));
+    }
+
+    private static String[] openGroupText(String sFilename) throws IOException {
+    	InputStream in = MugenDataStreams.openBinary(sFilename);
+    	try {
+    		return Parser.getGroupText(Parser.getText(in));
+    	} finally {
+    		in.close();
+    	}
     }
     public AirParser(String[] groups) throws IOException {
     	
@@ -188,6 +199,9 @@ public class AirParser {
     	}
     	
     	int rectCount = Integer.parseInt(matcher.group(1));
+    	if (rectCount < 0 || rectCount > 256) {
+    		throw new IOException("Invalid clsn count " + rectCount);
+    	}
     	org.lee.mugen.object.Rectangle[] clsn = new org.lee.mugen.object.Rectangle[rectCount];
         
         for (int i = 0; i < clsn.length; i++) {
@@ -233,11 +247,11 @@ public class AirParser {
 	
 	
     
-    private static final Pattern P_A = Pattern.compile(".*a$", Pattern.CASE_INSENSITIVE);
-    private static final Pattern P_AS09d09 = Pattern.compile(".*as([0-9]+)d([0-9]+).*", Pattern.CASE_INSENSITIVE);
-    private static final Pattern P_A09 = Pattern.compile(".*a([0-9]+).*", Pattern.CASE_INSENSITIVE);
-    private static final Pattern P_S09 = Pattern.compile(".*s([0-9]+).*", Pattern.CASE_INSENSITIVE);
-    private static final Pattern P_S = Pattern.compile(".*s$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern P_A = org.lee.mugen.util.MugenPatterns.compileInsensitive(".*a$");
+    private static final Pattern P_AS09d09 = org.lee.mugen.util.MugenPatterns.compileInsensitive(".*as([0-9]+)d([0-9]+).*");
+    private static final Pattern P_A09 = org.lee.mugen.util.MugenPatterns.compileInsensitive(".*a([0-9]+).*");
+    private static final Pattern P_S09 = org.lee.mugen.util.MugenPatterns.compileInsensitive(".*s([0-9]+).*");
+    private static final Pattern P_S = org.lee.mugen.util.MugenPatterns.compileInsensitive(".*s$");
     
     public static boolean parseAirData(String line, AirGroup aGrp, Wrapper<Rectangle[]> clsn1, Wrapper<Rectangle[]> clsn2) {
         line = getFormatedLine(line).replace(" ", "");
@@ -263,9 +277,9 @@ public class AirParser {
 //        if (matcher.group(7) != null)
 //            airData.alpha = Integer.parseInt(matcher.group(7)); // TODO ALPHA IN AIR PARSER strToken.nextToken();
         if (clsn1 != null)
-        	airData.clsn1 = (Rectangle[])clsn1.getValue().clone();
+        	airData.clsn1 = (Rectangle[]) clsn1.getValue();
         if (clsn2 != null)
-        	airData.clsn2 = (Rectangle[])clsn2.getValue().clone();
+        	airData.clsn2 = (Rectangle[]) clsn2.getValue();
         aGrp.airDataList.add(airData);
         
         Matcher adPattern = P_A.matcher(line);

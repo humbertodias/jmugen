@@ -13,6 +13,13 @@ public abstract class MugenDrawer {
 	public abstract ImageContainer getImageContainer(Object imageData);
 	
 	public abstract void scale(float x, float y);
+
+	public void translate(float x, float y) {
+	}
+
+	/** LibGDX: scale about clip corner for select-screen stage preview. */
+	public void setUniformScaleAboutClipCorner(boolean enabled) {
+	}
 	public abstract void draw(DrawProperties drawProperties);
 	public abstract void drawRect(float x1, float y1, float width, float height);
     public abstract void drawLine(int x1, int y1, int x2, int y2);

@@ -3,9 +3,10 @@ package org.lee.mugen.renderer.libgdx.web;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.backends.gwt.GwtApplication;
 import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
+import org.lee.mugen.core.GameMenu;
 
 /**
- * GWT entry point that attaches the JMugen web window to LibGDX.
+ * GWT entry point: same {@link GameMenu} flow as {@link org.lee.mugen.renderer.libgdx.android.AndroidLauncher}.
  */
 public class LGDXWebApplication extends GwtApplication {
 
@@ -17,8 +18,10 @@ public class LGDXWebApplication extends GwtApplication {
 
     @Override
     public ApplicationListener createApplicationListener() {
+        LibGDXWebRendererFactory.initialize();
+        LGDXWebPlatform.prepare();
         LGDXWebGameWindow window = LibGDXWebRendererFactory.getGameWindow();
-        window.setGameWindowCallback(new LGDXWebSmokeGame());
+        window.setGameWindowCallback(GameMenu.getInstance());
         return window;
     }
 }

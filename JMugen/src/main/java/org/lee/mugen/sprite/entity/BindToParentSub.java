@@ -14,7 +14,7 @@ public class BindToParentSub implements Cloneable, Serializable {
 	@Override
 	public Object clone() throws CloneNotSupportedException {
 		BindToParentSub clone = (BindToParentSub) super.clone();
-		clone.pos = (PointF) pos.clone();
+		clone.pos = pos.copy();
 		return clone;
 	}
 

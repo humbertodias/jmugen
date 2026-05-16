@@ -14,7 +14,8 @@
 
     <properties>
         <libgdx.version>1.14.0</libgdx.version>
-        <gwt.version>2.10.0</gwt.version>
+        <mugen.data.source>${project.basedir}/../data</mugen.data.source>
+        <gdx.assets.dir>${project.build.directory}/gdx-assets</gdx.assets.dir>
         <!-- gwt:run — embedded server (index.html); override: -Dgwt.port=… -->
         <gwt.port>8888</gwt.port>
         <!-- Code server UI; plugin default 9997; override: -Dgwt.codeServerPort=… -->
@@ -25,9 +26,49 @@
 
     <dependencies>
         <dependency>
+            <groupId>JMugen</groupId>
+            <artifactId>JMugen</artifactId>
+            <version>${jmugen.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>JMugen.plugin.audio.adx</groupId>
+                    <artifactId>JMugen.plugin.audio.adx</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.googlecode.soundlibs</groupId>
+                    <artifactId>mp3spi</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.googlecode.soundlibs</groupId>
+                    <artifactId>vorbisspi</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.googlecode.soundlibs</groupId>
+                    <artifactId>tritonus-share</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>JMugen.Properties</groupId>
+            <artifactId>JMugen.Properties</artifactId>
+            <version>${jmugen.version}</version>
+        </dependency>
+        <dependency>
             <groupId>JMugen.Render.libgdx.core</groupId>
             <artifactId>JMugen.Render.libgdx.core</artifactId>
             <version>${jmugen.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>JMugen</groupId>
+            <artifactId>JMugen</artifactId>
+            <version>${jmugen.version}</version>
+            <classifier>sources</classifier>
+        </dependency>
+        <dependency>
+            <groupId>JMugen.Properties</groupId>
+            <artifactId>JMugen.Properties</artifactId>
+            <version>${jmugen.version}</version>
+            <classifier>sources</classifier>
         </dependency>
         <dependency>
             <groupId>JMugen.Common</groupId>
@@ -77,6 +118,44 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.3.1</version>
+                <executions>
+                    <execution>
+                        <id>stage-mugen-data-into-gdx-assets</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${gdx.assets.dir}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${mugen.data.source}</directory>
+                                    <targetPath>data</targetPath>
+                                    <filtering>false</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.3.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>gwt-maven-plugin</artifactId>
                 <version>${gwt.version}</version>
@@ -95,6 +174,11 @@
                     <!-- Client runs as JS in the browser; PRETTY helps Chrome DevTools. JDWP only hits Java in this JVM. -->
                     <style>PRETTY</style>
                     <extraJvmArgs>-Xmx1024m ${gwt.jvm.debug.args}</extraJvmArgs>
+                    <compileSourcesArtifacts>
+                        <artifact>JMugen:JMugen</artifact>
+                        <artifact>JMugen.Common:JMugen.Common</artifact>
+                        <artifact>JMugen.Properties:JMugen.Properties</artifact>
+                    </compileSourcesArtifacts>
                 </configuration>
             </plugin>
         </plugins>

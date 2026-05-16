@@ -2,16 +2,18 @@
 <module rename-to="jmugen">
     <inherits name="com.badlogic.gdx.backends.gdx_backends_gwt"/>
     <inherits name="org.lee.mugen.renderer.libgdx.core.JMugenLibGDXCore"/>
+    <inherits name="org.lee.mugen.JMugen"/>
     <inherits name="com.levigo.util.GwtAwt" />
 
     <source path=""/>
     <!-- Source tree for PreloaderBundleGenerator (must differ from output; generator wipes output assets/). -->
-    <set-configuration-property name="gdx.assetpath" value="JMugen.Render.libgdx.web/src/main/gdx-assets"/>
+    <set-configuration-property name="gdx.assetpath" value="JMugen.Render.libgdx.web/target/gdx-assets"/>
     <!-- Writes webapp/assets/assets.txt + hashed copies for the browser preloader. -->
     <set-configuration-property name="gdx.assetoutputpath" value="JMugen.Render.libgdx.web/src/main/webapp/"/>
+    <set-configuration-property name="gdx.assetfilterclass"
+                                value="org.lee.mugen.renderer.libgdx.web.JMugenGwtAssetFilter"/>
 
-<!--    <entry-point class="org.lee.mugen.renderer.libgdx.web.LGDXWebApplication"/>-->
-    <entry-point class="org.lee.mugen.renderer.libgdx.web.LGDXWebHelloApplication"/>
+    <entry-point class="org.lee.mugen.renderer.libgdx.web.LGDXWebApplication"/>
 
 
 </module>

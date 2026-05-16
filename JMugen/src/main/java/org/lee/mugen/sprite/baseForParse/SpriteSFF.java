@@ -59,7 +59,12 @@ public class SpriteSFF {//implements Serializable {
 				timeToLoadPcx += time;
 				
 			} else {
-				bitmap = imgSprList.get(subFile.indexPreviousCopySprite);
+				int copyFrom = subFile.indexPreviousCopySprite;
+				if (copyFrom < 0 || copyFrom >= imgSprList.size()) {
+					throw new IOException("SFF linked sprite index " + copyFrom + " out of range (have "
+							+ imgSprList.size() + ")");
+				}
+				bitmap = imgSprList.get(copyFrom);
 			}
 			imgSprList.add(bitmap);
 
@@ -116,23 +121,19 @@ public class SpriteSFF {//implements Serializable {
 	}
 
 	public void reload(final SpriteSFF spriteSFF) {
-		new Thread() {
-			@Override
-			public void run() {
-				int i = 0;
-				for (GroupSpriteSFF grp: _groupMap.values()) {
-					for (ImageSpriteSFF img: grp.ImgMap().values()) {
-						if (spriteSFF.getGroupSpr(grp.getGrpNum()) == null || spriteSFF.getGroupSpr(grp.getGrpNum()).getImgSpr(img.getImgNum()) == null)
-							throw new IllegalArgumentException("reload Sprite must be the same groupe");
-						ImageSpriteSFF imgSFF = spriteSFF.getGroupSpr(grp.getGrpNum()).getImgSpr(img.getImgNum());
-						img.getImage().reload(imgSFF.getImage());
-						i++;
-					}
+		int i = 0;
+		for (GroupSpriteSFF grp : _groupMap.values()) {
+			for (ImageSpriteSFF img : grp.ImgMap().values()) {
+				if (spriteSFF.getGroupSpr(grp.getGrpNum()) == null
+						|| spriteSFF.getGroupSpr(grp.getGrpNum()).getImgSpr(img.getImgNum()) == null) {
+					throw new IllegalArgumentException("reload Sprite must be the same groupe");
 				}
-				Logger.log("Total Image reloaded " + i);
+				ImageSpriteSFF imgSFF = spriteSFF.getGroupSpr(grp.getGrpNum()).getImgSpr(img.getImgNum());
+				img.getImage().reload(imgSFF.getImage());
+				i++;
 			}
-		}.run();
-		
+		}
+		Logger.log("Total Image reloaded %s", i);
 	}
 
 }

@@ -3,7 +3,7 @@ package org.lee.mugen.snd;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
+import org.lee.mugen.io.MugenDataStreams;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -11,32 +11,39 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.lee.mugen.core.JMugenConstant;
 import org.lee.mugen.core.sound.SoundSystem;
 import org.lee.mugen.io.IOUtils;
+import org.lee.mugen.io.MugenDataStreams;
 import org.lee.mugen.io.LittleEndianDataInputStream;
 
 public class SndReader {
 	
-	private static void seek(LittleEndianDataInputStream fs, long skip) throws IOException {
+	private static void seek(ByteArrayInputStream fs, long skip) throws IOException {
     	fs.reset();
     	fs.skip(skip);
     }
 	
 	public static Snd parse(String filename) throws IOException {
-		BufferedInputStream bis = new BufferedInputStream(new FileInputStream(filename));
+		BufferedInputStream bis = new BufferedInputStream(MugenDataStreams.openBinary(filename));
 		return parse(bis);
 	}
 
 	
 	public static Snd parse(InputStream in) throws IOException {
 
-    	ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    	IOUtils.copy(in, baos);
-    	ByteArrayInputStream fs = new ByteArrayInputStream(baos.toByteArray());
+    	byte[] fileData = IOUtils.toByteArray(in);
+    	if (fileData.length < 512) {
+    		throw new IOException("SND file too small: " + fileData.length);
+    	}
+    	byte[] sndSig = new byte[] {'E', 'l', 'e', 'c', 'b', 'y', 't', 'e', 'S', 'n', 'd', 0};
+    	for (int i = 0; i < sndSig.length; i++) {
+    		if (fileData[i] != sndSig[i]) {
+    			throw new IOException("Not a Mugen SND (bad signature, " + fileData.length + " bytes)");
+    		}
+    	}
+    	ByteArrayInputStream fs = new ByteArrayInputStream(fileData);
     	LittleEndianDataInputStream dis = new LittleEndianDataInputStream(fs);
-    	baos.close();
-    	baos = null;
     	
     	Snd snd = new Snd();
-    	long size = dis.available();
+    	final int fileLength = fileData.length;
     	// read header
     	
     	// Electbyte signature 12
@@ -62,13 +69,14 @@ public class SndReader {
     		count++;
     		if (count > soundCount)
     			break;
-    		seek(dis, offset);
+    		seek(fs, offset);
     		offset = dis.readInt();
     		if (offset == -1)
     			break;
     		final int length = dis.readInt();
     		final int grpNumber = dis.readInt();
     		final int sampleNumber = dis.readInt();
+    		IOUtils.checkChunkSize(length, fileLength, "SND sample");
 
     		byte[] data = new byte[length];
     		dis.read(data);

@@ -1,9 +1,6 @@
 package org.lee.mugen.sprite.cns.eval.function;
 
 import java.io.Serializable;
-import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.lee.mugen.core.GameFight;
 import org.lee.mugen.parser.type.Valueable;
@@ -52,51 +49,12 @@ public abstract class StateCtrlFunction extends AbstractCnsFunction implements S
 		super(functionName, paramNames);
 	}
 
-	private static Map<Class, Map<String, Method>> shareCacheMap = new HashMap<Class, Map<String, Method>>();
-	
 	public static void endOfParsing() {
-		shareCacheMap.clear();
 	}
 	
 	@Override
 	public Valueable[] parseValue(String name, String value) {
-		String nameCaseCamel = Character.toUpperCase(name.charAt(0)) + name.substring(1);
-		String buildMethodName = "parseFor" + nameCaseCamel.replace('.', '$');
-
-//		try {
-			
-			Map<String, Method> methodOfClassMap = shareCacheMap.get(getClass());
-			if (methodOfClassMap == null) {
-				methodOfClassMap = new HashMap<String, Method>();
-				
-				Method[] methods = this.getClass().getMethods();
-				// Assert that there are no overload
-				for (Method m: methods) {
-					if (m.getName().startsWith("parseFor")) {
-						methodOfClassMap.put(m.getName(), m);
-					}
-				}
-				shareCacheMap.put(getClass(), methodOfClassMap);
-			
-			}
-			
-			Method m = methodOfClassMap.get(buildMethodName);
-			if (m != null) {
-				try {
-					return (Valueable[]) m.invoke(this, name, value);
-				} catch (Exception e) {
-					throw new IllegalArgumentException(
-							getClass().getName()
-							+ " Error In Parsing " + buildMethodName + " >> " + name + " = " + value);
-				}
-			}
-			return parse(name, value);
-			
-//		} catch (Exception e) {
-//			throw new IllegalArgumentException(
-//					getClass().getName()
-//					+ " do not describe a static method parse that return valuuable[] for given values ");
-//		}
+		return parse(name, value);
 	}
 
 

@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+
+import org.lee.mugen.io.MugenDataStreams;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.Serializable;
@@ -39,32 +41,66 @@ public class Parser {
 			new File("data")
 		};
 	}
+	private static String joinResourcePath(String dir, String filename) {
+		String d = dir.replace('\\', '/');
+		if (!d.isEmpty() && d.charAt(d.length() - 1) != '/') {
+			d += '/';
+		}
+		return d + filename.replace('\\', '/');
+	}
+
+	private static boolean existsViaDataStreams(String path) {
+		try {
+			InputStream in = MugenDataStreams.openBinary(path);
+			in.close();
+			return true;
+		} catch (IOException e) {
+			return false;
+		}
+	}
+
 	public static String getExistFile(String filename) {
+		if (existsViaDataStreams(filename)) {
+			return filename.replace('\\', '/');
+		}
 		File result = new File(filename);
-		
+
 		if (result.exists()) {
 			return result.getAbsolutePath();
 		}
-		
+
 		for (File base : searchDirFor()) {
 			result = new File(base, filename);
 			if (result.exists()) {
 				return result.getAbsolutePath();
 			}
+			String candidate = joinResourcePath(base.getPath(), filename);
+			if (existsViaDataStreams(candidate)) {
+				return candidate;
+			}
 		}
 		throw new IllegalArgumentException("File not exist: " + filename);
 	}
+
 	public static String getExistFile(File currentDir, String filename) {
+		String candidate = joinResourcePath(currentDir.getPath(), filename);
+		if (existsViaDataStreams(candidate)) {
+			return candidate;
+		}
 		File result = new File(currentDir, filename);
-		
+
 		if (result.exists()) {
 			return result.getAbsolutePath();
 		}
-		
+
 		for (File base : searchDirFor()) {
 			result = new File(base, filename);
 			if (result.exists()) {
 				return result.getAbsolutePath();
+			}
+			candidate = joinResourcePath(base.getPath(), filename);
+			if (existsViaDataStreams(candidate)) {
+				return candidate;
 			}
 		}
 		throw new IllegalArgumentException("File not exist: " + filename);

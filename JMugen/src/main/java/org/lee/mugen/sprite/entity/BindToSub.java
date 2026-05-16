@@ -12,7 +12,7 @@ public abstract class BindToSub implements Cloneable {
 	@Override
 	public Object clone() throws CloneNotSupportedException {
 		BindToSub clone = (BindToSub) super.clone();
-		clone.pos = (PointF) pos.clone();
+		clone.pos = pos.copy();
 		return clone;
 	}
 

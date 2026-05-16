@@ -28,7 +28,7 @@ public class Intro {
 	public static final String S_END = "(?:(?: *;.*$)|(?: *$))";
 
 	public static final String S_SCENE_TITLE_REGEX = "\\s*\\[ *scene *" + "([^\\]]*)" + "\\]" + S_END;
-	private static final Pattern P_SCENE_TITLE_REGEX = Pattern.compile(S_SCENE_TITLE_REGEX, Pattern.CASE_INSENSITIVE);
+	private static final Pattern P_SCENE_TITLE_REGEX = org.lee.mugen.util.MugenPatterns.compileInsensitive(S_SCENE_TITLE_REGEX);
 
 	private String filename;
 	

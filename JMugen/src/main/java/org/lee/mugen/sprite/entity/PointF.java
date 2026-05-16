@@ -7,7 +7,7 @@ import java.io.Serializable;
  * @author Dr Wong
  *
  */
-public class PointF implements Cloneable, Serializable {
+public class PointF implements Serializable {
 	private float x;
 	private float y;
 	private float z;
@@ -26,9 +26,15 @@ public class PointF implements Cloneable, Serializable {
 	public boolean isZSetted() {
 		return zSetted;
 	}
-	@Override
-	public Object clone() throws CloneNotSupportedException {
-		return super.clone();
+	public PointF copy() {
+		PointF p = new PointF();
+		p.x = x;
+		p.y = y;
+		p.z = z;
+		p.xSetted = xSetted;
+		p.ySetted = ySetted;
+		p.zSetted = zSetted;
+		return p;
 	}
 	public PointF() {
 		

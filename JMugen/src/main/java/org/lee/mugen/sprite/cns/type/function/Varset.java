@@ -25,14 +25,14 @@ public class Varset extends StateCtrlFunction {
 	private static final String S_VAR_REG = "var *\\(([^\\)]*)\\)";
 	private static final String S_VAR_F_REG = "fvar *\\(([^\\)]*)\\)";
 	
-	public static final Pattern P_SYSVAR_REG = Pattern.compile(S_SYSVAR_REG, Pattern.CASE_INSENSITIVE);
-	public static final Pattern P_SYSVAR_F_REG = Pattern.compile(S_SYSVAR_F_REG, Pattern.CASE_INSENSITIVE);
-	public static final Pattern P_VAR_REG = Pattern.compile(S_VAR_REG, Pattern.CASE_INSENSITIVE);
-	public static final Pattern P_VAR_F_REG = Pattern.compile(S_VAR_F_REG, Pattern.CASE_INSENSITIVE);
+	public static final Pattern P_SYSVAR_REG = org.lee.mugen.util.MugenPatterns.compileInsensitive(S_SYSVAR_REG);
+	public static final Pattern P_SYSVAR_F_REG = org.lee.mugen.util.MugenPatterns.compileInsensitive(S_SYSVAR_F_REG);
+	public static final Pattern P_VAR_REG = org.lee.mugen.util.MugenPatterns.compileInsensitive(S_VAR_REG);
+	public static final Pattern P_VAR_F_REG = org.lee.mugen.util.MugenPatterns.compileInsensitive(S_VAR_F_REG);
 	public static String SREG_IS_VAR_PARAM = (
 			S_SYSVAR_REG + "|" + S_SYSVAR_F_REG + "|" + S_VAR_REG + "|" + S_VAR_F_REG
 	);
-	public static final Pattern PREG_IS_VAR_PARAM = Pattern.compile(SREG_IS_VAR_PARAM, Pattern.CASE_INSENSITIVE);
+	public static final Pattern PREG_IS_VAR_PARAM = org.lee.mugen.util.MugenPatterns.compileInsensitive(SREG_IS_VAR_PARAM);
 	
 	public static boolean isMatch(Pattern reg, String in) {
 		return reg.matcher(in).find();

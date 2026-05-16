@@ -17,6 +17,7 @@ import org.lee.mugen.sprite.cns.eval.function.StateCtrlFunction;
 import org.lee.mugen.sprite.parser.ExpressionFactory;
 import org.lee.mugen.sprite.parser.Parser.GroupText;
 import org.lee.mugen.util.BeanTools;
+import org.lee.mugen.util.MugenPatterns;
 import org.lee.mugen.util.MugenTools;
 
 public class Background implements Serializable {
@@ -57,6 +58,13 @@ public class Background implements Serializable {
 		this.forceImage = forceImage;
 	}
 
+	/** Used by {@link GwtBackground} for regex-free title-screen parsing. */
+	protected void initTitleParseResult(BGdef bgdef, List<BG> bgs, AbstractAnimManager anim) {
+		this.bgdef = bgdef;
+		this.bgs = bgs;
+		this.anim = anim;
+	}
+
 	public File getCurrentDir() {
 		return currentDir;
 	}
@@ -65,37 +73,27 @@ public class Background implements Serializable {
 
 		BGCtrlDef parentBGCtrlDef = null;
 
-		Pattern bgdefPattern = Pattern.compile(bgdefRegex,
-				Pattern.CASE_INSENSITIVE);
-		Pattern bgPattern = Pattern.compile(bgRegex, Pattern.CASE_INSENSITIVE);
-		Pattern bgCtrlDefPattern = Pattern.compile(bgctrldefRegex,
-				Pattern.CASE_INSENSITIVE);
-		Pattern bgCtrlPattern = Pattern.compile(bgCtrlRegex,
-				Pattern.CASE_INSENSITIVE);
-		Pattern animGrpPattern = Pattern.compile(_GRP_ACTION_REGEX,
-				Pattern.CASE_INSENSITIVE);
-
 		AirParser airParser = new AirParser();
 
 		for (GroupText grp : groups) {
-			if (bgdefPattern.matcher(grp.getSection()).find()) {
+			if (MugenPatterns.findInsensitive(bgdefRegex, grp.getSection())) {
 				bgdef = new BGdef();
 				for (String key: grp.getKeysOrdered())
 					bgdef.parse(this, key, grp.getKeyValues().get(key), forceImage);
-			} else if (animGrpPattern.matcher(grp.getSection()).find()) {
+			} else if (MugenPatterns.findInsensitive(_GRP_ACTION_REGEX, grp.getSection())) {
 				airParser.parseGroup(grp);
-			} else if (bgCtrlDefPattern.matcher(grp.getSection()).find()) {
+			} else if (MugenPatterns.findInsensitive(bgctrldefRegex, grp.getSection())) {
 
 				parentBGCtrlDef = BGCtrlDef.parseBGCtrlDef(this, grp
 						.getSection(), grp);
 				bgCtrlDefMap.put(parentBGCtrlDef.getCtrlid(), parentBGCtrlDef);
-			} else if (bgCtrlPattern.matcher(grp.getSection()).find()) {
+			} else if (MugenPatterns.findInsensitive(bgCtrlRegex, grp.getSection())) {
 				BGCtrlDef.BGCtrl.parseBGCtrl(parentBGCtrlDef, parentBGCtrlDef
 						.getId(), grp.getSection(), grp);
-			} else if (bgPattern.matcher(grp.getSection()).find()) {
+			} else if (MugenPatterns.findInsensitive(bgRegex, grp.getSection())) {
 				String bgName;
 				
-				Matcher m = bgPattern.matcher(grp.getSection());
+				Matcher m = MugenPatterns.matcherInsensitive(bgRegex, grp.getSection());
 				m.find();
 				bgName = m.group(1);
 				

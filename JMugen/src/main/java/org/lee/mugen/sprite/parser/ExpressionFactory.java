@@ -181,12 +181,12 @@ public class ExpressionFactory {
 	public static final Pattern P_FLOAT_REGEX = Pattern.compile(_FLOAT_REGEX);
 	private static final Pattern P_SPECIAL_OPERATOR_REGEX = Pattern.compile(_SPECIAL_OPERATOR_REGEX);
 	private static final Pattern P_OPERATOR_REGEX = Pattern.compile(_OPERATOR_REGEX);
-	private static final Pattern P_TRIGGER_MATHS_FUNCTION_REGEX = Pattern.compile(_TRIGGER_MATHS_FUNCTION_REGEX, Pattern.CASE_INSENSITIVE);
-	private static final Pattern P_CONST_SPRITE_REGEX = Pattern.compile(_CONST_SPRITE_REGEX, Pattern.CASE_INSENSITIVE);
-	private static final Pattern P_TRIGGER_FUNCTION_SPRITE_REGEX = Pattern.compile(_TRIGGER_FUNCTION_SPRITE_REGEX, Pattern.CASE_INSENSITIVE);
-	private static final Pattern P_TRIGGER_FUNCTION_BG_REGEX = Pattern.compile(_TRIGGER_FUNCTION_BG_REGEX, Pattern.CASE_INSENSITIVE);
-	private static final Pattern P_STRING_REX_EXP = Pattern.compile(_STRING_REX_EXP, Pattern.CASE_INSENSITIVE);
-	private static final Pattern P_CONST_EXP = Pattern.compile("const *\\((.*)\\)", Pattern.CASE_INSENSITIVE);
+	private static final Pattern P_TRIGGER_MATHS_FUNCTION_REGEX = org.lee.mugen.util.MugenPatterns.compileInsensitive(_TRIGGER_MATHS_FUNCTION_REGEX);
+	private static final Pattern P_CONST_SPRITE_REGEX = org.lee.mugen.util.MugenPatterns.compileInsensitive(_CONST_SPRITE_REGEX);
+	private static final Pattern P_TRIGGER_FUNCTION_SPRITE_REGEX = org.lee.mugen.util.MugenPatterns.compileInsensitive(_TRIGGER_FUNCTION_SPRITE_REGEX);
+	private static final Pattern P_TRIGGER_FUNCTION_BG_REGEX = org.lee.mugen.util.MugenPatterns.compileInsensitive(_TRIGGER_FUNCTION_BG_REGEX);
+	private static final Pattern P_STRING_REX_EXP = org.lee.mugen.util.MugenPatterns.compileInsensitive(_STRING_REX_EXP);
+	private static final Pattern P_CONST_EXP = org.lee.mugen.util.MugenPatterns.compileInsensitive("const *\\((.*)\\)");
 	
 	private static boolean isMatch(Pattern reg, String input) {
 		return reg.matcher(input).matches();

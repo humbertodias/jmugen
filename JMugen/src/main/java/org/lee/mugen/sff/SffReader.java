@@ -2,7 +2,7 @@ package org.lee.mugen.sff;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
+import org.lee.mugen.io.MugenDataStreams;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -84,30 +84,65 @@ public class SffReader {
     	fs.reset();
     	fs.skip(skip);
     }
-    private static long getPosition(long len, long available) {
-    	return len - available;
+    private static int streamOffset(long len, ByteArrayInputStream fs) {
+    	return (int) (len - fs.available());
+    }
+
+    private static int sliceLength(int nextPosition, long len, ByteArrayInputStream fs) throws IOException {
+    	int read = streamOffset(len, fs);
+    	int iRead = nextPosition - read;
+    	IOUtils.checkChunkSize(iRead, (int) len, "SFF PCX slice");
+    	if (iRead < 0) {
+    		throw new IOException("Invalid SFF slice at offset " + read + ": next=" + nextPosition + " len=" + len);
+    	}
+    	return iRead;
+    }
+
+    private static void expectSignature(byte[] fileData) throws IOException {
+    	if (fileData.length < 12) {
+    		throw new IOException("SFF file too small");
+    	}
+    	byte[] sig = new byte[] {'E', 'l', 'e', 'c', 'b', 'y', 't', 'e', 'S', 'p', 'r', 0};
+    	for (int i = 0; i < sig.length; i++) {
+    		if (fileData[i] != sig[i]) {
+    			throw new IOException("Not a Mugen SFF (bad signature, " + fileData.length + " bytes)");
+    		}
+    	}
+    }
+
+    private static void copyPaletteTail(byte[] bytes, byte[] prevPalette, boolean isForceUSeDefPal) {
+    	if (isForceUSeDefPal && bytes.length >= PCXPalette.PALETTE_SIZE) {
+    		System.arraycopy(prevPalette, 0, bytes, bytes.length - PCXPalette.PALETTE_SIZE, PCXPalette.PALETTE_SIZE);
+    	}
+    }
+
+    private static void readPaletteTail(byte[] bytes, byte[] prevPalette) {
+    	if (bytes.length >= PCXPalette.PALETTE_SIZE) {
+    		System.arraycopy(bytes, bytes.length - PCXPalette.PALETTE_SIZE, prevPalette, 0, PCXPalette.PALETTE_SIZE);
+    	}
     }
     
 	public SffReader(String filename, byte[] useThisPal) throws FileNotFoundException, IOException {
-		this(new FileInputStream(filename), useThisPal);
+		this(MugenDataStreams.openBinary(filename), useThisPal);
 	}
     public SffReader(InputStream in, byte[] useThisPal) throws IOException {
 
     	boolean isForceUSeDefPal = useThisPal != null && useThisPal.length == 768;
-    	ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    	IOUtils.copy(in, baos);
-    	ByteArrayInputStream fs = new ByteArrayInputStream(baos.toByteArray());
-    	
+    	byte[] fileData = IOUtils.toByteArray(in);
+    	expectSignature(fileData);
+    	ByteArrayInputStream fs = new ByteArrayInputStream(fileData);
     	LittleEndianDataInputStream br = new LittleEndianDataInputStream(fs);
-    	baos.close();
-    	baos = null;
-    	long len = fs.available();
+    	final long len = fileData.length;
+    	if (len < 512) {
+    		throw new IOException("SFF file too small: " + len);
+    	}
     	
         sffHeader = new SffHeader(br);
         sffHeader.subHeaderSize = 512;
 
-        seek(br, 512);
-        
+        seek(fs, 512);
+        br = new LittleEndianDataInputStream(fs);
+
         SubFileHeader subFileHead = new SubFileHeader(br);
 
         byte[] prevPalette = isForceUSeDefPal? useThisPal: new byte[PCXPalette.PALETTE_SIZE];
@@ -116,20 +151,17 @@ public class SffReader {
         if (subFileHead.subFileLen > 0) {
         	br.read(bytes);
             subFileHead.pcxFile.pcxStream.write(bytes);
-            int iRead = (int)(subFileHead.nextPosition - (len - br.available()));
+            int iRead = sliceLength(subFileHead.nextPosition, len, fs);
             bytes = new byte[iRead];
             br.read(bytes);
-            if (isForceUSeDefPal) {
-            	System.arraycopy(prevPalette, 0, bytes, (int) (bytes.length - PCXPalette.PALETTE_SIZE), PCXPalette.PALETTE_SIZE);
-            	
-            }
+            copyPaletteTail(bytes, prevPalette, isForceUSeDefPal);
             subFileHead.pcxFile.pcxStream.write(bytes);
 
             bytes = subFileHead.pcxFile.pcxStream.toByteArray();
-           	System.arraycopy(bytes, (int) (bytes.length - PCXPalette.PALETTE_SIZE), prevPalette, 0, PCXPalette.PALETTE_SIZE);
+            readPaletteTail(bytes, prevPalette);
         }
         if (useThisPal == null)
-        	useThisPal = prevPalette.clone();
+        	useThisPal = java.util.Arrays.copyOf(prevPalette, prevPalette.length);
 
         int next = subFileHead.nextPosition;
         boolean enter = false;
@@ -137,12 +169,11 @@ public class SffReader {
         while (next != 0 && next < len) {
         	enter = true;
             SubFileList.add(subFileHead);
-            seek(br, next);
+            seek(fs, next);
+            br = new LittleEndianDataInputStream(fs);
             subFileHead = new SubFileHeader(br);
             if (subFileHead.subFileLen > 0) {
-                //int iRead = subFileHead.subFileLen - PcxReader.HEADER_SIZE - rewindPalette;
-                int iRead = (int)(subFileHead.nextPosition - getPosition(len, br.available()));
-                
+                int iRead = sliceLength(subFileHead.nextPosition, len, fs);
                 bytes = new byte[iRead];
                 br.read(bytes);
 
@@ -151,10 +182,10 @@ public class SffReader {
                     subFileHead.pcxFile.pcxStream.write(prevPalette);
 
                 } else {
-                	if (isForceUSeDefPal)
-                		System.arraycopy(prevPalette, 0, bytes, (int) (bytes.length - PCXPalette.PALETTE_SIZE), PCXPalette.PALETTE_SIZE);
-                	else if (subFileHead.grpNumber != 9000)
-                		System.arraycopy(bytes, (int) (bytes.length - PCXPalette.PALETTE_SIZE), prevPalette, 0, PCXPalette.PALETTE_SIZE);
+                	copyPaletteTail(bytes, prevPalette, isForceUSeDefPal);
+                	if (!isForceUSeDefPal && subFileHead.grpNumber != 9000) {
+                		readPaletteTail(bytes, prevPalette);
+                	}
                     subFileHead.pcxFile.pcxStream.write(bytes);
 //                    if (!isForceUSeDefPal) {
 //                        bytes = subFileHead.pcxFile.pcxStream.toByteArray();
@@ -175,20 +206,16 @@ public class SffReader {
     public static byte[] getImage(InputStream in, int grp, int num, byte[] useThisPal) throws IOException {
 
     	boolean isForceUSeDefPal = useThisPal != null && useThisPal.length == 768;
-    	ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    	IOUtils.copy(in, baos);
-    	ByteArrayInputStream fs = new ByteArrayInputStream(baos.toByteArray());
-    	
+    	byte[] fileData = IOUtils.toByteArray(in);
+    	ByteArrayInputStream fs = new ByteArrayInputStream(fileData);
     	LittleEndianDataInputStream br = new LittleEndianDataInputStream(fs);
-    	baos.close();
-    	baos = null;
-    	long len = fs.available();
+    	final long len = fileData.length;
         ArrayList<SffReader.SubFileHeader> SubFileList = new ArrayList<SffReader.SubFileHeader>();
         SffHeader sffHeader;
         sffHeader = new SffHeader(br);
         sffHeader.subHeaderSize = 512;
 
-        seek(br, 512);
+        seek(fs, 512);
         
         SubFileHeader subFileHead = new SubFileHeader(br);
 
@@ -199,7 +226,7 @@ public class SffReader {
         	br.read(bytes);
 
             subFileHead.pcxFile.pcxStream.write(bytes);
-            int iRead = (int)(subFileHead.nextPosition - (len - br.available()));
+            int iRead = sliceLength(subFileHead.nextPosition, len, fs);
             bytes = new byte[iRead];
             br.read(bytes);
             if (isForceUSeDefPal) {
@@ -214,7 +241,7 @@ public class SffReader {
            	System.arraycopy(bytes, (int) (bytes.length - PCXPalette.PALETTE_SIZE), prevPalette, 0, PCXPalette.PALETTE_SIZE);
         }
         if (useThisPal == null)
-        	useThisPal = prevPalette.clone();
+        	useThisPal = java.util.Arrays.copyOf(prevPalette, prevPalette.length);
 
         int next = subFileHead.nextPosition;
         boolean enter = false;
@@ -222,12 +249,10 @@ public class SffReader {
         while (next != 0 && next < len) {
         	enter = true;
             SubFileList.add(subFileHead);
-            seek(br, next);
+            seek(fs, next);
             subFileHead = new SubFileHeader(br);
             if (subFileHead.subFileLen > 0) {
-                //int iRead = subFileHead.subFileLen - PcxReader.HEADER_SIZE - rewindPalette;
-                int iRead = (int)(subFileHead.nextPosition - getPosition(len, br.available()));
-                
+                int iRead = sliceLength(subFileHead.nextPosition, len, fs);
                 bytes = new byte[iRead];
                 br.read(bytes);
 

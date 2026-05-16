@@ -50,6 +50,15 @@
 
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>**/gwt/**</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
 
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
@@ -72,6 +81,32 @@
                 <source>srcStage</source>
               </sources>
             </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>3.3.1</version>
+        <configuration>
+          <additionalSources>
+            <additionalSource>srcBackground</additionalSource>
+            <additionalSource>srcForFightDef</additionalSource>
+            <additionalSource>srcIntro</additionalSource>
+            <additionalSource>srcSystem</additionalSource>
+            <additionalSource>srcSelect</additionalSource>
+            <additionalSource>srcStage</additionalSource>
+            <additionalSource>src/main/java/org/lee/mugen/gwt</additionalSource>
+          </additionalSources>
+        </configuration>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <phase>package</phase>
+            <goals>
+              <goal>jar-no-fork</goal>
+            </goals>
           </execution>
         </executions>
       </plugin>

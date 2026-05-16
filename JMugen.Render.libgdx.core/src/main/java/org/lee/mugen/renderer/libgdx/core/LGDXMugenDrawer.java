@@ -115,6 +115,19 @@ public class LGDXMugenDrawer extends MugenDrawer {
         }
     }
 
+    @Override
+    public void translate(float x, float y) {
+        SpriteBatch batch = getBatch();
+        if (batch != null) {
+            batch.getTransformMatrix().translate(x, y, 0);
+        }
+    }
+
+    @Override
+    public void setUniformScaleAboutClipCorner(boolean enabled) {
+        uniformScaleAboutClipCorner = enabled;
+    }
+
     /**
      * Uniform shrink/zoom about the clip corner (only when {@link #uniformScaleAboutClipCorner} is on),
      * matching LWJGL's clip+scale behaviour for the select-screen stage preview. Clipped menu fonts keep
@@ -597,8 +610,8 @@ public class LGDXMugenDrawer extends MugenDrawer {
                 batch.setProjectionMatrix(cam.combined);
             }
             clipActive = true;
-            clipPivotX = 0f;
-            clipPivotY = 0f;
+            clipPivotX = minWx;
+            clipPivotY = minWy;
         } finally {
             resumeBatchIfNecessary(wasDrawing);
         }

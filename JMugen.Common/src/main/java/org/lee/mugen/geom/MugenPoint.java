@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * Integer 2D point (replaces {@link java.awt.Point} for Android where AWT is absent).
  */
-public final class MugenPoint implements Cloneable, Serializable {
+public final class MugenPoint implements Serializable {
 
     public int x;
     public int y;
@@ -18,8 +18,7 @@ public final class MugenPoint implements Cloneable, Serializable {
         this.y = y;
     }
 
-    @Override
-    public MugenPoint clone() {
+    public MugenPoint copy() {
         return new MugenPoint(x, y);
     }
 

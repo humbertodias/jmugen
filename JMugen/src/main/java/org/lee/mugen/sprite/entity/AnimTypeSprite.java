@@ -17,7 +17,7 @@ public class AnimTypeSprite extends AbstractSprite {
 	MugenPoint start;
 	public AnimTypeSprite(Type type, MugenPoint start) {
 		this.type = type;
-		this.start = (MugenPoint) start.clone();
+		this.start = start.copy();
 		
 	}
 	

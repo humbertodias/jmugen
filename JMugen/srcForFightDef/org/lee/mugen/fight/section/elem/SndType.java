@@ -2,7 +2,7 @@ package org.lee.mugen.fight.section.elem;
 
 import org.lee.mugen.util.BeanTools;
 
-public class SndType extends CommonType implements Cloneable {
+public class SndType extends CommonType {
 	int grp;
 	int num;
 	public int getGrp() {
@@ -17,6 +17,13 @@ public class SndType extends CommonType implements Cloneable {
 	public void setNum(int num) {
 		this.num = num;
 	}
+	public SndType copy() {
+		SndType c = new SndType();
+		c.grp = grp;
+		c.num = num;
+		return c;
+	}
+
 	@Override
 	public void parse(String name, String value) {
 		if (name.equals("snd")) {

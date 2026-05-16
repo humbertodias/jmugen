@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module>
+    <inherits name="org.lee.mugen.JMugenCommon"/>
+    <inherits name="org.lee.mugen.JMugenProperties"/>
+
+    <super-source path="gwt"/>
+
+    <source path="core">
+        <include name="GameMenu.java"/>
+        <include name="GwtGameFight.java"/>
+    </source>
+    <source path="fight">
+        <include name="GwtFightHud.java"/>
+        <include name="GwtFightHudParser.java"/>
+        <include name="GwtFightSprRoot.java"/>
+        <include name="GwtFightFighterAnim.java"/>
+        <include name="GwtFightPlayer.java"/>
+        <include name="GwtFightCmdProcess.java"/>
+        <include name="GwtCmdLoader.java"/>
+        <include name="GwtStageFightInfo.java"/>
+    </source>
+    <source path="core/gameSelect">
+        <include name="GwtGameVsScreen.java"/>
+    </source>
+    <source path="core/renderer/game/vsScreen">
+        <include name="GwtVsScreenRender.java"/>
+    </source>
+    <source path="core/renderer/game/system">
+        <include name="TitleInfoRender.java"/>
+        <include name="BackgroundRender.java"/>
+    </source>
+    <source path="core/renderer/game/fight">
+        <include name="BaseRender.java"/>
+    </source>
+    <source path="core/renderer/game/select">
+        <include name="GwtSelectRender.java"/>
+    </source>
+    <source path="fight/section/elem">
+        <include name="FontType.java"/>
+        <include name="SprType.java"/>
+    </source>
+    <source path="fight/system">
+        <include name="TitleInfo.java"/>
+        <include name="Music.java"/>
+        <include name="Info.java"/>
+    </source>
+    <source path="fight/system/elem">
+        <include name="Menu.java"/>
+        <include name="ItemName.java"/>
+        <include name="Item.java"/>
+        <include name="Value.java"/>
+        <include name="Cell.java"/>
+        <include name="PlayerSelectInfo.java"/>
+        <include name="PlayerCursor.java"/>
+        <include name="Stage.java"/>
+        <include name="StageDisplay.java"/>
+        <include name="GwtPlayerVsScreen.java"/>
+    </source>
+    <source path="background">
+        <include name="Background.java"/>
+        <include name="BG.java"/>
+        <include name="BGdef.java"/>
+        <include name="BGCtrlDef.java"/>
+        <include name="GwtBackground.java"/>
+        <include name="BgExpression.java"/>
+    </source>
+    <source path="fight/section">
+        <include name="Section.java"/>
+    </source>
+    <source path="fight/section/elem">
+        <include name="Type.java"/>
+        <include name="CommonType.java"/>
+        <include name="SndType.java"/>
+    </source>
+    <source path="fight/intro/entity">
+        <include name="Fade.java"/>
+    </source>
+    <source path="sprite/parser">
+        <include name="Parser.java"/>
+    </source>
+    <source path="sprite/common/resource">
+        <include name="FontParser.java"/>
+        <include name="FontProducer.java"/>
+        <include name="Desc.java"/>
+    </source>
+    <source path="sprite/base">
+        <include name="AbstractAnimManager.java"/>
+    </source>
+    <source path="sprite/baseForParse">
+        <include name="SpriteSFF.java"/>
+        <include name="ImageSpriteSFF.java"/>
+        <include name="GroupSpriteSFF.java"/>
+    </source>
+    <source path="sprite/character">
+        <include name="AnimGroup.java"/>
+        <include name="AnimElement.java"/>
+    </source>
+    <source path="sff">
+        <include name="**/*.java"/>
+    </source>
+    <source path="snd">
+        <include name="**/*.java"/>
+    </source>
+    <source path="parser/air">
+        <include name="**/*.java"/>
+    </source>
+
+    <source path="">
+        <exclude name="sprite/character/Sprite.java"/>
+        <exclude name="sprite/character/SpriteCns.java"/>
+        <exclude name="sprite/character/SpriteDef.java"/>
+        <exclude name="sprite/character/SpriteHelper.java"/>
+        <exclude name="sprite/character/SpriteState.java"/>
+        <exclude name="sprite/character/SpriteAnimManager.java"/>
+        <exclude name="sprite/character/spiteCnsSubClass/**"/>
+        <exclude name="sprite/entity/AfterImageSprite.java"/>
+        <exclude name="sprite/entity/ExplodSprite.java"/>
+        <exclude name="sprite/entity/ProjectileSprite.java"/>
+        <exclude name="sprite/entity/MakeDustSpriteManager.java"/>
+        <exclude name="sprite/entity/BindToParentSub.java"/>
+        <exclude name="sprite/entity/BindToTargetSub.java"/>
+        <exclude name="sprite/entity/BindToSub.java"/>
+        <exclude name="sprite/entity/CoupleOfAttrTypeAndLevel.java"/>
+        <exclude name="sprite/entity/HitOverrideSub.java"/>
+        <exclude name="sprite/entity/ExplodSub.java"/>
+        <exclude name="sprite/entity/HelperSub.java"/>
+        <exclude name="sprite/entity/ProjectileSub.java"/>
+        <exclude name="sprite/entity/Postype.java"/>
+        <exclude name="sprite/entity/AssertSpecialEval.java"/>
+        <exclude name="sprite/entity/Shake.java"/>
+        <exclude name="sprite/entity/StartFightSprite.java"/>
+        <exclude name="sprite/entity/AnimTypeSprite.java"/>
+        <exclude name="sprite/common/resource/FntRaw.java"/>
+        <exclude name="fight/system/VsScreen.java"/>
+        <exclude name="fight/system/elem/PlayerVsScreen.java"/>
+        <exclude name="sprite/others/**"/>
+        <exclude name="sprite/base/AbstractSprite.java"/>
+        <exclude name="sprite/cns/StateCtrl.java"/>
+        <exclude name="sprite/cns/eval/function/MathFunction.java"/>
+        <exclude name="sprite/cns/eval/function/StateCtrlFunctionDef.java"/>
+        <exclude name="sprite/parser/CmdParser.java"/>
+        <exclude name="core/FightEngine.java"/>
+        <exclude name="core/GameState.java"/>
+        <exclude name="core/GameGlobalEvents.java"/>
+        <exclude name="core/sound/SoundSystem.java"/>
+        <exclude name="fight/system/Files.java"/>
+        <exclude name="fight/system/MugenSystem.java"/>
+        <exclude name="fight/section/Fightdef.java"/>
+        <exclude name="fight/section/Lifebar.java"/>
+        <exclude name="fight/section/Powerbar.java"/>
+        <exclude name="fight/section/Round.java"/>
+        <exclude name="fight/section/SimulLifebar.java"/>
+        <exclude name="fight/section/TurnsLifebar.java"/>
+        <exclude name="fight/section/Fightfx.java"/>
+        <exclude name="fight/section/elem/AnimType.java"/>
+        <exclude name="fight/section/elem/FontType.java"/>
+        <exclude name="fight/section/elem/SprType.java"/>
+        <exclude name="fight/section/Files.java"/>
+        <exclude name="fight/system/elem/PlayerVsScreen.java"/>
+        <exclude name="stage/Stage.java"/>
+        <exclude name="stage/section/**"/>
+        <exclude name="background/bgCtrlFunction/**"/>
+        <exclude name="sprite/cns/eval/trigger/**"/>
+        <exclude name="sprite/cns/type/**"/>
+        <exclude name="sprite/cns/eval/redirect/**"/>
+        <exclude name="sprite/cns/eval/function/SpriteCnsFunctionDef.java"/>
+        <exclude name="sprite/parser/ExpressionFactory.java"/>
+        <exclude name="sprite/parser/CnsParse.java"/>
+        <exclude name="sprite/cns/StateDef.java"/>
+        <exclude name="fight/intro/**"/>
+        <exclude name="fight/select/**"/>
+        <exclude name="lang/**"/>
+        <exclude name="core/gameSelect/**"/>
+        <exclude name="core/physics/**"/>
+        <exclude name="core/GameFight.java"/>
+        <exclude name="core/renderer/game/fight/LifeBarRender.java"/>
+        <exclude name="core/renderer/game/fight/PowerBarRender.java"/>
+        <exclude name="core/renderer/game/fight/TimeRender.java"/>
+        <exclude name="core/renderer/game/fight/FaceRender.java"/>
+        <exclude name="core/renderer/game/fight/RoundRender.java"/>
+        <exclude name="core/renderer/game/fight/FightdefRender.java"/>
+        <exclude name="core/renderer/game/select/**"/>
+        <exclude name="core/renderer/game/vsScreen/**"/>
+        <exclude name="ExternalBundleControl.java"/>
+    </source>
+</module>

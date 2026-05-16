@@ -1,6 +1,5 @@
 package org.lee.mugen.input;
 
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;

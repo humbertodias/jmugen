@@ -224,7 +224,7 @@ public class BGCtrlDef {
 			while (strToken.hasMoreTokens()) {
 				String f = strToken.nextToken();
 				String line =  Parser.toLowerCase(f);
-				if (Pattern.matches(_COMMENT_OR_EMPTY_REGEX, line.trim())) {
+				if (org.lee.mugen.util.MugenPatterns.matchesInsensitive(_COMMENT_OR_EMPTY_REGEX, line.trim())) {
 					continue;
 				}
 				String[] keyValue = getSeparateKeyValue(line, strToken);
@@ -232,7 +232,7 @@ public class BGCtrlDef {
 				String value = keyValue[1];
 
 				
-				if (Pattern.matches(_TRIGGER_MAIN, line)) {
+				if (org.lee.mugen.util.MugenPatterns.matchesInsensitive(_TRIGGER_MAIN, line)) {
 //					boolean isTarget = false;
 //					isTarget = value.startsWith("target");
 //					if (isTarget)
@@ -244,9 +244,9 @@ public class BGCtrlDef {
 					Trigger trigger = new Trigger(valueToBeTrig);
 					bgCtrl.setMainTrigger(trigger);
 
-				} else if (Pattern.matches(_TRIGGER, line)) {
+				} else if (org.lee.mugen.util.MugenPatterns.matchesInsensitive(_TRIGGER, line)) {
 					String[] tokens = ExpressionFactory.expression2Tokens(value);
-					Matcher m = Pattern.compile(_TRIGGER, Pattern.CASE_INSENSITIVE).matcher(line);
+					Matcher m = org.lee.mugen.util.MugenPatterns.matcherInsensitive(_TRIGGER, line);
 					m.find();
 					int prio = Integer.parseInt(m.group(1));
 
@@ -423,7 +423,7 @@ public class BGCtrlDef {
 	private static String[] getSeparateKeyValue(String line,
 			StringTokenizer tokens) {
 		String[] keyValue = new String[2];
-		if (Pattern.matches(_COMMENT_OR_EMPTY_REGEX, line))
+		if (org.lee.mugen.util.MugenPatterns.matchesInsensitive(_COMMENT_OR_EMPTY_REGEX, line))
 			return null;
 		line = Parser.toLowerCase(line.trim());
 		int indexEnd = line.indexOf(";"); // search comment
@@ -465,7 +465,7 @@ public class BGCtrlDef {
 				grp.getText().toString(), "\r\n");
 		while (strToken.hasMoreTokens()) {
 			String line = strToken.nextToken().toLowerCase();
-			if (Pattern.matches(_COMMENT_OR_EMPTY_REGEX, line)) {
+			if (org.lee.mugen.util.MugenPatterns.matchesInsensitive(_COMMENT_OR_EMPTY_REGEX, line)) {
 				continue;
 			}
 			String[] keyValue = getSeparateKeyValue(line, strToken);

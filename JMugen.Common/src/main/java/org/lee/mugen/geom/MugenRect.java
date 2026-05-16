@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * Axis-aligned integer rectangle (replaces {@link java.awt.Rectangle} for Android where AWT is absent).
  */
-public final class MugenRect implements Cloneable, Serializable {
+public final class MugenRect implements Serializable {
 
     public int x;
     public int y;
@@ -26,8 +26,7 @@ public final class MugenRect implements Cloneable, Serializable {
         this(r.x, r.y, r.width, r.height);
     }
 
-    @Override
-    public MugenRect clone() {
+    public MugenRect copy() {
         return new MugenRect(x, y, width, height);
     }
 

@@ -76,8 +76,8 @@ public class PlayerLifebar extends Bar {
 	}
 	public void init() {
 		super.init();
-		getRangeFront().x = (MugenPoint) getRange().x.clone();
-		getRangeMid().x = (MugenPoint) getRange().x.clone();
+		getRangeFront().x = getRange().x.copy();
+		getRangeMid().x = getRange().x.copy();
 		if (mid != null)
 			mid.init();
 		if (front != null)

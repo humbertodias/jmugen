@@ -18,10 +18,13 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import org.lee.mugen.core.Game;
+import org.lee.mugen.core.sound.SoundSystem;
+import org.lee.mugen.input.CmdProcDispatcher;
 import org.lee.mugen.input.ISpriteCmdProcess;
 import org.lee.mugen.renderer.GameWindow;
 import org.lee.mugen.renderer.MugenTimer;
 import org.lee.mugen.renderer.libgdx.core.GDXKeyMapper;
+import org.lee.mugen.renderer.libgdx.core.LGDXImageLoader;
 import org.lee.mugen.renderer.libgdx.core.LGDXMugenTimer;
 import org.lee.mugen.renderer.libgdx.core.LGDXRenderContext;
 
@@ -29,6 +32,16 @@ import org.lee.mugen.renderer.libgdx.core.LGDXRenderContext;
  * Browser-backed LibGDX game window. The drawing implementation is shared through core.
  */
 public class LGDXWebGameWindow implements GameWindow, ApplicationListener, LGDXRenderContext {
+
+    private static class CmdProcessListener {
+        boolean[] areKeysPress;
+        int[] keys;
+
+        void setKeys(int[] keys) {
+            this.keys = keys;
+            areKeysPress = new boolean[keys.length];
+        }
+    }
 
     private static class SprCmdProcessListenerAction {
         private final ISpriteCmdProcess scp;
@@ -52,12 +65,14 @@ public class LGDXWebGameWindow implements GameWindow, ApplicationListener, LGDXR
     private final Vector3 unprojectTmp = new Vector3();
     private final Matrix4 batchTransformIdentity = new Matrix4();
     private final Matrix4 worldProjectionSnapshot = new Matrix4();
+    private final List<CmdProcessListener> cmdProcess = new LinkedList<>();
     private final List<SprCmdProcessListenerAction> spriteCmdProcess = new LinkedList<>();
     private final List<MugenKeyListener> mugenKeyListeners = new ArrayList<>();
 
     private SpriteBatch batch;
     private OrthographicCamera camera;
     private Viewport viewport;
+    private final LGDXWebImageLoader imageLoader = new LGDXWebImageLoader();
     private boolean finishInit;
     private boolean gameRunning = true;
 
@@ -129,6 +144,9 @@ public class LGDXWebGameWindow implements GameWindow, ApplicationListener, LGDXR
         batch.setProjectionMatrix(camera.combined);
         worldProjectionSnapshot.set(camera.combined);
 
+        SoundSystem.installAudioPlayback(new LGDXWebAudioPlayback());
+        initKeys();
+
         if (callback == null) {
             finishInit = true;
             return;
@@ -179,6 +197,9 @@ public class LGDXWebGameWindow implements GameWindow, ApplicationListener, LGDXR
 
         try {
             int delta = (int) (Gdx.graphics.getDeltaTime() * 1000);
+            if (delta <= 0) {
+                delta = 16;
+            }
             callback.update(delta);
 
             Game another = callback.getNext();
@@ -205,15 +226,91 @@ public class LGDXWebGameWindow implements GameWindow, ApplicationListener, LGDXR
         }
     }
 
+    private void initKeys() {
+        cmdProcess.clear();
+        spriteCmdProcess.clear();
+        CmdProcDispatcher.getSpriteDispatcherMap().clear();
+
+        CmdProcDispatcher p1 =
+                new CmdProcDispatcher(
+                        Input.Keys.W,
+                        Input.Keys.S,
+                        Input.Keys.A,
+                        Input.Keys.D,
+                        Input.Keys.J,
+                        Input.Keys.K,
+                        Input.Keys.L,
+                        Input.Keys.U,
+                        Input.Keys.I,
+                        Input.Keys.O,
+                        Input.Keys.SEMICOLON,
+                        Input.Keys.P);
+        CmdProcDispatcher.getSpriteDispatcherMap().put("1", p1);
+        CmdProcDispatcher.getSpriteDispatcherMap().put("menu", p1);
+        registerDispatcherKeys("1");
+
+        CmdProcDispatcher p2 =
+                new CmdProcDispatcher(
+                        Input.Keys.UP,
+                        Input.Keys.DOWN,
+                        Input.Keys.LEFT,
+                        Input.Keys.RIGHT,
+                        Input.Keys.NUM_0,
+                        Input.Keys.NUMPAD_2,
+                        Input.Keys.NUMPAD_3,
+                        Input.Keys.NUMPAD_4,
+                        Input.Keys.NUMPAD_5,
+                        Input.Keys.NUMPAD_6,
+                        Input.Keys.NUMPAD_8,
+                        Input.Keys.NUMPAD_7);
+        CmdProcDispatcher.getSpriteDispatcherMap().put("2", p2);
+        registerDispatcherKeys("2");
+
+        CmdProcessListener systemKeys = new CmdProcessListener();
+        systemKeys.setKeys(
+            new int[] {
+                GDXKeyMapper.KEY_ESCAPE,
+                Input.Keys.ENTER
+            });
+        cmdProcess.add(systemKeys);
+    }
+
+    private void registerDispatcherKeys(String id) {
+        CmdProcDispatcher dispatcher = CmdProcDispatcher.getSpriteDispatcherMap().get(id);
+        if (dispatcher == null) {
+            return;
+        }
+        CmdProcessListener listener = new CmdProcessListener();
+        listener.setKeys(dispatcher.getKeys());
+        cmdProcess.add(listener);
+    }
+
+    private static boolean isKeyDown(int key) {
+        return Gdx.input.isKeyPressed(key);
+    }
+
     private void keyManagementExecute() {
+        for (CmdProcessListener cmd : cmdProcess) {
+            for (int i = 0; i < cmd.keys.length; ++i) {
+                int key = cmd.keys[i];
+                if (!cmd.areKeysPress[i] && isKeyDown(key)) {
+                    cmd.areKeysPress[i] = true;
+                    notifyKeyListeners(key, true);
+                } else if (cmd.areKeysPress[i] && !isKeyDown(key)) {
+                    cmd.areKeysPress[i] = false;
+                    notifyKeyListeners(key, false);
+                }
+            }
+        }
+
         for (SprCmdProcessListenerAction action : spriteCmdProcess) {
             for (int i = 0; i < action.keys.length; ++i) {
                 int key = action.keys[i];
-                if (!action.areKeysPress[i] && Gdx.input.isKeyPressed(key)) {
+                if (!action.areKeysPress[i] && isKeyDown(key)) {
                     action.areKeysPress[i] = true;
                     action.scp.keyPressed(key);
                     notifyKeyListeners(key, true);
-                } else if (action.areKeysPress[i] && !Gdx.input.isKeyPressed(key)) {
+                } else if (action.areKeysPress[i] && !isKeyDown(key)) {
                     action.areKeysPress[i] = false;
                     action.scp.keyReleased(key);
                     notifyKeyListeners(key, false);
@@ -329,6 +426,11 @@ public class LGDXWebGameWindow implements GameWindow, ApplicationListener, LGDXR
     @Override
     public int getGameHeight() {
         return height;
+    }
+
+    @Override
+    public LGDXImageLoader getImageLoader() {
+        return imageLoader;
     }
 
     public String getTitle() {

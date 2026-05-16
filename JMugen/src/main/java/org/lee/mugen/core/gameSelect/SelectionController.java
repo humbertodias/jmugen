@@ -168,7 +168,7 @@ public class SelectionController implements MugenKeyListener {
 	private void addToPosition(int x, int y) {
 		int row = MugenSystem.getInstance().getSelectInfo().getRows();
 		int col = MugenSystem.getInstance().getSelectInfo().getColumns();
-		MugenPoint original = (MugenPoint) position.clone();
+		MugenPoint original = position.copy();
 		position.x += x;
 		position.y += y;
 		if (position.x < 0)

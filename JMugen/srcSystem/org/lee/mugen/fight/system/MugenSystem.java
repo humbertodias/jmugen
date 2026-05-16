@@ -1,13 +1,12 @@
 package org.lee.mugen.fight.system;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.List;
 
 import org.lee.mugen.background.Background;
 import org.lee.mugen.core.JMugenConstant;
+import org.lee.mugen.io.MugenDataStreams;
 import org.lee.mugen.fight.section.Section;
 import org.lee.mugen.sprite.baseForParse.SpriteSFF;
 import org.lee.mugen.sprite.parser.Parser;
@@ -36,7 +35,11 @@ public class MugenSystem {
 	}
 	
 	public File getCurrentDir() {
-		return new File(filename).getParentFile();
+		int slash = Math.max(filename.lastIndexOf('/'), filename.lastIndexOf('\\'));
+		if (slash < 0) {
+			return new File("");
+		}
+		return new File(filename.substring(0, slash));
 	}
 
 	private Info info;
@@ -88,7 +91,7 @@ public class MugenSystem {
 	}
 	
 	private void parse() throws Exception {
-        Reader r = new InputStreamReader(new FileInputStream(filename), "utf-8");
+        Reader r = MugenDataStreams.openUtf8Reader(filename);
 
 		List<GroupText> groups = Parser.getGroupTextMap(r);
 

@@ -642,7 +642,7 @@ public class JoglMugenDrawer extends MugenDrawer {
 		if (gl == null)
 			return;
 		if (r != null) {
-			r = (Rectangle) r.clone();
+			r = r.copy();
 			final int xl = r.getX1() * 2;
 			final int yt = r.getY1() * 2;
 			final int xr = r.getX2() * 2;

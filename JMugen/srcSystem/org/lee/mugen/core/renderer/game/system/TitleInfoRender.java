@@ -2,7 +2,6 @@ package org.lee.mugen.core.renderer.game.system;
 
 import org.lee.mugen.geom.MugenPoint;
 
-import org.lee.mugen.core.GameFight;
 import org.lee.mugen.core.GameMenu;
 import org.lee.mugen.core.renderer.game.fight.BaseRender;
 import org.lee.mugen.fight.section.elem.FontType;
@@ -48,7 +47,7 @@ public class TitleInfoRender extends BaseRender {
 			md.setAlpha(0);
 		}
 		
-		MugenPoint pos = (MugenPoint) menu.getPos().clone();
+		MugenPoint pos = menu.getPos().copy();
 			
 		ItemName itemName = menu.getItemname();
 		String[] strs = itemName.getList();
@@ -57,7 +56,7 @@ public class TitleInfoRender extends BaseRender {
 		int count = menu.getWindow$visibleitems();
 		int base = gameMenu.getLastStartIndex();//menu.getItemname().startIndex();
 		int add = gameMenu.getaddPixel();
-		Rectangle box = (Rectangle) menu.getBoxcursor$coords().clone();
+		Rectangle box = menu.getBoxcursor$coords().copy();
 		GraphicsWrapper.getInstance().setClip(
 				new Rectangle(
 						pos.x + box.getX1(), 

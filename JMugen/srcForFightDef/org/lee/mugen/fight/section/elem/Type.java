@@ -6,7 +6,7 @@ import org.lee.mugen.fight.section.elem.FontType.ALIGNMT;
 import org.lee.mugen.sprite.entity.PointF;
 import org.lee.mugen.util.BeanTools;
 
-public class Type implements Cloneable {
+public class Type {
 	
 	public static String getNext(String name) {
 		return name.substring(name.indexOf(".") + 1);
@@ -24,28 +24,40 @@ public class Type implements Cloneable {
 	MugenPoint offset = new MugenPoint();
 	MugenPoint pos = new MugenPoint();
 	
-	@Override
-	public Object clone() {
-		try {
-			Type clone = (Type) super.clone();
-			if (type != null)
-				clone.type = (CommonType) type.clone();
-			if (offset != null)
-				clone.offset = (MugenPoint) offset.clone();
-			if (pos != null)
-				clone.pos = (MugenPoint) pos.clone();
-			if (snd != null)
-				clone.snd = (SndType) snd.clone();
-			if (scale != null)
-				clone.scale = (PointF) scale.clone();
-			return clone;
-		} catch (CloneNotSupportedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			throw new IllegalStateException(e);
+	public Type copy() {
+		Type c = new Type();
+		if (type != null) {
+			c.type = type.copy();
 		}
+		if (offset != null) {
+			c.offset = offset.copy();
+		}
+		if (pos != null) {
+			c.pos = pos.copy();
+		}
+		if (snd != null) {
+			c.snd = snd.copy();
+		}
+		if (scale != null) {
+			c.scale = scale.copy();
+		}
+		c.displaytime = displaytime;
+		c.originalDisplaytime = originalDisplaytime;
+		c.facing = facing;
+		c.vfacing = vfacing;
+		c.sndtime = sndtime;
+		c.originalSndtime = originalSndtime;
+		c.layerno = layerno;
+		c.starttime = starttime;
+		c.originalStarttime = originalStarttime;
+		c.alpha = alpha;
+		return c;
 	}
-	
+
+	public Object clone() {
+		return copy();
+	}
+
 	int displaytime = -1;
 	int originalDisplaytime = -1;
 	int facing = 1;

@@ -130,7 +130,7 @@ public class SelectRender extends BaseRender {
 
 				pos = (MugenPoint) getProperty(selectInfo, 
 						"p" + posName + ".face.offset");
-				pos = (MugenPoint) pos.clone();
+				pos = pos.copy();
 				int ifacing = (Integer) getProperty(selectInfo, 
 						"p" + posName + ".face.facing");
 				boolean facing = ifacing == -1;

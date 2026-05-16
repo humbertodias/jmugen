@@ -80,15 +80,15 @@ public class CnsParse {
 	
 	private static final Pattern P_COMMENT_OR_EMPTY_REGEX = Pattern.compile(S_COMMENT_OR_EMPTY_REGEX);
 	private static final Pattern P_FLOAT_REGEX = Pattern.compile(S_FLOAT_REGEX);
-	private static final Pattern P_DATA_TITLE_REGEX = Pattern.compile(S_DATA_TITLE_REGEX, Pattern.CASE_INSENSITIVE);
-	private static final Pattern P_SIZE_TITLE_REGEX = Pattern.compile(S_SIZE_TITLE_REGEX, Pattern.CASE_INSENSITIVE);
-	private static final Pattern P_VELOCITY_TITLE_REGEX = Pattern.compile(S_VELOCITY_TITLE_REGEX, Pattern.CASE_INSENSITIVE);
-	private static final Pattern P_MOVEMENT_TITLE_REGEX = Pattern.compile(S_MOVEMENT_TITLE_REGEX, Pattern.CASE_INSENSITIVE);
-	private static final Pattern P_STATE_DEF_TITLE_REGEX = Pattern.compile(S_STATE_DEF_TITLE_REGEX, Pattern.CASE_INSENSITIVE);
+	private static final Pattern P_DATA_TITLE_REGEX = org.lee.mugen.util.MugenPatterns.compileInsensitive(S_DATA_TITLE_REGEX);
+	private static final Pattern P_SIZE_TITLE_REGEX = org.lee.mugen.util.MugenPatterns.compileInsensitive(S_SIZE_TITLE_REGEX);
+	private static final Pattern P_VELOCITY_TITLE_REGEX = org.lee.mugen.util.MugenPatterns.compileInsensitive(S_VELOCITY_TITLE_REGEX);
+	private static final Pattern P_MOVEMENT_TITLE_REGEX = org.lee.mugen.util.MugenPatterns.compileInsensitive(S_MOVEMENT_TITLE_REGEX);
+	private static final Pattern P_STATE_DEF_TITLE_REGEX = org.lee.mugen.util.MugenPatterns.compileInsensitive(S_STATE_DEF_TITLE_REGEX);
 	private static final Pattern P_STATE_CONTINUE_DEF_TITLE_REGEX = Pattern.compile(S_STATE_CONTINUE_DEF_TITLE_REGEX);
-	private static final Pattern P_STATE_CTRL_TITLE_REGEX = Pattern.compile(S_STATE_CTRL_TITLE_REGEX, Pattern.CASE_INSENSITIVE);
-	private static final Pattern P_TRIGGER_MAIN = Pattern.compile(S_TRIGGER_MAIN, Pattern.CASE_INSENSITIVE);
-	private static final Pattern P_TRIGGER = Pattern.compile(S_TRIGGER, Pattern.CASE_INSENSITIVE);
+	private static final Pattern P_STATE_CTRL_TITLE_REGEX = org.lee.mugen.util.MugenPatterns.compileInsensitive(S_STATE_CTRL_TITLE_REGEX);
+	private static final Pattern P_TRIGGER_MAIN = org.lee.mugen.util.MugenPatterns.compileInsensitive(S_TRIGGER_MAIN);
+	private static final Pattern P_TRIGGER = org.lee.mugen.util.MugenPatterns.compileInsensitive(S_TRIGGER);
 	
 	private static boolean isMatch(Pattern reg, String input) {
 		return reg.matcher(input).matches();
@@ -555,8 +555,8 @@ public class CnsParse {
 	public static final String S_STATEDEF = " *statedef +([a-zA-Z0-9\\ \\-\\+\\_\\(\\)\\{\\}\\,]*,.*) *";
 	public static final String S_STATECTRL = " *state +([a-zA-Z0-9\\ \\-\\+\\_\\(\\)\\{\\}\\,]*,.*) *";
 	
-	public static final Pattern P_STATEDEF = Pattern.compile(S_STATEDEF, Pattern.CASE_INSENSITIVE);
-	public static final Pattern P_STATECTRL = Pattern.compile(S_STATECTRL, Pattern.CASE_INSENSITIVE);
+	public static final Pattern P_STATEDEF = org.lee.mugen.util.MugenPatterns.compileInsensitive(S_STATEDEF);
+	public static final Pattern P_STATECTRL = org.lee.mugen.util.MugenPatterns.compileInsensitive(S_STATECTRL);
 
 
 	public static void buildSpriteInfoForReal(List<GroupText> groups, Sprite sprite, SpriteCns spriteInfo, SpriteState spriteState) throws Exception {

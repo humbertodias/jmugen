@@ -2,8 +2,6 @@ package org.lee.mugen.core.renderer.game.fight;
 
 import org.lee.mugen.geom.MugenPoint;
 
-import org.lee.mugen.core.GameFight;
-import org.lee.mugen.fight.section.Fightdef;
 import org.lee.mugen.fight.section.elem.AnimType;
 import org.lee.mugen.fight.section.elem.FontType;
 import org.lee.mugen.fight.section.elem.SprType;
@@ -59,7 +57,6 @@ public class BaseRender implements Renderable {
 		md.draw(drawProperties);
 	}
 	protected ImageSpriteSFF getImageSFF(Type type) {
-		Fightdef fightdef = GameFight.getInstance().getFightdef();
 		if (type.getType() instanceof AnimType) {
 			AnimType anim = (AnimType) type.getType();
 			return anim.getImage();

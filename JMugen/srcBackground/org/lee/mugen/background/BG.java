@@ -118,15 +118,6 @@ public class BG implements Cloneable, Serializable {
 		this.pos = pos;
 	}
 
-	@Override
-	public Object clone() {
-		try {
-			return super.clone();
-		} catch (CloneNotSupportedException e) {
-			throw new IllegalStateException(e);
-		}
-	};
-
 	public BG(Object root) {
 		parent = root;
 	}
@@ -299,7 +290,7 @@ public class BG implements Cloneable, Serializable {
 	}
 
 	public void setWindow(Rectangle r) {
-		window = (Rectangle) r.clone();
+		window = r.copy();
 	}
 
 
@@ -402,15 +393,8 @@ public class BG implements Cloneable, Serializable {
 
 	public AbstractAnimManager getAnimManager() {
 		if (anim == null) {
-			try {
-				AbstractAnimManager animManager = (AbstractAnimManager) parent.getClass().getMethod("getAnim").invoke(parent);
-				HashMap<Integer, AnimGroup> aMap = animManager.getGroupSpriteMap();
-				anim = new AbstractAnimManager(aMap);
-				anim.setAction(actionno);
-				
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			anim = new AbstractAnimManager(new HashMap<Integer, AnimGroup>());
+			anim.setAction(actionno);
 		}
 		return anim;
 	}
