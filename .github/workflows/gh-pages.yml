@@ -31,7 +31,9 @@ jobs:
 
       - name: Build WebAssembly
         run: |
-              mvn -pl JMugen.Render.libgdx.web -am package -DskipTests
+              mvn install -DskipTests -pl '!JMugen.Render.libgdx.android'
+          
+              mvn -pl JMugen.Render.libgdx.web -am package
               mvn -pl JMugen.Render.libgdx.web -rf :JMugen.Render.libgdx.web gwt:compile
               
               cp JMugen.Render.libgdx.web/src/main/webapp/index.html JMugen.Render.libgdx.web/target/webapp/index.html
