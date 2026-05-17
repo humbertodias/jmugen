@@ -3,7 +3,6 @@
     <inherits name="com.badlogic.gdx.backends.gdx_backends_gwt"/>
     <inherits name="org.lee.mugen.renderer.libgdx.core.JMugenLibGDXCore"/>
     <inherits name="org.lee.mugen.JMugen"/>
-    <inherits name="com.levigo.util.GwtAwt" />
 
     <source path=""/>
     <!-- Source tree for PreloaderBundleGenerator (must differ from output; generator wipes output assets/). -->
