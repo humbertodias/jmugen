@@ -99,13 +99,6 @@
             <version>${libgdx.version}</version>
             <classifier>sources</classifier>
         </dependency>
-        <!-- Source: https://mvnrepository.com/artifact/com.levigo/gwt-awt -->
-        <dependency>
-            <groupId>com.levigo</groupId>
-            <artifactId>gwt-awt</artifactId>
-            <version>1.0.1</version>
-            <scope>compile</scope>
-        </dependency>
 
         <dependency>
             <groupId>junit</groupId>
