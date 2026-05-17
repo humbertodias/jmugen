@@ -99,3 +99,15 @@ http://127.0.0.1:9876/
 `LGDXWebApplication` runs **`LGDXWebSmokeGame`** (drawer + cena de teste). **`GameMenu`** (jogo completo) ainda **não compila no GWT**: o módulo `JMugen` falha com centenas de erros (`FileInputStream`, `clone()`, classes fora do `JMugenCommon.gwt.xml`, etc.). Quando `org.lee.mugen.JMugen` estiver limpo para GWT, descomenta `<inherits name="org.lee.mugen.JMugen"/>` em `JMugenWeb.gwt.xml`, repõe as dependências `JMugen` no `pom.xml` e troca o callback para `GameMenu.getInstance()`.
 
 `LGDXWebPlatform` (dados Gdx, `MugenDataStreams`, drawer) fica pronto para esse passo. Os ficheiros do jogo copiam-se de `../data` para `target/gdx-assets/data/` no `package`.
+
+
+Dist
+```
+mvn -pl JMugen.Render.libgdx.web -am package -DskipTests
+mvn -pl JMugen.Render.libgdx.web -rf :JMugen.Render.libgdx.web gwt:compile
+
+cp JMugen.Render.libgdx.web/src/main/webapp/index.html JMugen.Render.libgdx.web/target/webapp/index.html
+cp -r JMugen.Render.libgdx.web/src/main/webapp/assets JMugen.Render.libgdx.web/target/webapp/
+
+python3 -m http.server -d JMugen.Render.libgdx.web/target/webapp/
+```
