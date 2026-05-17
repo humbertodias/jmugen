@@ -1,0 +1,17 @@
+This lifebar is made by illure (7thblues@gmail.com)
+
+Extract all files to mugen/data folder.
+All sprites are ripped by Guilty Gear XX#Realod Sprite Ripper. (http://www.newwavemugen.com/~xenozip/)
+Thanks to Xenozip ad Blip for good tool.
+
+** NEVER Distribute this lifebar with any unauthorized complete MUGEN game **
+
+update 3/4
+----------
+fixed lack of symmetry
+
+update 3/5
+----------
+fixed bug (round1.animtime to correct value)
+
+http://blog.paran.com/illure

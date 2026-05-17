@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>JMugen - LibGDX Web</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            overflow: hidden;
+        }
+        /* LibGDX GWT preloads /assets/assets.txt before starting; keep this below the WebGL canvas. */
+        canvas {
+            position: relative;
+            z-index: 2;
+        }
+        #jmugen-status {
+            position: absolute;
+            left: 16px;
+            top: 16px;
+            max-width: 720px;
+            color: #ddd;
+            font: 14px/1.4 Arial, sans-serif;
+            background: rgba(0, 0, 0, 0.72);
+            border: 1px solid #444;
+            padding: 12px 14px;
+            z-index: 1;
+            pointer-events: none;
+        }
+        #jmugen-status strong {
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+<div id="jmugen-status">
+    <strong>Carregando JMugen Web...</strong><br>
+    Se esta mensagem nao mudar, o modulo GWT ainda nao terminou de carregar.
+</div>
+<script src="jmugen/jmugen.nocache.js"></script>
+</body>
+</html>
