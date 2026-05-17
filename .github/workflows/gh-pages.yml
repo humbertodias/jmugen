@@ -1,0 +1,48 @@
+name: gh-pages
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Maven cache
+        uses: actions/cache@v5
+        with:
+          path: ~/.m2/repository
+          key: maven-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            maven-${{ runner.os }}-${{ runner.arch }}-
+
+      # Switch back to Java 8 for the Maven build
+      - name: Set up JDK 8
+        uses: actions/setup-java@v5
+        with:
+          distribution: corretto
+          java-version: '8'
+
+      - name: Build WebAssembly
+        run: |
+              mvn -pl JMugen.Render.libgdx.web -am package -DskipTests
+              mvn -pl JMugen.Render.libgdx.web -rf :JMugen.Render.libgdx.web gwt:compile
+              
+              cp JMugen.Render.libgdx.web/src/main/webapp/index.html JMugen.Render.libgdx.web/target/webapp/index.html
+              cp -r JMugen.Render.libgdx.web/src/main/webapp/assets JMugen.Render.libgdx.web/target/webapp/
+
+      - name: Upload site artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: JMugen.Render.libgdx.web/target/webapp/
+
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: JMugen.Render.libgdx.web/target/webapp/
