@@ -15,6 +15,8 @@ import org.lee.mugen.io.MugenDataStreams;
 import org.lee.mugen.renderer.GraphicsWrapper;
 import org.lee.mugen.renderer.ImageContainer;
 import org.lee.mugen.sff.SffReader;
+import org.lee.mugen.sprite.baseForParse.ImageSpriteSFF;
+import org.lee.mugen.sprite.baseForParse.SpriteSFF;
 import org.lee.mugen.sprite.parser.Parser;
 
 /**
@@ -30,6 +32,7 @@ public class GwtCharacters {
     private final Map<String, String> animFiles = new HashMap<String, String>();
     private final Map<String, String> displayNames = new HashMap<String, String>();
     private final Map<String, ImageContainer> portraits = new HashMap<String, ImageContainer>();
+    private final Map<String, ImageSpriteSFF> portraitSprites = new HashMap<String, ImageSpriteSFF>();
     private final Map<String, ImageContainer> bigPortraits = new HashMap<String, ImageContainer>();
     private final Map<String, Integer> lifeValues = new HashMap<String, Integer>();
 
@@ -45,15 +48,32 @@ public class GwtCharacters {
     }
 
     public ImageContainer getPortrait(String characterId) {
-        ImageContainer cached = portraits.get(characterId);
+        ImageSpriteSFF spr = getPortraitSprite(characterId);
+        return spr != null ? spr.getImage() : null;
+    }
+
+    /**
+     * Small portrait (9000,0) with SFF axes — needed for fight HUD face placement.
+     */
+    public ImageSpriteSFF getPortraitSprite(String characterId) {
+        ImageSpriteSFF cached = portraitSprites.get(characterId);
         if (cached != null) {
             return cached;
         }
-        ImageContainer ic = loadPortraitImage(characterId, PORTRAIT_IMG);
-        if (ic != null) {
-            portraits.put(characterId, ic);
+        ImageSpriteSFF fromSff = loadPortraitFromSff(characterId, PORTRAIT_IMG);
+        if (fromSff != null) {
+            portraitSprites.put(characterId, fromSff);
+            portraits.put(characterId, fromSff.getImage());
+            return fromSff;
         }
-        return ic;
+        ImageContainer ic = loadPortraitImage(characterId, PORTRAIT_IMG);
+        if (ic == null) {
+            return null;
+        }
+        ImageSpriteSFF fallback = new ImageSpriteSFF(PORTRAIT_GRP, PORTRAIT_IMG, ic, 0, 0);
+        portraitSprites.put(characterId, fallback);
+        portraits.put(characterId, ic);
+        return fallback;
     }
 
     /** Stand pose (group 0, image 0) for in-fight display. */
@@ -208,6 +228,25 @@ public class GwtCharacters {
             } finally {
                 in.close();
             }
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /** Full SFF load so portrait axes match desktop FaceRender. */
+    private ImageSpriteSFF loadPortraitFromSff(String characterId, int imageIndex) {
+        String sff = spriteFiles.get(characterId);
+        if (sff == null || sff.isEmpty()) {
+            return null;
+        }
+        try {
+            String path =
+                    Parser.getExistFile(JMugenConstant.RESOURCE + "chars/" + characterId + "/" + sff);
+            SpriteSFF spriteSff = new SpriteSFF(new SffReader(path, null), true, false);
+            if (spriteSff.getGroupSpr(PORTRAIT_GRP) == null) {
+                return null;
+            }
+            return spriteSff.getGroupSpr(PORTRAIT_GRP).getImgSpr(imageIndex);
         } catch (Exception e) {
             return null;
         }

@@ -33,6 +33,19 @@
         #jmugen-status strong {
             color: #fff;
         }
+        #jmugen-audio-hint {
+            position: absolute;
+            left: 50%;
+            bottom: 24px;
+            transform: translateX(-50%);
+            color: #eee;
+            font: 15px/1.4 Arial, sans-serif;
+            background: rgba(0, 0, 0, 0.75);
+            border: 1px solid #555;
+            padding: 10px 16px;
+            z-index: 3;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
@@ -40,6 +53,7 @@
     <strong>Carregando JMugen Web...</strong><br>
     Se esta mensagem nao mudar, o modulo GWT ainda nao terminou de carregar.
 </div>
+<div id="jmugen-audio-hint">Clique ou pressione uma tecla para ativar o audio</div>
 <script src="jmugen/jmugen.nocache.js"></script>
 </body>
 </html>

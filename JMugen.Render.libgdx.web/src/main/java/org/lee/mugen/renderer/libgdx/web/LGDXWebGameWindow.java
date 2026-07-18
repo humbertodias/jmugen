@@ -17,7 +17,10 @@ import com.google.gwt.dom.client.Style;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import org.lee.mugen.core.AbstractGameFight;
+import org.lee.mugen.core.AbstractGameFight.DebugAction;
 import org.lee.mugen.core.Game;
+import org.lee.mugen.core.sound.AudioPlayback;
 import org.lee.mugen.core.sound.SoundSystem;
 import org.lee.mugen.input.CmdProcDispatcher;
 import org.lee.mugen.input.ISpriteCmdProcess;
@@ -32,6 +35,76 @@ import org.lee.mugen.renderer.libgdx.core.LGDXRenderContext;
  * Browser-backed LibGDX game window. The drawing implementation is shared through core.
  */
 public class LGDXWebGameWindow implements GameWindow, ApplicationListener, LGDXRenderContext {
+
+    /** Same shortcuts as desktop {@code LGDXGameWindow} / LWJGL. */
+    private static final class DebugChord {
+        final DebugAction action;
+        final int[] keys;
+        final boolean allowRepeat;
+        boolean pressed;
+
+        DebugChord(DebugAction action, int[] keys, boolean allowRepeat) {
+            this.action = action;
+            this.keys = keys;
+            this.allowRepeat = allowRepeat;
+        }
+    }
+
+    private class DebugEventManager {
+        private final List<DebugChord> chords = new ArrayList<>();
+
+        DebugEventManager() {
+            add(DebugAction.SWITCH_PLAYER_DEBUG_INFO, GDXKeyMapper.KEY_LCONTROL, GDXKeyMapper.KEY_D);
+            add(DebugAction.EXPLOD_DEBUG_INFO, GDXKeyMapper.KEY_LCONTROL, GDXKeyMapper.KEY_E);
+            add(DebugAction.INIT_PLAYER, GDXKeyMapper.KEY_SPACE);
+            add(DebugAction.SHOW_HIDE_CNS, GDXKeyMapper.KEY_LCONTROL, GDXKeyMapper.KEY_C);
+            add(DebugAction.SHOW_HIDE_ATTACK_CNS, GDXKeyMapper.KEY_LCONTROL, GDXKeyMapper.KEY_X);
+            addRepeat(DebugAction.INCREASE_FPS, GDXKeyMapper.KEY_LCONTROL, GDXKeyMapper.KEY_ADD);
+            addRepeat(DebugAction.DECREASE_FPS, GDXKeyMapper.KEY_LCONTROL, GDXKeyMapper.KEY_SUBTRACT);
+            addRepeat(DebugAction.INCREASE_FPS, GDXKeyMapper.KEY_LCONTROL, GDXKeyMapper.KEY_EQUALS);
+            addRepeat(DebugAction.DECREASE_FPS, GDXKeyMapper.KEY_LCONTROL, GDXKeyMapper.KEY_MINUS);
+            add(DebugAction.RESET_FPS, GDXKeyMapper.KEY_LCONTROL, GDXKeyMapper.KEY_MULTIPLY);
+            add(DebugAction.DEBUG_PAUSE, GDXKeyMapper.KEY_LCONTROL, GDXKeyMapper.KEY_P);
+            add(DebugAction.PAUSE_PLUS_ONE_FRAME, GDXKeyMapper.KEY_LCONTROL, GDXKeyMapper.KEY_A);
+            add(DebugAction.DISPLAY_HELP, GDXKeyMapper.KEY_F1);
+        }
+
+        private void add(DebugAction action, int... keys) {
+            chords.add(new DebugChord(action, keys, false));
+        }
+
+        private void addRepeat(DebugAction action, int... keys) {
+            chords.add(new DebugChord(action, keys, true));
+        }
+
+        void process(Game cb) {
+            if (!(cb instanceof AbstractGameFight)) {
+                return;
+            }
+            AbstractGameFight fight = (AbstractGameFight) cb;
+            for (DebugChord chord : chords) {
+                boolean all = true;
+                for (int key : chord.keys) {
+                    if (!isDebugKeyDown(key)) {
+                        all = false;
+                        break;
+                    }
+                }
+                if (chord.allowRepeat) {
+                    if (all) {
+                        fight.onDebugAction(chord.action);
+                    }
+                    continue;
+                }
+                if (all) {
+                    chord.pressed = true;
+                } else if (chord.pressed) {
+                    chord.pressed = false;
+                    fight.onDebugAction(chord.action);
+                }
+            }
+        }
+    }
 
     private static class CmdProcessListener {
         boolean[] areKeysPress;
@@ -68,6 +141,7 @@ public class LGDXWebGameWindow implements GameWindow, ApplicationListener, LGDXR
     private final List<CmdProcessListener> cmdProcess = new LinkedList<>();
     private final List<SprCmdProcessListenerAction> spriteCmdProcess = new LinkedList<>();
     private final List<MugenKeyListener> mugenKeyListeners = new ArrayList<>();
+    private final DebugEventManager debugEventManager = new DebugEventManager();
 
     private SpriteBatch batch;
     private OrthographicCamera camera;
@@ -192,6 +266,7 @@ public class LGDXWebGameWindow implements GameWindow, ApplicationListener, LGDXR
             return;
         }
 
+        unlockAudioIfNeeded();
         keyManagementExecute();
         viewport.apply();
 
@@ -289,7 +364,54 @@ public class LGDXWebGameWindow implements GameWindow, ApplicationListener, LGDXR
         return Gdx.input.isKeyPressed(key);
     }
 
+    private static boolean isDebugKeyDown(int key) {
+        if (key == GDXKeyMapper.KEY_LCONTROL) {
+            return isKeyDown(GDXKeyMapper.KEY_LCONTROL) || isKeyDown(GDXKeyMapper.KEY_RCONTROL);
+        }
+        return isKeyDown(key);
+    }
+
+    /**
+     * Browsers block Music/SFX until a user gesture. Unlock on first key or pointer press.
+     */
+    private void unlockAudioIfNeeded() {
+        AudioPlayback playback = SoundSystem.getAudioPlayback();
+        if (!(playback instanceof LGDXWebAudioPlayback)) {
+            return;
+        }
+        LGDXWebAudioPlayback web = (LGDXWebAudioPlayback) playback;
+        if (web.isUnlocked()) {
+            return;
+        }
+        boolean gesture = Gdx.input.isTouched();
+        if (!gesture) {
+            for (int k = 0; k < 256; k++) {
+                if (Gdx.input.isKeyPressed(k)) {
+                    gesture = true;
+                    break;
+                }
+            }
+        }
+        if (gesture) {
+            web.onUserGesture();
+            Scheduler.get()
+                    .scheduleDeferred(
+                            new Scheduler.ScheduledCommand() {
+                                @Override
+                                public void execute() {
+                                    Element el = Document.get().getElementById("jmugen-audio-hint");
+                                    if (el != null) {
+                                        el.getStyle().setDisplay(Style.Display.NONE);
+                                    }
+                                }
+                            });
+        }
+    }
+
     private void keyManagementExecute() {
+        if (callback != null) {
+            debugEventManager.process(callback);
+        }
         for (CmdProcessListener cmd : cmdProcess) {
             for (int i = 0; i < cmd.keys.length; ++i) {
                 int key = cmd.keys[i];

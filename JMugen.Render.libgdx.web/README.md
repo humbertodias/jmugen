@@ -111,3 +111,9 @@ cp -r JMugen.Render.libgdx.web/src/main/webapp/assets JMugen.Render.libgdx.web/t
 
 python3 -m http.server -d JMugen.Render.libgdx.web/target/webapp/
 ```
+
+
+How to gwt:run
+```
+mvn -pl JMugen.Render.libgdx.web gwt:run
+```

@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.Reader;
 import org.lee.mugen.io.MugenDataStreams;
 
-/** Parses {@code fight.def} lifebar section for {@link GwtFightHud}. */
+/** Parses {@code fight.def} sections needed by {@link GwtFightHud}. */
 final class GwtFightHudParser {
 
     private GwtFightHudParser() {
@@ -26,7 +26,12 @@ final class GwtFightHudParser {
                     section = line.substring(1, line.length() - 1).trim().toLowerCase();
                     continue;
                 }
-                if (!"lifebar".equals(section)) {
+                if (!"files".equals(section)
+                        && !"lifebar".equals(section)
+                        && !"powerbar".equals(section)
+                        && !"time".equals(section)
+                        && !"face".equals(section)
+                        && !"name".equals(section)) {
                     continue;
                 }
                 int eq = line.indexOf('=');
@@ -39,7 +44,19 @@ final class GwtFightHudParser {
                 if (semi >= 0) {
                     value = value.substring(0, semi).trim();
                 }
-                hud.applyLifebarKey(key, value, hud);
+                if ("files".equals(section)) {
+                    hud.applyFilesKey(key, value);
+                } else if ("lifebar".equals(section)) {
+                    hud.applyLifebarKey(key, value, hud);
+                } else if ("powerbar".equals(section)) {
+                    hud.applyPowerbarKey(key, value);
+                } else if ("time".equals(section)) {
+                    hud.applyTimeKey(key, value);
+                } else if ("face".equals(section)) {
+                    hud.applyFaceKey(key, value);
+                } else {
+                    hud.applyNameKey(key, value);
+                }
             }
         } finally {
             reader.close();

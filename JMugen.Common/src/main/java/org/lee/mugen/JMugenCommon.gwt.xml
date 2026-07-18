@@ -18,6 +18,7 @@
     </source>
     <source path="core">
         <include name="Game.java"/>
+        <include name="AbstractGameFight.java"/>
         <include name="ResourceRoots.java"/>
         <include name="JMugenConstant.java"/>
     </source>

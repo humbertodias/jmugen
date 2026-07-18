@@ -324,6 +324,18 @@ public class LGDXMugenDrawer extends MugenDrawer {
             }
         }
 
+        // Without PalFx shader (or compile failure): approximate dark tint for shadows / palfx.
+        if (!usedPalFx && palfx != null) {
+            float mulA = palfx.getMul() != null ? palfx.getMul().getA() / 255f : 0.15f;
+            if (mulA < 0.08f) {
+                mulA = 0.08f;
+            }
+            if (mulA > 0.55f) {
+                mulA = 0.55f;
+            }
+            sprite.setColor(0f, 0f, 0f, currentAlpha * drawProperties.getAlpha() * mulA);
+        }
+
         sprite.draw(batch);
 
         if (usedPalFx && ps != null) {
