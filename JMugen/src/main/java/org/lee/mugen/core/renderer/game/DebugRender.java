@@ -186,7 +186,7 @@ public class DebugRender implements Renderable {
 			FontProducer fp = FontParser.getFontProducer();
 			int x = 10;
 			int y = 50;
-			fp.draw(0, x, y+=fp.getSize().y*2,GraphicsWrapper.getInstance(),"F1         : Display Help");
+			fp.draw(0, x, y+=fp.getSize().y*2,GraphicsWrapper.getInstance(),"F1 / Ctrl-H : Display Help");
 			fp.draw(0, x, y+=fp.getSize().y, GraphicsWrapper.getInstance(), "CTRL '+/-' : +/- FPS");
 			fp.draw(0, x, y+=fp.getSize().y, GraphicsWrapper.getInstance(), "CTRL '*'   : Reset FPS");
 			fp.draw(0, x, y+=fp.getSize().y, GraphicsWrapper.getInstance(), "Space      : Init");

@@ -346,14 +346,17 @@ public class LGDXAndroidGameWindow implements GameWindow, ApplicationListener, L
             worldProjectionSnapshot.set(camera.combined);
             batchTransformIdentity.idt();
             batch.setTransformMatrix(batchTransformIdentity);
-            batch.begin();
-            try {
-                callback.render();
-            } finally {
-                if (batch.isDrawing()) {
-                    batch.end();
+                batch.begin();
+                try {
+                    callback.render();
+                    if (callback instanceof AbstractGameFight) {
+                        ((AbstractGameFight) callback).renderDebugInfo();
+                    }
+                } finally {
+                    if (batch.isDrawing()) {
+                        batch.end();
+                    }
                 }
-            }
         } catch (Exception e) {
             Gdx.app.error("JMugenAndroid", "Error updating Android game", e);
         }

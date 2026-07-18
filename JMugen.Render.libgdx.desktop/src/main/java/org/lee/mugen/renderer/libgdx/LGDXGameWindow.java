@@ -21,16 +21,15 @@ import org.lee.mugen.input.CmdProcDispatcher;
 import org.lee.mugen.input.ISpriteCmdProcess;
 import org.lee.mugen.renderer.GameWindow;
 import org.lee.mugen.renderer.MugenTimer;
+import org.lee.mugen.renderer.libgdx.core.GDXKeyMapper;
 import org.lee.mugen.renderer.libgdx.core.LGDXAudioPlayback;
 import org.lee.mugen.renderer.libgdx.core.LGDXImageLoader;
 import org.lee.mugen.renderer.libgdx.core.LGDXPalFxShader;
 import org.lee.mugen.util.Logger;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.ResourceBundle;
 
 /**
@@ -39,53 +38,69 @@ import java.util.ResourceBundle;
 public class LGDXGameWindow implements GameWindow, ApplicationListener, org.lee.mugen.renderer.libgdx.core.LGDXRenderContext {
 
     private class DebugEventManager {
-        private final Map<DebugAction, int[]> actionKeyMap = new HashMap<>();
-        private final Map<DebugAction, Boolean> actionPressMap = new HashMap<>();
+        private final class Chord {
+            final DebugAction action;
+            final int[] keys;
+            final boolean allowRepeat;
+            boolean pressed;
 
-        DebugEventManager() {
-            addAction(DebugAction.SWITCH_PLAYER_DEBUG_INFO, new int[]{org.lee.mugen.renderer.libgdx.core.GDXKeyMapper.KEY_LCONTROL, org.lee.mugen.renderer.libgdx.core.GDXKeyMapper.KEY_D});
-            addAction(DebugAction.EXPLOD_DEBUG_INFO, new int[]{org.lee.mugen.renderer.libgdx.core.GDXKeyMapper.KEY_LCONTROL, org.lee.mugen.renderer.libgdx.core.GDXKeyMapper.KEY_E});
-            addAction(DebugAction.INIT_PLAYER, new int[]{org.lee.mugen.renderer.libgdx.core.GDXKeyMapper.KEY_SPACE});
-            addAction(DebugAction.SHOW_HIDE_CNS, new int[]{org.lee.mugen.renderer.libgdx.core.GDXKeyMapper.KEY_LCONTROL, org.lee.mugen.renderer.libgdx.core.GDXKeyMapper.KEY_C});
-            addAction(DebugAction.SHOW_HIDE_ATTACK_CNS, new int[]{org.lee.mugen.renderer.libgdx.core.GDXKeyMapper.KEY_LCONTROL, org.lee.mugen.renderer.libgdx.core.GDXKeyMapper.KEY_X});
-            addAction(DebugAction.INCREASE_FPS, new int[]{org.lee.mugen.renderer.libgdx.core.GDXKeyMapper.KEY_LCONTROL, org.lee.mugen.renderer.libgdx.core.GDXKeyMapper.KEY_ADD}, true);
-            addAction(DebugAction.DECREASE_FPS, new int[]{org.lee.mugen.renderer.libgdx.core.GDXKeyMapper.KEY_LCONTROL, org.lee.mugen.renderer.libgdx.core.GDXKeyMapper.KEY_SUBTRACT}, true);
-            addAction(DebugAction.RESET_FPS, new int[]{org.lee.mugen.renderer.libgdx.core.GDXKeyMapper.KEY_LCONTROL, org.lee.mugen.renderer.libgdx.core.GDXKeyMapper.KEY_MULTIPLY});
-            addAction(DebugAction.DEBUG_PAUSE, new int[]{org.lee.mugen.renderer.libgdx.core.GDXKeyMapper.KEY_LCONTROL, org.lee.mugen.renderer.libgdx.core.GDXKeyMapper.KEY_P});
-            addAction(DebugAction.PAUSE_PLUS_ONE_FRAME, new int[]{org.lee.mugen.renderer.libgdx.core.GDXKeyMapper.KEY_LCONTROL, org.lee.mugen.renderer.libgdx.core.GDXKeyMapper.KEY_A});
-            addAction(DebugAction.DISPLAY_HELP, new int[]{org.lee.mugen.renderer.libgdx.core.GDXKeyMapper.KEY_F1});
-        }
-
-        private void addAction(DebugAction action, int[] keys) {
-            addAction(action, keys, false);
-        }
-
-        private void addAction(DebugAction action, int[] keys, boolean isAllowKeyRepeat) {
-            actionKeyMap.put(action, keys);
-            if (!isAllowKeyRepeat) {
-                actionPressMap.put(action, false);
+            Chord(DebugAction action, int[] keys, boolean allowRepeat) {
+                this.action = action;
+                this.keys = keys;
+                this.allowRepeat = allowRepeat;
             }
         }
 
+        private final List<Chord> chords = new ArrayList<>();
+
+        DebugEventManager() {
+            add(DebugAction.SWITCH_PLAYER_DEBUG_INFO, GDXKeyMapper.KEY_LCONTROL, GDXKeyMapper.KEY_D);
+            add(DebugAction.EXPLOD_DEBUG_INFO, GDXKeyMapper.KEY_LCONTROL, GDXKeyMapper.KEY_E);
+            add(DebugAction.INIT_PLAYER, GDXKeyMapper.KEY_SPACE);
+            add(DebugAction.SHOW_HIDE_CNS, GDXKeyMapper.KEY_LCONTROL, GDXKeyMapper.KEY_C);
+            add(DebugAction.SHOW_HIDE_ATTACK_CNS, GDXKeyMapper.KEY_LCONTROL, GDXKeyMapper.KEY_X);
+            addRepeat(DebugAction.INCREASE_FPS, GDXKeyMapper.KEY_LCONTROL, GDXKeyMapper.KEY_ADD);
+            addRepeat(DebugAction.DECREASE_FPS, GDXKeyMapper.KEY_LCONTROL, GDXKeyMapper.KEY_SUBTRACT);
+            add(DebugAction.RESET_FPS, GDXKeyMapper.KEY_LCONTROL, GDXKeyMapper.KEY_MULTIPLY);
+            add(DebugAction.DEBUG_PAUSE, GDXKeyMapper.KEY_LCONTROL, GDXKeyMapper.KEY_P);
+            add(DebugAction.PAUSE_PLUS_ONE_FRAME, GDXKeyMapper.KEY_LCONTROL, GDXKeyMapper.KEY_A);
+            add(DebugAction.DISPLAY_HELP, GDXKeyMapper.KEY_F1);
+            // macOS: F-keys often need Fn; Ctrl+H is a reliable alternate.
+            add(DebugAction.DISPLAY_HELP, GDXKeyMapper.KEY_LCONTROL, GDXKeyMapper.KEY_H);
+        }
+
+        private void add(DebugAction action, int... keys) {
+            chords.add(new Chord(action, keys, false));
+        }
+
+        private void addRepeat(DebugAction action, int... keys) {
+            chords.add(new Chord(action, keys, true));
+        }
+
         public void process(Game cb) {
-            for (DebugAction action : actionKeyMap.keySet()) {
-                boolean isAllKeyOk = true;
-                for (int key : actionKeyMap.get(action)) {
-                    isAllKeyOk = isAllKeyOk && isKeyDown(key);
+            if (!(cb instanceof AbstractGameFight)) {
+                return;
+            }
+            AbstractGameFight fight = (AbstractGameFight) cb;
+            for (Chord chord : chords) {
+                boolean all = true;
+                for (int key : chord.keys) {
+                    if (!isKeyDown(key)) {
+                        all = false;
+                        break;
+                    }
                 }
-                if (isAllKeyOk && actionPressMap.get(action) == null) {
-                    if (cb instanceof AbstractGameFight) {
-                        ((AbstractGameFight) cb).onDebugAction(action);
+                if (chord.allowRepeat) {
+                    if (all) {
+                        fight.onDebugAction(chord.action);
                     }
                     continue;
                 }
-                if (isAllKeyOk) {
-                    actionPressMap.put(action, true);
-                } else if (Boolean.TRUE.equals(actionPressMap.get(action))) {
-                    actionPressMap.put(action, false);
-                    if (cb instanceof AbstractGameFight) {
-                        ((AbstractGameFight) cb).onDebugAction(action);
-                    }
+                if (all) {
+                    chord.pressed = true;
+                } else if (chord.pressed) {
+                    chord.pressed = false;
+                    fight.onDebugAction(chord.action);
                 }
             }
         }
@@ -369,6 +384,9 @@ public class LGDXGameWindow implements GameWindow, ApplicationListener, org.lee.
                 batch.begin();
                 try {
                     callback.render();
+                    if (callback instanceof AbstractGameFight) {
+                        ((AbstractGameFight) callback).renderDebugInfo();
+                    }
                 } finally {
                     if (batch.isDrawing()) {
                         batch.end();
