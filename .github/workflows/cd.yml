@@ -10,17 +10,18 @@ defaults:
   run:
     shell: bash
 
-# required for upload
 permissions:
   contents: write
 
+env:
+  MAIN_CLASS: org.lee.mugen.renderer.libgdx.LGDXDesktopMain
+  # Skip Android/Web in the desktop job; each has its own job.
+  MVN_DESKTOP: mvn -DskipTests -pl '!JMugen.Render.libgdx.android,!JMugen.Render.libgdx.web'
+
 jobs:
 
-  Linux:
-    runs-on: ${{ matrix.runner }}
-    strategy:
-      matrix:
-        runner: [ ubuntu-24.04, ubuntu-24.04-arm ]
+  Desktop:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
 
@@ -28,45 +29,24 @@ jobs:
         uses: actions/cache@v5
         with:
           path: ~/.m2/repository
-          key: maven-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/pom.xml') }}
+          key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
-            maven-${{ runner.os }}-${{ runner.arch }}-
+            maven-${{ runner.os }}-
 
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
-          distribution: 'corretto'
+          distribution: corretto
           java-version: '8'
 
-      - name: Package jar
-        run: mvn package
-
-      - name: jpackage app-image
-        run: |
-          make dist
-
-#      - name: Download and install AppImageTool
-#        run: |
-#          curl -LO "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-${{ runner.arch }}.AppImage"
-#          chmod +x "appimagetool-${{ runner.arch }}.AppImage"
-#          sudo mv "appimagetool-${{ runner.arch }}.AppImage" /usr/local/bin/appimagetool
-
-#      - name: AppImage
-#        run: |
-#          appimagetool dist/jmugen*
-#          mv dist/*.AppImage jmugen-${{ env.GITHUB_REF_NAME }}.AppImage
+      - name: Package LibGDX desktop jar
+        run: ${{ env.MVN_DESKTOP }} -Dmain.class=${{ env.MAIN_CLASS }} package
 
       - name: Prepare release
         run: |
-          pwd
-          
-          # data
           zip -9 -r data.zip data
-
-          # jar
-          cp JMugen.Debug/target/JMugen.Debug-0.0.1-SNAPSHOT.jar jmugen-${GITHUB_REF_NAME}.jar 
-
-          ls -lha
+          cp JMugen.Debug/target/JMugen.Debug-0.0.1-SNAPSHOT.jar "jmugen-${GITHUB_REF_NAME}-libgdx.jar"
+          ls -lha jmugen-*-libgdx.jar data.zip
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -75,14 +55,10 @@ jobs:
         with:
           files: |
             data.zip
-            jmugen-*.jar
-            jmugen-*.tar.gz
+            jmugen-*-libgdx.jar
 
-  macOS:
-    runs-on: ${{ matrix.runner }}
-    strategy:
-      matrix:
-        runner: [ macos-latest, macos-15-intel ]
+  Web:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
 
@@ -90,22 +66,25 @@ jobs:
         uses: actions/cache@v5
         with:
           path: ~/.m2/repository
-          key: maven-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/pom.xml') }}
+          key: maven-web-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
-            maven-${{ runner.os }}-${{ runner.arch }}-
+            maven-web-${{ runner.os }}-
 
-      - name: Set up JDK
+      - name: Set up JDK 8
         uses: actions/setup-java@v5
         with:
-          distribution: 'corretto'
+          distribution: corretto
           java-version: '8'
 
-      - name: Package jar
-        run: mvn package
-
-      - name: jpackage app-image
+      - name: Package LibGDX web
         run: |
-          make dist
+          mvn install -DskipTests -pl '!JMugen.Render.libgdx.android'
+          mvn -pl JMugen.Render.libgdx.web -am package -DskipTests
+          mvn -pl JMugen.Render.libgdx.web -rf :JMugen.Render.libgdx.web gwt:compile
+          cp JMugen.Render.libgdx.web/src/main/webapp/index.html JMugen.Render.libgdx.web/target/webapp/index.html
+          cp -r JMugen.Render.libgdx.web/src/main/webapp/assets JMugen.Render.libgdx.web/target/webapp/
+          (cd JMugen.Render.libgdx.web/target/webapp && zip -9 -r "../../../jmugen-${GITHUB_REF_NAME}-libgdx-web.zip" .)
+          ls -lha jmugen-*-libgdx-web.zip
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -113,17 +92,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           files: |
-            jmugen-*.tar.gz
+            jmugen-*-libgdx-web.zip
 
-
-  Windows:
-    runs-on: ${{ matrix.runner }}
-    strategy:
-      matrix:
-        runner: [ windows-latest, windows-11-arm ]
-    defaults:
-      run:
-        shell: cmd
+  Android:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
 
@@ -131,39 +103,51 @@ jobs:
         uses: actions/cache@v5
         with:
           path: ~/.m2/repository
-          key: maven-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/pom.xml') }}
+          key: maven-android-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
-            maven-${{ runner.os }}-${{ runner.arch }}-
+            maven-android-${{ runner.os }}-
 
-      - name: Set up JDK
+      - name: Set up JDK 17
         uses: actions/setup-java@v5
         with:
-          distribution: 'zulu'
+          distribution: corretto
+          java-version: '17'
+
+      - name: Install Android SDK
+        run: |
+          mkdir -p $HOME/android-sdk/cmdline-tools
+          cd $HOME/android-sdk/cmdline-tools
+          curl -o sdk.zip https://dl.google.com/android/repository/commandlinetools-linux-13114758_latest.zip
+          unzip -q sdk.zip
+          mv cmdline-tools latest
+          export ANDROID_HOME=$HOME/android-sdk
+          export ANDROID_SDK_ROOT=$ANDROID_HOME
+          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager \
+            "platforms;android-34" \
+            "build-tools;28.0.3" \
+            "platform-tools"
+          cd $ANDROID_HOME
+          curl -L -o tools.zip https://dl.google.com/android/repository/tools_r25.2.5-linux.zip
+          unzip -q tools.zip
+
+      - name: Set up JDK 8
+        uses: actions/setup-java@v5
+        with:
+          distribution: corretto
           java-version: '8'
 
-      - name: Package jar
-        run: mvn package
-
-      - name: jpackage app-image
+      - name: Package LibGDX Android APK
+        env:
+          ANDROID_HOME: /home/runner/android-sdk
+          ANDROID_SDK_ROOT: /home/runner/android-sdk
         run: |
-          jpackage --version
-          
-          mkdir tmp
-          copy JMugen.Debug\target\JMugen.Debug-0.0.1-SNAPSHOT.jar tmp\jmugen.jar
-          
-          jpackage --input tmp ^
-          --name jmugen-%GITHUB_REF_NAME% ^
-          --main-jar jmugen.jar ^
-          --type app-image ^
-          --java-options "--add-opens java.desktop/sun.awt=ALL-UNNAMED" ^
-          --dest dist/
-          
-          rmdir /s /q tmp
-
-      - name: Prepare release
-        run: |
-          powershell Copy-Item -Path release/win/* -Destination dist/ -Recurse
-          powershell Compress-Archive -Path "dist/*" -DestinationPath "jmugen-%GITHUB_REF_NAME%-${{ runner.os }}-${{ runner.arch }}.zip"
+          mvn -DskipTests -pl JMugen.Render.libgdx.android -am package
+          APK=$(find JMugen.Render.libgdx.android/target -name '*.apk' | head -1)
+          test -n "$APK"
+          cp "$APK" "jmugen-${GITHUB_REF_NAME}-libgdx-android.apk"
+          ls -lha jmugen-*-android.apk
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -171,4 +155,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           files: |
-            jmugen-*.zip
+            jmugen-*-libgdx-android.apk
