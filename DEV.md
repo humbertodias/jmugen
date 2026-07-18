@@ -1,65 +1,82 @@
-
 # JMugen Development Guide
 
 ## Requirements
 
-Before starting, make sure you have the following installed:
-
-- [SDKMAN](https://sdkman.io/install)
-- Java 17 or higher
+- [SDKMAN](https://sdkman.io/install) (optional but convenient)
+- **JDK 8** for GWT / web (`gwt:compile`, `gwt:run`, gh-pages)
+- **JDK 17+** is fine for desktop / Android LibGDX builds when not compiling GWT
 - Maven 3.6.3 or higher
 
-### Installation Steps
-
-1. Install Java and Maven using SDKMAN:
+### SDKMAN example
 
 ```sh
-sdk install java 17.0.14-amzn
-sdk install maven 3.6.3
+sdk install java 8.0.472-amzn   # web / GWT
+sdk install java 17.0.14-amzn  # desktop / Android if preferred
+sdk install maven 3.9.9
 ```
 
-2. Switch to the correct Java and Maven versions:
+## Project layout (LibGDX)
+
+```text
+JMugen/  JMugen.Common/  JMugen.Properties/  JMugen.plugin.audio.adx/
+JMugen.Render.libgdx/{core,desktop,android,web}
+tools/{JMugen.Debug,JMugen.Launcher,Syntax}
+data/
+```
+
+Always run Maven from the **repo root** so `-am` / `-rf` and `data/` paths resolve correctly.
+
+## Desktop
 
 ```sh
-sdk use java 17.0.14-amzn
-sdk use maven 3.6.3
+mvn -pl JMugen.Render.libgdx/desktop -am compile -DskipTests
+mvn -pl JMugen.Render.libgdx/desktop -rf :JMugen.Render.libgdx.desktop exec:exec
 ```
 
-## Running the Project
+- Prefer **`exec:exec`** over `exec:java` (macOS needs a forked JVM with `-XstartOnFirstThread`).
+- Working directory should be the repo root so `./data/...` is found.
+- More detail: [JMugen.Render.libgdx/desktop/README.md](./JMugen.Render.libgdx/desktop/README.md).
 
-To compile and run the project, follow these steps:
+### IDE
 
-1. Build the project with Maven:
+- Main: `org.lee.mugen.renderer.libgdx.LGDXDesktopMain`
+- macOS VM option: `-XstartOnFirstThread`
+- Working directory: repository root (or `-Djmugen.resource=…/data/`)
+
+### Debug help (in fight)
+
+- `F1` (on macOS often `Fn`+`F1`)
+- or `Ctrl`+`H`
+
+## Web (GWT)
 
 ```sh
-mvn package
+mvn -pl JMugen.Render.libgdx/web -am package -DskipTests
+mvn -pl JMugen.Render.libgdx/web -rf :JMugen.Render.libgdx.web gwt:run
 ```
 
-2. Run the application with the following command:
+Open http://127.0.0.1:8888/index.html
+
+- Shared GWT sources: `JMugen/…/JMugen.gwt.xml`
+- Browser-only code: `JMugen.Render.libgdx/web` → `JMugenWebClient.gwt.xml` + `org/lee/mugen/gwt/` + `Gwt*.java`
+- Full guide: [JMugen.Render.libgdx/web/README.md](./JMugen.Render.libgdx/web/README.md)
+
+### Force GWT recompile
 
 ```sh
-java $JAVA_OPTS -cp JMugen.Debug/target/JMugen.Debug-0.0.1-SNAPSHOT.jar org.lee.mugen.test.TestGameFight
+mvn -pl JMugen.Render.libgdx/web -rf :JMugen.Render.libgdx.web gwt:compile -Dgwt.compiler.force=true
 ```
 
-## Debugging
+## Android
 
-To debug the project, use the following Java options:
+See `JMugen.Render.libgdx/android` and its asset sync scripts. Build from the repo root with the Android module in the reactor (CI excludes it when needed).
 
-```properties
-JAVA_OPTS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=0.0.0.0:5005"
-```
+## Legacy modules
 
-
-## Release version
-
-```shell
-mvn package
-java $JAVA_OPTS -jar JMugen.Launcher/target/JMugen.Launcher-0.0.1-SNAPSHOT.jar
-```
+`tools/JMugen.Launcher` / `tools/JMugen.Debug` may still exist for older flows. The supported LibGDX path is **desktop / Android / web** above.
 
 ## References
 
-- [Download JMugen 0.2 Alpha](https://sourceforge.net/projects/mugen-net/files/)
-- [Mugen Engine Wikipedia](https://en.wikipedia.org/wiki/Mugen_(game_engine))
+- [Mugen Engine (Wikipedia)](https://en.wikipedia.org/wiki/Mugen_(game_engine))
 - [Google Code Archive: JMugen](https://code.google.com/archive/p/jmugen/)
 - [JMugen Live Debug and Expression Watch (YouTube)](https://www.youtube.com/watch?v=6uVFrC91OU8)

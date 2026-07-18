@@ -16,7 +16,7 @@ permissions:
 env:
   MAIN_CLASS: org.lee.mugen.renderer.libgdx.LGDXDesktopMain
   # Skip Android/Web in the desktop job; each has its own job.
-  MVN_DESKTOP: mvn -DskipTests -pl '!JMugen.Render.libgdx.android,!JMugen.Render.libgdx.web'
+  MVN_DESKTOP: mvn -DskipTests -pl '!JMugen.Render.libgdx/android,!JMugen.Render.libgdx/web'
 
 jobs:
 
@@ -45,7 +45,7 @@ jobs:
       - name: Prepare release
         run: |
           zip -9 -r data.zip data
-          cp JMugen.Debug/target/JMugen.Debug-0.0.1-SNAPSHOT.jar "jmugen-${GITHUB_REF_NAME}-libgdx.jar"
+          cp tools/JMugen.Debug/target/JMugen.Debug-0.0.1-SNAPSHOT.jar "jmugen-${GITHUB_REF_NAME}-libgdx.jar"
           ls -lha jmugen-*-libgdx.jar data.zip
 
       - name: Create GitHub Release
@@ -78,12 +78,12 @@ jobs:
 
       - name: Package LibGDX web
         run: |
-          mvn install -DskipTests -pl '!JMugen.Render.libgdx.android'
-          mvn -pl JMugen.Render.libgdx.web -am package -DskipTests
-          mvn -pl JMugen.Render.libgdx.web -rf :JMugen.Render.libgdx.web gwt:compile
-          cp JMugen.Render.libgdx.web/src/main/webapp/index.html JMugen.Render.libgdx.web/target/webapp/index.html
-          cp -r JMugen.Render.libgdx.web/src/main/webapp/assets JMugen.Render.libgdx.web/target/webapp/
-          (cd JMugen.Render.libgdx.web/target/webapp && zip -9 -r "../../../jmugen-${GITHUB_REF_NAME}-libgdx-web.zip" .)
+          mvn install -DskipTests -pl '!JMugen.Render.libgdx/android'
+          mvn -pl JMugen.Render.libgdx/web -am package -DskipTests
+          mvn -pl JMugen.Render.libgdx/web -rf :JMugen.Render.libgdx.web gwt:compile
+          cp JMugen.Render.libgdx/web/src/main/webapp/index.html JMugen.Render.libgdx/web/target/webapp/index.html
+          cp -r JMugen.Render.libgdx/web/src/main/webapp/assets JMugen.Render.libgdx/web/target/webapp/
+          (cd JMugen.Render.libgdx/web/target/webapp && zip -9 -r "../../../../jmugen-${GITHUB_REF_NAME}-libgdx-web.zip" .)
           ls -lha jmugen-*-libgdx-web.zip
 
       - name: Create GitHub Release
@@ -143,8 +143,8 @@ jobs:
           ANDROID_HOME: /home/runner/android-sdk
           ANDROID_SDK_ROOT: /home/runner/android-sdk
         run: |
-          mvn -DskipTests -pl JMugen.Render.libgdx.android -am package
-          APK=$(find JMugen.Render.libgdx.android/target -name '*.apk' | head -1)
+          mvn -DskipTests -pl JMugen.Render.libgdx/android -am package
+          APK=$(find JMugen.Render.libgdx/android/target -name '*.apk' | head -1)
           test -n "$APK"
           cp "$APK" "jmugen-${GITHUB_REF_NAME}-libgdx-android.apk"
           ls -lha jmugen-*-android.apk

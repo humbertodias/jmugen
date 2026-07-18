@@ -34,20 +34,20 @@ jobs:
 
       - name: Build WebAssembly
         run: |
-              mvn install -DskipTests -pl '!JMugen.Render.libgdx.android'
+              mvn install -DskipTests -pl '!JMugen.Render.libgdx/android'
           
-              mvn -pl JMugen.Render.libgdx.web -am package
-              mvn -pl JMugen.Render.libgdx.web -rf :JMugen.Render.libgdx.web gwt:compile
+              mvn -pl JMugen.Render.libgdx/web -am package
+              mvn -pl JMugen.Render.libgdx/web -rf :JMugen.Render.libgdx.web gwt:compile
               
-              cp JMugen.Render.libgdx.web/src/main/webapp/index.html JMugen.Render.libgdx.web/target/webapp/index.html
-              cp -r JMugen.Render.libgdx.web/src/main/webapp/assets JMugen.Render.libgdx.web/target/webapp/
+              cp JMugen.Render.libgdx/web/src/main/webapp/index.html JMugen.Render.libgdx/web/target/webapp/index.html
+              cp -r JMugen.Render.libgdx/web/src/main/webapp/assets JMugen.Render.libgdx/web/target/webapp/
 
       - name: Upload site artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          path: JMugen.Render.libgdx.web/target/webapp/
+          path: JMugen.Render.libgdx/web/target/webapp/
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: JMugen.Render.libgdx.web/target/webapp/
+          folder: JMugen.Render.libgdx/web/target/webapp/

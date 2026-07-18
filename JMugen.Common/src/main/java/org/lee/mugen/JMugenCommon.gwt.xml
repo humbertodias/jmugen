@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Shared GWT-translatable types only. Browser FQN overrides live in JMugen.Render.libgdx/web. -->
 <module>
-    <super-source path="gwt"/>
-
     <source path="geom">
         <include name="MugenPoint.java"/>
         <include name="MugenRect.java"/>

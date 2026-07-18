@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -18,24 +19,20 @@
     </properties>
 
     <modules>
-        <module>JMugen.Debug</module>
-        <module>JMugen.Common</module>
-        <module>JMugen.Launcher</module>
-        <module>JMugen.plugin.audio.adx</module>
+        <!-- Engine -->
         <module>JMugen.Properties</module>
-        <module>JMugen.Render.libgdx.core</module>
-        <module>JMugen.Render.libgdx.desktop</module>
-        <module>JMugen.Render.libgdx.android</module>
-        <module>JMugen.Render.libgdx.web</module>
+        <module>JMugen.Common</module>
+        <module>JMugen.plugin.audio.adx</module>
         <module>JMugen</module>
-        <module>Syntax</module>
+        <!-- LibGDX (core / desktop / android / web) -->
+        <module>JMugen.Render.libgdx</module>
+        <!-- Optional tooling -->
+        <module>tools</module>
     </modules>
 
     <build>
-        <!-- global -->
         <pluginManagement>
             <plugins>
-                <!-- Version only; each module supplies its own configuration. -->
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>gwt-maven-plugin</artifactId>
