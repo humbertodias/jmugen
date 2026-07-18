@@ -24,6 +24,7 @@
     </source>
     <source path="core/sound">
         <include name="AudioPlayback.java"/>
+        <include name="AudioPlaybacks.java"/>
     </source>
     <source path="io">
         <include name="MugenDataStreams.java"/>

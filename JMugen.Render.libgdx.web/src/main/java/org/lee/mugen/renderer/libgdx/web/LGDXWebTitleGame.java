@@ -8,7 +8,8 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import org.lee.mugen.core.Game;
-import org.lee.mugen.core.sound.SoundSystem;
+import org.lee.mugen.core.sound.AudioPlayback;
+import org.lee.mugen.core.sound.AudioPlaybacks;
 import org.lee.mugen.io.MugenDataStreams;
 import org.lee.mugen.renderer.GameWindow;
 
@@ -31,7 +32,10 @@ public class LGDXWebTitleGame implements Game {
         drawer = LibGDXWebRendererFactory.getDrawer();
         loadSystemDef();
         if (titleBgm != null && !titleBgm.isEmpty()) {
-            SoundSystem.SoundBackGround.playMusic(LGDXWebPlatform.DATA_PREFIX + titleBgm);
+            AudioPlayback playback = AudioPlaybacks.get();
+            if (playback != null) {
+                playback.playMusic(LGDXWebPlatform.DATA_PREFIX + titleBgm);
+            }
         }
     }
 
@@ -89,7 +93,10 @@ public class LGDXWebTitleGame implements Game {
 
     @Override
     public void free() {
-        SoundSystem.SoundBackGround.stopMusic();
+        AudioPlayback playback = AudioPlaybacks.get();
+        if (playback != null) {
+            playback.stopMusic();
+        }
     }
 
     private void loadSystemDef() throws IOException {

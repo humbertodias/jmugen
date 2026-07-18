@@ -6,7 +6,7 @@ import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
 import org.lee.mugen.core.GameMenu;
 
 /**
- * GWT entry point: same {@link GameMenu} flow as {@link org.lee.mugen.renderer.libgdx.android.AndroidLauncher}.
+ * GWT entry point: same {@link GameMenu} flow as Android / desktop LibGDX.
  */
 public class LGDXWebApplication extends GwtApplication {
 

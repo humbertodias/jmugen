@@ -96,9 +96,9 @@ http://127.0.0.1:9876/
 
 ## Current state
 
-`LGDXWebApplication` runs **`LGDXWebSmokeGame`** (drawer + cena de teste). **`GameMenu`** (jogo completo) ainda **não compila no GWT**: o módulo `JMugen` falha com centenas de erros (`FileInputStream`, `clone()`, classes fora do `JMugenCommon.gwt.xml`, etc.). Quando `org.lee.mugen.JMugen` estiver limpo para GWT, descomenta `<inherits name="org.lee.mugen.JMugen"/>` em `JMugenWeb.gwt.xml`, repõe as dependências `JMugen` no `pom.xml` e troca o callback para `GameMenu.getInstance()`.
+`LGDXWebApplication` runs **`GameMenu`** (menu + select + fight via GWT supersources under `JMugen/.../gwt/`).
 
-`LGDXWebPlatform` (dados Gdx, `MugenDataStreams`, drawer) fica pronto para esse passo. Os ficheiros do jogo copiam-se de `../data` para `target/gdx-assets/data/` no `package`.
+`LGDXWebPlatform` (dados Gdx, `MugenDataStreams`, drawer) prepara o ambiente antes do callback.
 
 
 Dist

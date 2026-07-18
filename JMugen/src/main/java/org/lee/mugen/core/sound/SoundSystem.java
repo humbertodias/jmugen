@@ -27,11 +27,9 @@ import org.lee.mugen.util.Logger;
  */
 public final class SoundSystem {
 
-	private static volatile AudioPlayback audioPlayback;
-
 	public static void installAudioPlayback(AudioPlayback playback) {
-		AudioPlayback old = audioPlayback;
-		audioPlayback = playback;
+		AudioPlayback old = AudioPlaybacks.get();
+		AudioPlaybacks.install(playback);
 		if (old != null && old != playback) {
 			try {
 				old.shutdown();
@@ -42,7 +40,7 @@ public final class SoundSystem {
 	}
 
 	public static AudioPlayback getAudioPlayback() {
-		return audioPlayback;
+		return AudioPlaybacks.get();
 	}
 
 	/**

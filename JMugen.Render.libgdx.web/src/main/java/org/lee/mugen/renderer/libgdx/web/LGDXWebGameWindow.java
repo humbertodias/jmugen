@@ -21,7 +21,7 @@ import org.lee.mugen.core.AbstractGameFight;
 import org.lee.mugen.core.AbstractGameFight.DebugAction;
 import org.lee.mugen.core.Game;
 import org.lee.mugen.core.sound.AudioPlayback;
-import org.lee.mugen.core.sound.SoundSystem;
+import org.lee.mugen.core.sound.AudioPlaybacks;
 import org.lee.mugen.input.CmdProcDispatcher;
 import org.lee.mugen.input.ISpriteCmdProcess;
 import org.lee.mugen.renderer.GameWindow;
@@ -218,7 +218,7 @@ public class LGDXWebGameWindow implements GameWindow, ApplicationListener, LGDXR
         batch.setProjectionMatrix(camera.combined);
         worldProjectionSnapshot.set(camera.combined);
 
-        SoundSystem.installAudioPlayback(new LGDXWebAudioPlayback());
+        AudioPlaybacks.install(new LGDXWebAudioPlayback());
         initKeys();
 
         if (callback == null) {
@@ -375,7 +375,7 @@ public class LGDXWebGameWindow implements GameWindow, ApplicationListener, LGDXR
      * Browsers block Music/SFX until a user gesture. Unlock on first key or pointer press.
      */
     private void unlockAudioIfNeeded() {
-        AudioPlayback playback = SoundSystem.getAudioPlayback();
+        AudioPlayback playback = AudioPlaybacks.get();
         if (!(playback instanceof LGDXWebAudioPlayback)) {
             return;
         }
@@ -457,6 +457,14 @@ public class LGDXWebGameWindow implements GameWindow, ApplicationListener, LGDXR
 
     @Override
     public void dispose() {
+        AudioPlayback playback = AudioPlaybacks.get();
+        if (playback != null) {
+            try {
+                playback.shutdown();
+            } catch (Exception ignored) {
+            }
+            AudioPlaybacks.install(null);
+        }
         if (batch != null) {
             batch.dispose();
             batch = null;
