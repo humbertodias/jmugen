@@ -112,6 +112,18 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <!-- Super-source only for GWT; same FQN as JVM types. -->
+                        <exclude>**/gwt/**</exclude>
+                        <!-- Web engine types; compiled by GWT against super-source, not javac. -->
+                        <exclude>**/Gwt*.java</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>3.3.1</version>
                 <executions>

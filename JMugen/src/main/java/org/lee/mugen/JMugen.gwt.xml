@@ -1,39 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Shared GWT-translatable engine sources (no browser-only Gwt* / super-source).
+  Web entry inherits org.lee.mugen.JMugenWebClient for overrides + Gwt* implementations.
+-->
 <module>
     <inherits name="org.lee.mugen.JMugenCommon"/>
     <inherits name="org.lee.mugen.JMugenProperties"/>
 
-    <super-source path="gwt"/>
-
     <source path="core">
         <include name="GameMenu.java"/>
-        <include name="GwtGameFight.java"/>
-    </source>
-    <source path="fight">
-        <include name="GwtFightHud.java"/>
-        <include name="GwtFightHudParser.java"/>
-        <include name="GwtFightSprRoot.java"/>
-        <include name="GwtFightFighterAnim.java"/>
-        <include name="GwtFightPlayer.java"/>
-        <include name="GwtFightCmdProcess.java"/>
-        <include name="GwtCmdLoader.java"/>
-        <include name="GwtCnsData.java"/>
-        <include name="GwtCnsLoader.java"/>
-        <include name="GwtCnsRuntime.java"/>
-        <include name="GwtStageFightInfo.java"/>
-        <include name="GwtFightRules.java"/>
-        <include name="GwtFightAudio.java"/>
-        <include name="GwtFightHitbox.java"/>
-        <include name="GwtFightPush.java"/>
-    </source>
-    <source path="core/gameSelect">
-        <include name="GwtGameVsScreen.java"/>
-    </source>
-    <source path="core/renderer/game">
-        <include name="GwtStageBackgroundRender.java"/>
-    </source>
-    <source path="core/renderer/game/vsScreen">
-        <include name="GwtVsScreenRender.java"/>
     </source>
     <source path="core/renderer/game/system">
         <include name="TitleInfoRender.java"/>
@@ -41,9 +16,6 @@
     </source>
     <source path="core/renderer/game/fight">
         <include name="BaseRender.java"/>
-    </source>
-    <source path="core/renderer/game/select">
-        <include name="GwtSelectRender.java"/>
     </source>
     <source path="fight/section/elem">
         <include name="FontType.java"/>
@@ -64,7 +36,6 @@
         <include name="PlayerCursor.java"/>
         <include name="Stage.java"/>
         <include name="StageDisplay.java"/>
-        <include name="GwtPlayerVsScreen.java"/>
     </source>
     <source path="background">
         <include name="Background.java"/>
@@ -185,12 +156,13 @@
         <exclude name="background/bgCtrlFunction/**"/>
         <exclude name="sprite/cns/eval/function/SpriteCnsFunctionDef.java"/>
         <exclude name="fight/intro/**"/>
-        <exclude name="fight/select/**"/>
+        <exclude name="fight/select/Select.java"/>
+        <exclude name="fight/select/Characters.java"/>
+        <exclude name="fight/select/ExtraStages.java"/>
+        <exclude name="fight/select/Options.java"/>
         <exclude name="lang/**"/>
-        <exclude name="core/gameSelect/**"/>
+        <exclude name="core/gameSelect/SelectionController.java"/>
         <exclude name="core/physics/**"/>
-        <exclude name="core/renderer/game/select/**"/>
-        <exclude name="core/renderer/game/vsScreen/**"/>
         <exclude name="ExternalBundleControl.java"/>
     </source>
 </module>

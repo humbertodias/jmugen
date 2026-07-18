@@ -55,6 +55,7 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
           <excludes>
+            <!-- Legacy unused path if present; browser overrides live in JMugen.Render.libgdx.web. -->
             <exclude>**/gwt/**</exclude>
           </excludes>
         </configuration>
@@ -97,7 +98,6 @@
             <additionalSource>srcSystem</additionalSource>
             <additionalSource>srcSelect</additionalSource>
             <additionalSource>srcStage</additionalSource>
-            <additionalSource>src/main/java/org/lee/mugen/gwt</additionalSource>
           </additionalSources>
         </configuration>
         <executions>

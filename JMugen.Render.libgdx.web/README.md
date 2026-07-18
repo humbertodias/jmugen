@@ -96,9 +96,14 @@ http://127.0.0.1:9876/
 
 ## Current state
 
-`LGDXWebApplication` runs **`GameMenu`** (menu + select + fight via GWT supersources under `JMugen/.../gwt/`).
+`LGDXWebApplication` runs **`GameMenu`**. Browser-only engine code lives in this module:
 
-`LGDXWebPlatform` (dados Gdx, `MugenDataStreams`, drawer) prepara o ambiente antes do callback.
+- `org/lee/mugen/JMugenWebClient.gwt.xml` — GWT module for web client pieces
+- `org/lee/mugen/gwt/` — super-source overrides
+- `org/lee/mugen/**/Gwt*.java` — web implementations
+
+Shared GWT-translatable types stay in `JMugen` (`JMugen.gwt.xml`). `JMugenWeb.gwt.xml` inherits both.
+
 
 
 Dist
