@@ -41,25 +41,7 @@
       <artifactId>JMugen.Render.libgdx.desktop</artifactId>
       <version>${jmugen.version}</version>
     </dependency>
-
-    <dependency>
-      <groupId>JMugen.Render.Lwjgl</groupId>
-      <artifactId>JMugen.Render.Lwjgl</artifactId>
-      <version>${jmugen.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>JMugen.Render.jogl</groupId>
-      <artifactId>JMugen.Render.jogl</artifactId>
-      <version>${jmugen.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>JMugen.Render.Java</groupId>
-      <artifactId>JMugen.Render.Java</artifactId>
-      <version>${jmugen.version}</version>
-    </dependency>
-
+    
   </dependencies>
 
   <build>
