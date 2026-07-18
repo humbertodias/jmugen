@@ -402,7 +402,7 @@ public class AbstractAnimManager implements Serializable {
 		isFirstChange = true;
 		
 		_animElemTimeCount = 0;
-		animTime = getAnimTimeReal();
+		animTime = getCurrentGroupSprite() != null ? getAnimTimeReal() : 0;
 	}
 
 
@@ -414,7 +414,7 @@ public class AbstractAnimManager implements Serializable {
 		isFirstChange = true;
 		
 		_animElemTimeCount = getAnimTimeCount(_animElem);
-		animTime = getAnimTimeReal();
+		animTime = getCurrentGroupSprite() != null ? getAnimTimeReal() : 0;
 
 }
 

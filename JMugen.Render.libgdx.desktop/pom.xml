@@ -14,6 +14,7 @@
 
     <properties>
         <libgdx.version>1.14.0</libgdx.version>
+        <desktop.mainClass>org.lee.mugen.renderer.libgdx.LGDXDesktopMain</desktop.mainClass>
     </properties>
 
     <dependencies>
@@ -50,20 +51,60 @@
             <version>4.13.2</version>
             <scope>test</scope>
         </dependency>
-        
     </dependencies>
 
     <build>
         <plugins>
+            <!--
+              Prefer exec:exec (forked JVM). exec:java reuses the Maven JVM, so
+              -XstartOnFirstThread cannot apply on macOS and GLFW fails.
+            -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.5.0</version>
                 <configuration>
-                    <mainClass>org.lee.mugen.renderer.libgdx.LGDXDesktopWebGameDebugMain</mainClass>
+                    <executable>java</executable>
+                    <workingDirectory>${session.executionRootDirectory}</workingDirectory>
+                    <arguments>
+                        <argument>-cp</argument>
+                        <classpath/>
+                        <argument>${desktop.mainClass}</argument>
+                    </arguments>
+                    <mainClass>${desktop.mainClass}</mainClass>
                 </configuration>
             </plugin>
         </plugins>
     </build>
-    
+
+    <profiles>
+        <profile>
+            <id>macos-lwjgl</id>
+            <activation>
+                <os>
+                    <family>mac</family>
+                </os>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>3.5.0</version>
+                        <configuration>
+                            <executable>java</executable>
+                            <workingDirectory>${session.executionRootDirectory}</workingDirectory>
+                            <arguments>
+                                <argument>-XstartOnFirstThread</argument>
+                                <argument>-cp</argument>
+                                <classpath/>
+                                <argument>${desktop.mainClass}</argument>
+                            </arguments>
+                            <mainClass>${desktop.mainClass}</mainClass>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

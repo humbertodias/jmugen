@@ -2,34 +2,43 @@
 
 This module is **not** GWT. There is no `gwt:run` here. You run a normal Java `main`.
 
+Default entry: **`LGDXDesktopMain`** → full `GameMenu` (same flow as Android / web).
+
+The old **`LGDXDesktopWebGameDebugMain`** only draws a pulsing rectangle (drawer smoke test). Do not use it if you want the game.
+
 ### From the repository root (no `install` required)
+
+**Why two steps:** with `-am`, Maven also runs the goal on `JMugen.Parent`, which has no exec config. Compile with `-am`, then run only the desktop module with `-rf`.
+
+**Use `exec:exec` (not `exec:java`)** on macOS: `exec:java` runs inside the Maven JVM, so `-XstartOnFirstThread` cannot be applied and GLFW fails. `exec:exec` forks a new JVM; the `macos-lwjgl` profile (auto on Mac) adds `-XstartOnFirstThread`.
 
 ```bash
 cd /path/to/jmugen
-mvn -pl JMugen.Render.libgdx.desktop -am compile exec:java -DskipTests
+mvn -pl JMugen.Render.libgdx.desktop -am compile -DskipTests
+mvn -pl JMugen.Render.libgdx.desktop -rf :JMugen.Render.libgdx.desktop exec:exec
 ```
 
-`exec:java` runs `org.lee.mugen.renderer.libgdx.LGDXDesktopWebGameDebugMain` (same smoke `Game` path as the web module, on LWJGL3).
+### Drawer smoke test only
+
+```bash
+mvn -pl JMugen.Render.libgdx.desktop -rf :JMugen.Render.libgdx.desktop exec:exec \
+  -Ddesktop.mainClass=org.lee.mugen.renderer.libgdx.LGDXDesktopWebGameDebugMain
+```
+
+(That property only works if you pass it into the plugin arguments; easier: run that class from the IDE.)
 
 ### From this module’s POM only
 
-Requires `JMugen.Render.libgdx.core` (and its transitive deps) to already be available in `~/.m2`, or run `install` / use the root command above.
-
 ```bash
-mvn -f JMugen.Render.libgdx.desktop/pom.xml compile exec:java
+mvn -f JMugen.Render.libgdx.desktop/pom.xml compile exec:exec
 ```
 
-### macOS (GLFW / main thread)
+### IDE
 
-On macOS, LWJGL3 needs **`-XstartOnFirstThread`**. The `macos-lwjgl` Maven profile (auto-activated on Mac) adds it for `exec:java`. If you start from the IDE, add **`-XstartOnFirstThread`** to the VM options of your run configuration.
+Main class: `org.lee.mugen.renderer.libgdx.LGDXDesktopMain`  
+On macOS, add **`-XstartOnFirstThread`** to VM options.  
+Working directory (or VM `-Djmugen.resource=/path/to/jmugen/data/`) must see `data/data/system.def`. The main also walks up from `user.dir` to find it.
 
-### Full game / menu
+### Full game via JMugen.Debug
 
-The main JMugen entry points live in **`JMugen.Debug`** / **`JMugen.Launcher`**, for example:
-
-```bash
-mvn package
-java -XstartOnFirstThread -jar JMugen.Launcher/target/JMugen.Launcher-0.0.1-SNAPSHOT.jar
-```
-
-(Adjust the JAR name/version if your build differs.)
+`render.properties` already points at `LGDXMugenDrawer`. You can also run `org.lee.mugen.test.TestMenu` from **JMugen.Debug** (same menu path; still needs `-XstartOnFirstThread` on macOS).

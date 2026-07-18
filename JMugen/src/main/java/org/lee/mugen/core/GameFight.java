@@ -714,7 +714,11 @@ public class GameFight implements AbstractGameFight {
 	}
 	
 	public void render() {
-		
+		if (backgroundRenderList == null || backgroundRenderList.isEmpty()) {
+			render(renderableList);
+			return;
+		}
+
 		StageBackgroundRender br = (StageBackgroundRender) backgroundRenderList.get(0);
 		br.setLayerDisplay(0);
 		

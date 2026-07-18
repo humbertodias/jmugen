@@ -376,6 +376,7 @@ public class LGDXGameWindow implements GameWindow, ApplicationListener, org.lee.
                 }
             } catch (Exception e) {
                 Logger.error("Error updating game", e);
+                e.printStackTrace();
             }
         }
     }

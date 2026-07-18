@@ -393,7 +393,13 @@ public class BG implements Cloneable, Serializable {
 
 	public AbstractAnimManager getAnimManager() {
 		if (anim == null) {
-			anim = new AbstractAnimManager(new HashMap<Integer, AnimGroup>());
+			// Parent Background owns the shared AIR map; an empty map makes setAction NPE.
+			if (parent instanceof Background) {
+				anim = ((Background) parent).getAnim();
+			}
+			if (anim == null) {
+				anim = new AbstractAnimManager(new HashMap<Integer, AnimGroup>());
+			}
 			anim.setAction(actionno);
 		}
 		return anim;

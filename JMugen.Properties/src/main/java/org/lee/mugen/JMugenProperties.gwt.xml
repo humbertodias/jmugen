@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module>
+    <!-- Replaces org.lee.mugen.ResourceBundleHelper for the browser (no File / ResourceBundle). -->
     <super-source path="gwt"/>
-    <source path=""/>
+
+    <!-- Do not compile the JVM helper into GWT (java.io.File / java.util.ResourceBundle). -->
+    <source path="">
+        <exclude name="gwt/**"/>
+        <exclude name="ResourceBundleHelper.java"/>
+        <exclude name="ExternalBundleControl.java"/>
+    </source>
 </module>
