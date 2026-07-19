@@ -346,10 +346,15 @@ public class PhysicsEngime {
 
 		sprite.getInfo().getVelset().addY(friction);
 
-		if (sprite.getInfo().getYPos() >= 0) {
+		// Land only while falling onto the ground. If we also land on velY == 0 while
+		// YPos is still 0 (e.g. first tick of statedef 105 before the hop lifts off, or
+		// if run.back.y failed to apply), the hop is cancelled in the same frame.
+		if (sprite.getInfo().getYPos() >= 0 && sprite.getInfo().getVelset().getY() > 0) {
 			sprite.getInfo().getVelset().setY(0);
 			sprite.getInfo().setYPos(0);
-			sprite.getSpriteState().changeStateDef(52);
+			int stateId = sprite.getSpriteState().getCurrentState().getIntId();
+			// Run-back hop has its own land state (106); generic air land is 52.
+			sprite.getSpriteState().changeStateDef(stateId == 105 ? 106 : 52);
 		}
 
 	}

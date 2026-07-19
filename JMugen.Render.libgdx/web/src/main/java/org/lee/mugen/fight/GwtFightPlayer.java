@@ -130,9 +130,13 @@ public final class GwtFightPlayer {
     private boolean prevStrongKick;
     private boolean prevUp;
     private boolean prevToward;
+    private boolean prevAway;
     private int towardTapTimer;
     private boolean towardTapArmed;
     private boolean towardSawRelease;
+    private int awayTapTimer;
+    private boolean awayTapArmed;
+    private boolean awaySawRelease;
     private int turnCooldown;
 
     public GwtFightPlayer(
@@ -324,15 +328,20 @@ public final class GwtFightPlayer {
         boolean strongKickPress = strongKick && !prevStrongKick;
         boolean upPress = up && !prevUp;
         boolean towardPress = toward && !prevToward;
+        boolean awayPress = away && !prevAway;
         prevPunch = punch;
         prevKick = kick;
         prevStrongPunch = strongPunch;
         prevStrongKick = strongKick;
         prevUp = up;
         prevToward = toward;
+        prevAway = away;
 
         if (towardTapTimer > 0) {
             towardTapTimer--;
+        }
+        if (awayTapTimer > 0) {
+            awayTapTimer--;
         }
         if (turnCooldown > 0) {
             turnCooldown--;
@@ -455,14 +464,36 @@ public final class GwtFightPlayer {
                 if (towardTapArmed && towardSawRelease && towardTapTimer > 0) {
                     startRun();
                     clearTowardTap();
+                    clearAwayTap();
                 } else {
                     towardTapArmed = true;
                     towardSawRelease = false;
                     towardTapTimer = FF_WINDOW;
+                    clearAwayTap();
                 }
             }
             if (towardTapTimer <= 0 && towardTapArmed) {
                 clearTowardTap();
+            }
+
+            // Double-tap away → hop back (statedef 105)
+            if (!away && awayTapArmed) {
+                awaySawRelease = true;
+            }
+            if (onGround && !running && awayPress) {
+                if (awayTapArmed && awaySawRelease && awayTapTimer > 0) {
+                    startRunBack();
+                    clearAwayTap();
+                    clearTowardTap();
+                } else {
+                    awayTapArmed = true;
+                    awaySawRelease = false;
+                    awayTapTimer = FF_WINDOW;
+                    clearTowardTap();
+                }
+            }
+            if (awayTapTimer <= 0 && awayTapArmed) {
+                clearAwayTap();
             }
 
             // Auto-turn only when idle horizontally (prevents flip loop while walking past)
@@ -562,6 +593,12 @@ public final class GwtFightPlayer {
         towardTapTimer = 0;
     }
 
+    private void clearAwayTap() {
+        awayTapArmed = false;
+        awaySawRelease = false;
+        awayTapTimer = 0;
+    }
+
     private void startRun() {
         if (!onGround || turning) {
             return;
@@ -569,6 +606,7 @@ public final class GwtFightPlayer {
         running = true;
         inAttack = false;
         clearTowardTap();
+        clearAwayTap();
         currentAction = ACT_RUN;
         anim.setAction(anim.hasAction(ACT_RUN) ? ACT_RUN : ACT_WALK_FWD);
     }
@@ -579,11 +617,20 @@ public final class GwtFightPlayer {
         }
         running = false;
         inAttack = false;
+        clearTowardTap();
+        clearAwayTap();
         onGround = false;
         jumpPhase = JumpPhase.AIR;
         jumpDir = -1;
-        vy = -4f;
-        vx = -facing * runSpeed() * 0.85f;
+        vy = cns != null ? cns.runBackY : -3.8f;
+        if (vy >= 0) {
+            vy = -3.8f;
+        }
+        float backSpeed = cns != null ? Math.abs(cns.runBackX) : runSpeed() * 0.85f;
+        if (backSpeed < 0.1f) {
+            backSpeed = runSpeed() * 0.85f;
+        }
+        vx = -facing * backSpeed;
         currentAction = ACT_RUN_BACK;
         anim.setAction(anim.hasAction(ACT_RUN_BACK) ? ACT_RUN_BACK : ACT_JUMP_BACK);
     }
@@ -1584,9 +1631,13 @@ public final class GwtFightPlayer {
         this.prevStrongKick = false;
         this.prevUp = false;
         this.prevToward = false;
+        this.prevAway = false;
         this.towardTapTimer = 0;
         this.towardTapArmed = false;
         this.towardSawRelease = false;
+        this.awayTapTimer = 0;
+        this.awayTapArmed = false;
+        this.awaySawRelease = false;
         this.turnCooldown = 0;
         this.currentAction = ACT_STAND;
         anim.setAction(ACT_STAND);
