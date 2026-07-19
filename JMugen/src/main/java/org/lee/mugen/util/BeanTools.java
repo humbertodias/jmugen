@@ -994,7 +994,13 @@ public class BeanTools {
 		return null;
 	}
 
-	private static Method findWriteMethod(Class<?> clazz, String acces) {
+	/**
+	 * Prefer a setter whose parameter type fits {@code value}. Overloaded beans like
+	 * {@code setFwd(float)} / {@code setFwd(float[])} / {@code setFwd(PointF)} used to pick the
+	 * first {@link Class#getMethods()} hit with a converter — often {@code float}, which then
+	 * rejects multi-value CNS lines such as {@code run.fwd = 4.6, 0} (run speed stayed 0).
+	 */
+	private static Method findWriteMethod(Class<?> clazz, String acces, Object value) {
 		String setterName = "set" + Character.toUpperCase(acces.charAt(0)) + acces.substring(1);
 		List<Method> matches = new ArrayList<Method>();
 		for (Method m : clazz.getMethods()) {
@@ -1008,14 +1014,89 @@ public class BeanTools {
 		if (matches.size() == 1) {
 			return matches.get(0);
 		}
+		Method best = null;
+		int bestScore = Integer.MIN_VALUE;
 		for (Method m : matches) {
 			Class<?> pt = m.getParameterTypes()[0];
-			if (convertersMap.containsKey(pt)) {
-				return m;
+			if (!convertersMap.containsKey(pt)) {
+				continue;
 			}
+			int score = scoreWriteMethod(pt, value);
+			if (score > bestScore) {
+				bestScore = score;
+				best = m;
+			}
+		}
+		if (best != null) {
+			return best;
 		}
 		matches.sort(Comparator.comparing(m -> m.getParameterTypes()[0].getName()));
 		return matches.get(0);
+	}
+
+	private static int arrayLength(Object value) {
+		if (value == null || !value.getClass().isArray()) {
+			return -1;
+		}
+		return java.lang.reflect.Array.getLength(value);
+	}
+
+	private static int scoreWriteMethod(Class<?> paramType, Object value) {
+		if (value == null) {
+			return 0;
+		}
+		if (paramType.isInstance(value)) {
+			return 100;
+		}
+		int len = arrayLength(value);
+		boolean multi = len > 1;
+		boolean singleArray = len == 1;
+		boolean scalar = len < 0;
+
+		if (multi) {
+			if (paramType == PointF.class) {
+				return 90;
+			}
+			if (paramType == float[].class || paramType == Float[].class) {
+				return 85;
+			}
+			if (paramType == int[].class || paramType == Integer[].class) {
+				return 80;
+			}
+			if (paramType == Object[].class) {
+				return 70;
+			}
+			if (paramType == MugenPoint.class) {
+				return 65;
+			}
+			// Scalar setters cannot accept "x, y" CNS pairs.
+			if (paramType == float.class || paramType == Float.class
+					|| paramType == double.class || paramType == Double.class
+					|| paramType == int.class || paramType == Integer.class
+					|| paramType == boolean.class || paramType == Boolean.class) {
+				return -100;
+			}
+			return 10;
+		}
+
+		if (scalar || singleArray) {
+			if (paramType == float.class || paramType == Float.class) {
+				return value instanceof Number ? 90 : 50;
+			}
+			if (paramType == int.class || paramType == Integer.class) {
+				return value instanceof Number ? 85 : 45;
+			}
+			if (paramType == double.class || paramType == Double.class) {
+				return value instanceof Number ? 80 : 40;
+			}
+			if (paramType == PointF.class || paramType == float[].class || paramType == Float[].class) {
+				return 30;
+			}
+			if (paramType == Object[].class) {
+				return 20;
+			}
+		}
+		return 0;
 	}
 
 	public static void setObject(Object bean, String acces, Object value)
@@ -1050,7 +1131,7 @@ public class BeanTools {
 			setObject(o, target, value);
 
 		} else {
-			Method mW = findWriteMethod(bean.getClass(), acces);
+			Method mW = findWriteMethod(bean.getClass(), acces, value);
 			if (mW == null) {
 				mW = getMethod(bean.getClass(), acces);
 			}
