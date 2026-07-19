@@ -155,7 +155,7 @@ public final class LGDXAudioPlayback implements AudioPlayback {
             Sound snd = sfxByKey.get(key);
             if (snd == null) {
                 String ext = extFor(data);
-                FileHandle fh = Gdx.files.local("jmugen_sfx/" + Long.toHexString(key) + ext);
+                FileHandle fh = Gdx.files.local(".cache/sfx/" + Long.toHexString(key) + ext);
                 fh.parent().mkdirs();
                 fh.writeBytes(data, false);
                 snd = Gdx.audio.newSound(fh);

@@ -21,3 +21,7 @@ resource/cache
 **/resource/cache/
 **/resource/logs/
 **/resource/logs/
+
+# LibGDX SFX decode cache (runtime; not game assets)
+.cache/sfx/
+**/.cache/sfx/
