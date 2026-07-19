@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>JMugen.plugin.audio.adx</groupId>
   <artifactId>JMugen.plugin.audio.adx</artifactId>
@@ -11,22 +13,11 @@
   </parent>
 
   <dependencies>
-
-    <!-- https://mvnrepository.com/artifact/javazoom/jlayer -->
-    <dependency>
-      <groupId>javazoom</groupId>
-      <artifactId>jlayer</artifactId>
-      <version>1.0.1</version>
-    </dependency>
-
-    <!-- https://mvnrepository.com/artifact/com.googlecode.soundlibs/tritonus-share -->
+    <!-- Tritonus helpers used by AdxAudioFileReader / AdxFormatConversionProvider -->
     <dependency>
       <groupId>com.googlecode.soundlibs</groupId>
       <artifactId>tritonus-share</artifactId>
       <version>0.3.7.4</version>
     </dependency>
-
   </dependencies>
-
-
 </project>
