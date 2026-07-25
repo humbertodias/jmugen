@@ -90,10 +90,13 @@ tasks.register('distWeb') {
         copy {
             from "${projectDir}/src/main/webapp"
             into webappDir
+            exclude 'WEB-INF/**'
         }
+        // Runtime JS only — omit gwt-unitCache/gen/extra/deploy (compile artifacts; can exceed GitHub 100MB limit).
         copy {
             from layout.buildDirectory.dir('gwt')
             into webappDir
+            include 'jmugen/**'
         }
     }
 }

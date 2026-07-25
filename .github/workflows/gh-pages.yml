@@ -36,6 +36,11 @@ jobs:
       - name: Build web
         run: ./gradlew :html:distWeb
 
+      - name: Verify deploy artifact size
+        run: |
+          test ! -d html/build/webapp/gwt-unitCache
+          find html/build/webapp -type f -size +95M -print -quit | grep -q . && exit 1 || true
+
       - name: Upload site artifact
         uses: actions/upload-pages-artifact@v4
         with:
