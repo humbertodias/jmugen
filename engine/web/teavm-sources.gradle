@@ -192,7 +192,6 @@ ext.teavmPropertiesExcludes = [
 ]
 
 ext.teavmCoreExcludes = [
-    'shader/',
     'LGDXAudioPlayback.java',
 ]
 

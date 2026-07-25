@@ -4,8 +4,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import org.lee.mugen.renderer.RGB;
 
 /**
- * Optional platform shader hook. Web builds can leave it disabled while desktop
- * keeps the existing PalFx shader implementation.
+ * Optional platform shader hook. Desktop, Android, and TeaVM web use {@link org.lee.mugen.renderer.libgdx.core.shader.PalFxShader}.
  */
 public interface LGDXPalFxShader {
     void apply(SpriteBatch batch);

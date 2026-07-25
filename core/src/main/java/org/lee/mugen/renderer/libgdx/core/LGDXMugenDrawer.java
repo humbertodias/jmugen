@@ -326,14 +326,26 @@ public class LGDXMugenDrawer extends MugenDrawer {
 
         // Without PalFx shader (or compile failure): approximate dark tint for shadows / palfx.
         if (!usedPalFx && palfx != null) {
-            float mulA = palfx.getMul() != null ? palfx.getMul().getA() / 255f : 0.15f;
-            if (mulA < 0.08f) {
-                mulA = 0.08f;
+            org.lee.mugen.renderer.RGB mul = palfx.getMul();
+            float drawAlpha = currentAlpha * drawProperties.getAlpha();
+            if (
+                mul != null &&
+                mul.getR() <= 1f &&
+                mul.getG() <= 1f &&
+                mul.getB() <= 1f
+            ) {
+                // Shadow-style PalFx (mul rgb ~0): black silhouette, keep sprite alpha like the shader.
+                sprite.setColor(0f, 0f, 0f, drawAlpha);
+            } else {
+                float mulA = mul != null ? mul.getA() / 255f : 0.15f;
+                if (mulA < 0.08f) {
+                    mulA = 0.08f;
+                }
+                if (mulA > 0.55f) {
+                    mulA = 0.55f;
+                }
+                sprite.setColor(0f, 0f, 0f, drawAlpha * mulA);
             }
-            if (mulA > 0.55f) {
-                mulA = 0.55f;
-            }
-            sprite.setColor(0f, 0f, 0f, currentAlpha * drawProperties.getAlpha() * mulA);
         }
 
         sprite.draw(batch);

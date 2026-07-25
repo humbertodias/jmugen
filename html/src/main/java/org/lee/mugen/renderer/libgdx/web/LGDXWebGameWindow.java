@@ -25,6 +25,7 @@ import org.lee.mugen.renderer.MugenTimer;
 import org.lee.mugen.renderer.libgdx.core.GDXKeyMapper;
 import org.lee.mugen.renderer.libgdx.core.LGDXImageLoader;
 import org.lee.mugen.renderer.libgdx.core.LGDXMugenTimer;
+import org.lee.mugen.renderer.libgdx.core.LGDXPalFxShader;
 import org.lee.mugen.renderer.libgdx.core.LGDXRenderContext;
 
 /**
@@ -143,6 +144,7 @@ public class LGDXWebGameWindow implements GameWindow, ApplicationListener, LGDXR
     private OrthographicCamera camera;
     private Viewport viewport;
     private final LGDXWebImageLoader imageLoader = new LGDXWebImageLoader();
+    private final LGDXPalFxShader palFxShader = new LGDXWebPalFxShader();
     private boolean finishInit;
     private boolean gameRunning = true;
 
@@ -537,6 +539,11 @@ public class LGDXWebGameWindow implements GameWindow, ApplicationListener, LGDXR
     @Override
     public LGDXImageLoader getImageLoader() {
         return imageLoader;
+    }
+
+    @Override
+    public LGDXPalFxShader getPalFxShader() {
+        return palFxShader;
     }
 
     public String getTitle() {

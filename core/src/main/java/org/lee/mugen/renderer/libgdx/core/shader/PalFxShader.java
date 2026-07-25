@@ -1,5 +1,7 @@
 package org.lee.mugen.renderer.libgdx.core.shader;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,6 +18,59 @@ import org.lee.mugen.util.Logger;
  */
 public class PalFxShader extends GDXShader {
 
+    private static final String VERT_PATH =
+        "/org/lee/mugen/renderer/libgdx/core/shader/palfx.vert";
+    private static final String FRAG_PATH =
+        "/org/lee/mugen/renderer/libgdx/core/shader/palfx.frag";
+    private static final String VERT_CLASSPATH =
+        "org/lee/mugen/renderer/libgdx/core/shader/palfx.vert";
+    private static final String FRAG_CLASSPATH =
+        "org/lee/mugen/renderer/libgdx/core/shader/palfx.frag";
+
+    /** Embedded fallback for TeaVM / environments where classpath streams are unavailable. */
+    private static final String VERT_SOURCE =
+        "#ifdef GL_ES\n"
+            + "precision mediump float;\n"
+            + "#endif\n"
+            + "\n"
+            + "attribute vec4 a_position;\n"
+            + "attribute vec4 a_color;\n"
+            + "attribute vec2 a_texCoord0;\n"
+            + "\n"
+            + "uniform mat4 u_projTrans;\n"
+            + "\n"
+            + "varying vec4 v_color;\n"
+            + "varying vec2 v_texCoords;\n"
+            + "\n"
+            + "void main() {\n"
+            + "    v_color = a_color;\n"
+            + "    v_texCoords = a_texCoord0;\n"
+            + "    gl_Position = u_projTrans * a_position;\n"
+            + "}\n";
+
+    private static final String FRAG_SOURCE =
+        "#ifdef GL_ES\n"
+            + "precision mediump float;\n"
+            + "#endif\n"
+            + "\n"
+            + "uniform sampler2D u_texture;\n"
+            + "uniform vec4 add;\n"
+            + "uniform vec4 mul;\n"
+            + "uniform vec4 ampl;\n"
+            + "uniform float alpha;\n"
+            + "\n"
+            + "varying vec4 v_color;\n"
+            + "varying vec2 v_texCoords;\n"
+            + "\n"
+            + "void main() {\n"
+            + "    vec4 sprColor = texture2D(u_texture, v_texCoords);\n"
+            + "    vec3 adjustedRGB = (sprColor.rgb + add.rgb + ampl.rgb) * mul.rgb;\n"
+            + "    adjustedRGB = clamp(adjustedRGB, 0.0, 1.0);\n"
+            + "    float finalAlpha = sprColor.a * alpha;\n"
+            + "    vec4 outColor = vec4(adjustedRGB, finalAlpha) * v_color;\n"
+            + "    gl_FragColor = outColor;\n"
+            + "}\n";
+
     public PalFxShader() {
         compile();
     }
@@ -23,23 +78,19 @@ public class PalFxShader extends GDXShader {
     @Override
     public void compile() {
         try {
-            // Require external shader files in resources (no fallback allowed)
-            String vert = loadResource(
-                "/org/lee/mugen/renderer/libgdx/core/shader/palfx.vert"
-            );
-            String frag = loadResource(
-                "/org/lee/mugen/renderer/libgdx/core/shader/palfx.frag"
-            );
+            String vert = loadShaderSource(VERT_PATH, VERT_CLASSPATH, VERT_SOURCE);
+            String frag = loadShaderSource(FRAG_PATH, FRAG_CLASSPATH, FRAG_SOURCE);
             if (vert == null || frag == null) {
                 Logger.error(
-                    "PalFxShader: external shader files not found. Expected resources:\n  %s\n  %s",
-                    "/org/lee/mugen/renderer/libgdx/core/shader/palfx.vert",
-                    "/org/lee/mugen/renderer/libgdx/core/shader/palfx.frag"
+                    "PalFxShader: shader sources not found. Expected resources:\n  %s\n  %s",
+                    VERT_PATH,
+                    FRAG_PATH
                 );
                 isCompiled = false;
                 return;
             }
 
+            ShaderProgram.pedantic = false;
             shaderProgram = new ShaderProgram(vert, frag);
 
             if (!shaderProgram.isCompiled()) {
@@ -57,9 +108,26 @@ public class PalFxShader extends GDXShader {
         }
     }
 
-    private static String loadResource(String path) {
+    private static String loadShaderSource(
+            String resourcePath,
+            String classpathPath,
+            String embedded) {
+        String fromStream = loadResourceStream(resourcePath);
+        if (fromStream != null) {
+            return fromStream;
+        }
+        String fromGdx = loadGdxClasspath(classpathPath);
+        if (fromGdx != null) {
+            return fromGdx;
+        }
+        return embedded;
+    }
+
+    private static String loadResourceStream(String path) {
         try (InputStream is = PalFxShader.class.getResourceAsStream(path)) {
-            if (is == null) return null;
+            if (is == null) {
+                return null;
+            }
             BufferedReader br = new BufferedReader(
                 new InputStreamReader(is, StandardCharsets.UTF_8)
             );
@@ -77,6 +145,21 @@ public class PalFxShader extends GDXShader {
             );
             return null;
         }
+    }
+
+    private static String loadGdxClasspath(String classpathPath) {
+        try {
+            if (Gdx.files == null) {
+                return null;
+            }
+            FileHandle fh = Gdx.files.classpath(classpathPath);
+            if (fh.exists()) {
+                return fh.readString();
+            }
+        } catch (Throwable ignored) {
+            // Gdx not ready yet (desktop compile) or unavailable.
+        }
+        return null;
     }
 
     /**
