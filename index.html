@@ -2,6 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
     <title>JMugen - LibGDX Web</title>
     <style>
         html, body {
@@ -12,9 +13,15 @@
             background: #000;
             overflow: hidden;
         }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
         canvas {
             position: relative;
             z-index: 2;
+            border: none;
         }
         #jmugen-status {
             position: absolute;
@@ -47,12 +54,23 @@
         }
     </style>
 </head>
-<body>
-<div id="jmugen-status">
-    <strong>Carregando JMugen Web...</strong><br>
-    Se esta mensagem nao mudar, o jogo ainda nao terminou de carregar.
-</div>
-<div id="jmugen-audio-hint">Clique ou pressione uma tecla para ativar o audio</div>
-<script src="app.js"></script>
+<body oncontextmenu="return false">
+<canvas id="canvas"></canvas>
+<script>
+    async function start() {
+        try {
+            await main();
+        } catch (err) {
+            var status = document.getElementById('jmugen-status');
+            if (status) {
+                status.innerHTML = '<strong>Error starting JMugen Web</strong><br>' + err;
+                status.style.pointerEvents = 'auto';
+            }
+            console.error(err);
+        }
+    }
+    window.addEventListener('load', start);
+</script>
+<script type="text/javascript" charset="utf-8" src="app.js"></script>
 </body>
 </html>
