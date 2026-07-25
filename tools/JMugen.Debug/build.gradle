@@ -1,0 +1,49 @@
+plugins {
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+}
+
+group = 'JMugen.Debug'
+
+dependencies {
+    implementation project(':jmugen-engine')
+    implementation project(':jmugen-common')
+    implementation project(':jmugen-properties')
+    implementation project(':jmugen-syntax')
+    implementation project(':libgdx-desktop')
+}
+
+tasks.named('jar') {
+    enabled = false
+}
+
+tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+    archiveBaseName.set('JMugen.Debug')
+    archiveClassifier.set('')
+    mergeServiceFiles()
+    manifest {
+        attributes 'Main-Class': providers.gradleProperty('mainClass').get()
+    }
+    exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
+}
+
+components.java {
+    withVariantsFromConfiguration(configurations.apiElements) { skip() }
+    withVariantsFromConfiguration(configurations.runtimeElements) { skip() }
+}
+
+artifacts {
+    add('archives', tasks.named('shadowJar'))
+}
+
+configurations.named('apiElements') {
+    outgoing.artifacts.clear()
+    outgoing.artifact(tasks.named('shadowJar'))
+}
+configurations.named('runtimeElements') {
+    outgoing.artifacts.clear()
+    outgoing.artifact(tasks.named('shadowJar'))
+}
+
+tasks.named('build') {
+    dependsOn tasks.named('shadowJar')
+}

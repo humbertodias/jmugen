@@ -13,11 +13,6 @@ defaults:
 permissions:
   contents: write
 
-env:
-  MAIN_CLASS: org.lee.mugen.renderer.libgdx.LGDXDesktopMain
-  # Skip Android/Web in the desktop job; each has its own job.
-  MVN_DESKTOP: mvn -DskipTests -pl '!JMugen.Render.libgdx/android,!JMugen.Render.libgdx/web'
-
 jobs:
 
   Desktop:
@@ -25,27 +20,29 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Maven cache
+      - name: Gradle cache
         uses: actions/cache@v5
         with:
-          path: ~/.m2/repository
-          key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', 'gradle/wrapper/gradle-wrapper.properties') }}
           restore-keys: |
-            maven-${{ runner.os }}-
+            gradle-${{ runner.os }}-
 
-      - name: Set up JDK
+      - name: Set up JDK 17
         uses: actions/setup-java@v5
         with:
           distribution: corretto
-          java-version: '8'
+          java-version: '17'
 
-      - name: Package LibGDX desktop jar
-        run: ${{ env.MVN_DESKTOP }} -Dmain.class=${{ env.MAIN_CLASS }} package
+      - name: Package desktop release jar
+        run: ./gradlew :jmugen-debug:shadowJar
 
       - name: Prepare release
         run: |
           zip -9 -r data.zip data
-          cp tools/JMugen.Debug/target/JMugen.Debug-0.0.1-SNAPSHOT.jar "jmugen-${GITHUB_REF_NAME}-libgdx.jar"
+          cp tools/JMugen.Debug/build/libs/JMugen.Debug-*.jar "jmugen-${GITHUB_REF_NAME}-libgdx.jar"
           ls -lha jmugen-*-libgdx.jar data.zip
 
       - name: Create GitHub Release
@@ -62,28 +59,26 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Maven cache
+      - name: Gradle cache
         uses: actions/cache@v5
         with:
-          path: ~/.m2/repository
-          key: maven-web-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-web-${{ runner.os }}-${{ hashFiles('**/*.gradle*', 'gradle/wrapper/gradle-wrapper.properties') }}
           restore-keys: |
-            maven-web-${{ runner.os }}-
+            gradle-web-${{ runner.os }}-
 
-      - name: Set up JDK 8
+      - name: Set up JDK 17
         uses: actions/setup-java@v5
         with:
           distribution: corretto
-          java-version: '8'
+          java-version: '17'
 
       - name: Package LibGDX web
         run: |
-          mvn install -DskipTests -pl '!JMugen.Render.libgdx/android'
-          mvn -pl JMugen.Render.libgdx/web -am package -DskipTests
-          mvn -pl JMugen.Render.libgdx/web -rf :JMugen.Render.libgdx.web gwt:compile
-          cp JMugen.Render.libgdx/web/src/main/webapp/index.html JMugen.Render.libgdx/web/target/webapp/index.html
-          cp -r JMugen.Render.libgdx/web/src/main/webapp/assets JMugen.Render.libgdx/web/target/webapp/
-          (cd JMugen.Render.libgdx/web/target/webapp && zip -9 -r "../../../../jmugen-${GITHUB_REF_NAME}-libgdx-web.zip" .)
+          ./gradlew :libgdx-web:distWeb
+          (cd JMugen.Render.libgdx/web/build/webapp && zip -9 -r "../../../../jmugen-${GITHUB_REF_NAME}-libgdx-web.zip" .)
           ls -lha jmugen-*-libgdx-web.zip
 
       - name: Create GitHub Release
@@ -99,13 +94,15 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Maven cache
+      - name: Gradle cache
         uses: actions/cache@v5
         with:
-          path: ~/.m2/repository
-          key: maven-android-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-android-${{ runner.os }}-${{ hashFiles('**/*.gradle*', 'gradle/wrapper/gradle-wrapper.properties') }}
           restore-keys: |
-            maven-android-${{ runner.os }}-
+            gradle-android-${{ runner.os }}-
 
       - name: Set up JDK 17
         uses: actions/setup-java@v5
@@ -126,25 +123,17 @@ jobs:
           yes | sdkmanager --licenses >/dev/null || true
           sdkmanager \
             "platforms;android-34" \
-            "build-tools;28.0.3" \
+            "build-tools;34.0.0" \
             "platform-tools"
-          cd $ANDROID_HOME
-          curl -L -o tools.zip https://dl.google.com/android/repository/tools_r25.2.5-linux.zip
-          unzip -q tools.zip
-
-      - name: Set up JDK 8
-        uses: actions/setup-java@v5
-        with:
-          distribution: corretto
-          java-version: '8'
 
       - name: Package LibGDX Android APK
         env:
           ANDROID_HOME: /home/runner/android-sdk
           ANDROID_SDK_ROOT: /home/runner/android-sdk
         run: |
-          mvn -DskipTests -pl JMugen.Render.libgdx/android -am package
-          APK=$(find JMugen.Render.libgdx/android/target -name '*.apk' | head -1)
+          echo "sdk.dir=$ANDROID_HOME" > local.properties
+          ./gradlew -Pandroid :libgdx-android:assembleDebug
+          APK=$(find JMugen.Render.libgdx/android/build/outputs/apk -name '*.apk' | head -1)
           test -n "$APK"
           cp "$APK" "jmugen-${GITHUB_REF_NAME}-libgdx-android.apk"
           ls -lha jmugen-*-android.apk

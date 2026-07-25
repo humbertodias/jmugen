@@ -17,37 +17,31 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Maven cache
+      - name: Gradle cache
         uses: actions/cache@v5
         with:
-          path: ~/.m2/repository
-          key: maven-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/pom.xml') }}
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', 'gradle/wrapper/gradle-wrapper.properties') }}
           restore-keys: |
-            maven-${{ runner.os }}-${{ runner.arch }}-
+            gradle-${{ runner.os }}-
 
-      # Switch back to Java 8 for the Maven build
-      - name: Set up JDK 8
+      - name: Set up JDK 17
         uses: actions/setup-java@v5
         with:
           distribution: corretto
-          java-version: '8'
+          java-version: '17'
 
-      - name: Build WebAssembly
-        run: |
-              mvn install -DskipTests -pl '!JMugen.Render.libgdx/android'
-          
-              mvn -pl JMugen.Render.libgdx/web -am package
-              mvn -pl JMugen.Render.libgdx/web -rf :JMugen.Render.libgdx.web gwt:compile
-              
-              cp JMugen.Render.libgdx/web/src/main/webapp/index.html JMugen.Render.libgdx/web/target/webapp/index.html
-              cp -r JMugen.Render.libgdx/web/src/main/webapp/assets JMugen.Render.libgdx/web/target/webapp/
+      - name: Build web
+        run: ./gradlew :libgdx-web:distWeb
 
       - name: Upload site artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          path: JMugen.Render.libgdx/web/target/webapp/
+          path: JMugen.Render.libgdx/web/build/webapp/
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: JMugen.Render.libgdx/web/target/webapp/
+          folder: JMugen.Render.libgdx/web/build/webapp/

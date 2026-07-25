@@ -1,0 +1,48 @@
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
+plugins {
+    id 'com.android.application' version '8.5.2' apply false
+}
+
+rootProject.name = 'jmugen'
+
+include 'jmugen-properties'
+project(':jmugen-properties').projectDir = file('JMugen.Properties')
+
+include 'jmugen-common'
+project(':jmugen-common').projectDir = file('JMugen.Common')
+
+include 'jmugen-plugin-audio-adx'
+project(':jmugen-plugin-audio-adx').projectDir = file('JMugen.plugin.audio.adx')
+
+include 'jmugen-engine'
+project(':jmugen-engine').projectDir = file('JMugen')
+
+include 'libgdx-core'
+project(':libgdx-core').projectDir = file('JMugen.Render.libgdx/core')
+
+include 'libgdx-desktop'
+project(':libgdx-desktop').projectDir = file('JMugen.Render.libgdx/desktop')
+
+include 'libgdx-web'
+project(':libgdx-web').projectDir = file('JMugen.Render.libgdx/web')
+
+include 'jmugen-syntax'
+project(':jmugen-syntax').projectDir = file('tools/Syntax')
+
+include 'jmugen-debug'
+project(':jmugen-debug').projectDir = file('tools/JMugen.Debug')
+
+include 'jmugen-launcher'
+project(':jmugen-launcher').projectDir = file('tools/JMugen.Launcher')
+
+if (gradle.startParameter.projectProperties.containsKey('android')) {
+    include 'libgdx-android'
+    project(':libgdx-android').projectDir = file('JMugen.Render.libgdx/android')
+}

@@ -2,81 +2,73 @@
 
 ## Requirements
 
-- [SDKMAN](https://sdkman.io/install) (optional but convenient)
-- **JDK 8** for GWT / web (`gwt:compile`, `gwt:run`, gh-pages)
-- **JDK 17+** is fine for desktop / Android LibGDX builds when not compiling GWT
-- Maven 3.6.3 or higher
+- **JDK 17+** (Gradle / LibGDX / Android / GWT compiler)
+- Gradle wrapper: `./gradlew` (included in repo)
 
 ### SDKMAN example
 
 ```sh
-sdk install java 8.0.472-amzn   # web / GWT
-sdk install java 17.0.14-amzn  # desktop / Android if preferred
-sdk install maven 3.9.9
+sdk install java 17.0.14-amzn
 ```
 
-## Project layout (LibGDX)
+## Build
 
-```text
-JMugen/  JMugen.Common/  JMugen.Properties/  JMugen.plugin.audio.adx/
-JMugen.Render.libgdx/{core,desktop,android,web}
-tools/{JMugen.Debug,JMugen.Launcher,Syntax}
-data/
+From the **repository root**:
+
+```sh
+./gradlew build              # everything except Android
+./gradlew -Pandroid build    # include Android APK (needs ANDROID_HOME)
 ```
-
-Always run Maven from the **repo root** so `-am` / `-rf` and `data/` paths resolve correctly.
 
 ## Desktop
 
 ```sh
-mvn -pl JMugen.Render.libgdx/desktop -am compile -DskipTests
-mvn -pl JMugen.Render.libgdx/desktop -rf :JMugen.Render.libgdx.desktop exec:exec
+./gradlew :libgdx-desktop:run
 ```
 
-- Prefer **`exec:exec`** over `exec:java` (macOS needs a forked JVM with `-XstartOnFirstThread`).
-- Working directory should be the repo root so `./data/...` is found.
-- More detail: [JMugen.Render.libgdx/desktop/README.md](./JMugen.Render.libgdx/desktop/README.md).
-
-### IDE
-
-- Main: `org.lee.mugen.renderer.libgdx.LGDXDesktopMain`
-- macOS VM option: `-XstartOnFirstThread`
-- Working directory: repository root (or `-Djmugen.resource=…/data/`)
-
-### Debug help (in fight)
-
-- `F1` (on macOS often `Fn`+`F1`)
-- or `Ctrl`+`H`
+- Working directory is the repo root (so `./data/` resolves).
+- macOS: `-XstartOnFirstThread` is applied automatically.
 
 ## Web (GWT)
 
 ```sh
-mvn -pl JMugen.Render.libgdx/web -am package -DskipTests
-mvn -pl JMugen.Render.libgdx/web -rf :JMugen.Render.libgdx.web gwt:run
+./gradlew :libgdx-web:distWeb
+python3 -m http.server -d JMugen.Render.libgdx/web/build/webapp 8888
 ```
 
 Open http://127.0.0.1:8888/index.html
 
-- Shared GWT sources: `JMugen/…/JMugen.gwt.xml`
-- Browser-only code: `JMugen.Render.libgdx/web` → `JMugenWebClient.gwt.xml` + `org/lee/mugen/gwt/` + `Gwt*.java`
-- Full guide: [JMugen.Render.libgdx/web/README.md](./JMugen.Render.libgdx/web/README.md)
-
-### Force GWT recompile
-
-```sh
-mvn -pl JMugen.Render.libgdx/web -rf :JMugen.Render.libgdx.web gwt:compile -Dgwt.compiler.force=true
-```
-
 ## Android
 
-See `JMugen.Render.libgdx/android` and its asset sync scripts. Build from the repo root with the Android module in the reactor (CI excludes it when needed).
+Optional — enable with `-Pandroid` and set `ANDROID_HOME`:
 
-## Legacy modules
+```sh
+export ANDROID_HOME=/path/to/Android/Sdk
+echo "sdk.dir=$ANDROID_HOME" > local.properties
+./gradlew -Pandroid :libgdx-android:assembleDebug
+```
 
-`tools/JMugen.Launcher` / `tools/JMugen.Debug` may still exist for older flows. The supported LibGDX path is **desktop / Android / web** above.
+APK: `JMugen.Render.libgdx/android/build/outputs/apk/debug/`
 
-## References
+## Release jar (shaded desktop)
 
-- [Mugen Engine (Wikipedia)](https://en.wikipedia.org/wiki/Mugen_(game_engine))
-- [Google Code Archive: JMugen](https://code.google.com/archive/p/jmugen/)
-- [JMugen Live Debug and Expression Watch (YouTube)](https://www.youtube.com/watch?v=6uVFrC91OU8)
+```sh
+./gradlew :jmugen-debug:shadowJar
+# → tools/JMugen.Debug/build/libs/JMugen.Debug-0.0.1-SNAPSHOT.jar
+```
+
+## Gradle modules
+
+| Gradle project | Directory |
+|----------------|-----------|
+| `:jmugen-properties` | `JMugen.Properties/` |
+| `:jmugen-common` | `JMugen.Common/` |
+| `:jmugen-plugin-audio-adx` | `JMugen.plugin.audio.adx/` |
+| `:jmugen-engine` | `JMugen/` |
+| `:libgdx-core` | `JMugen.Render.libgdx/core/` |
+| `:libgdx-desktop` | `JMugen.Render.libgdx/desktop/` |
+| `:libgdx-web` | `JMugen.Render.libgdx/web/` |
+| `:libgdx-android` | `JMugen.Render.libgdx/android/` (with `-Pandroid`) |
+| `:jmugen-syntax` | `tools/Syntax/` |
+| `:jmugen-debug` | `tools/JMugen.Debug/` |
+| `:jmugen-launcher` | `tools/JMugen.Launcher/` |

@@ -1,0 +1,115 @@
+buildscript {
+    dependencies {
+        classpath "org.docstr:gwt-gradle-plugin:$gwtPluginVersion"
+        classpath "org.gretty:gretty:$grettyVersion"
+    }
+}
+
+plugins {
+    id 'java-library'
+}
+
+apply plugin: 'gwt'
+apply plugin: 'war'
+apply plugin: 'org.gretty'
+
+group = 'JMugen.Render.libgdx.web'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+sourceSets.main.java {
+    exclude '**/gwt/**'
+    exclude '**/Gwt*.java'
+}
+
+configurations.all {
+    exclude group: 'org.eclipse.jetty', module: 'apache-jsp'
+}
+
+configurations {
+    gwtSources {
+        transitive = false
+    }
+}
+
+dependencies {
+    implementation project(':libgdx-core')
+    implementation project(':jmugen-properties')
+    implementation(project(':jmugen-engine')) {
+        exclude group: 'com.googlecode.soundlibs', module: 'mp3spi'
+        exclude group: 'com.googlecode.soundlibs', module: 'vorbisspi'
+        exclude group: 'com.googlecode.soundlibs', module: 'tritonus-share'
+    }
+    implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
+    gwtSources("com.badlogicgames.gdx:gdx:$gdxVersion") {
+        artifact { classifier = 'sources' }
+    }
+    gwtSources("com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion") {
+        artifact { classifier = 'sources' }
+    }
+    compileOnly "org.gwtproject:gwt-dev:$gwtVersion"
+}
+
+def gwtProjectModules = [':jmugen-engine', ':jmugen-common', ':jmugen-properties', ':libgdx-core']
+
+tasks.register('syncGdxAssets', Copy) {
+    from "${rootProject.projectDir}/data"
+    into layout.buildDirectory.dir('gdx-assets/data')
+}
+
+tasks.register('unpackGwtSources', Sync) {
+    dependsOn syncGdxAssets
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    gwtProjectModules.each { path ->
+        def p = project(path)
+        from p.sourceSets.main.java.srcDirs
+        from p.sourceSets.main.resources.srcDirs
+    }
+    from sourceSets.main.resources.srcDirs
+    from configurations.gwtSources.collect { zipTree(it) }
+    into layout.buildDirectory.dir('gwt-src')
+}
+
+gwt {
+    gwtVersion = gwtVersion
+    maxHeapSize = '1024M'
+    minHeapSize = '512M'
+    src = files("${projectDir}/src/main/java", layout.buildDirectory.dir('gwt-src'))
+    modules 'org.lee.mugen.renderer.libgdx.web.JMugenWeb'
+    devModules 'org.lee.mugen.renderer.libgdx.web.JMugenWeb'
+    compiler.style = 'PRETTY'
+}
+
+gretty {
+    httpPort = 8888
+    contextPath = '/'
+    servletContainer = 'jetty11'
+}
+
+tasks.named('compileGwt').configure { dependsOn unpackGwtSources }
+tasks.named('draftCompileGwt').configure { dependsOn unpackGwtSources }
+
+tasks.register('distWeb') {
+    group = 'build'
+    description = 'GWT output + static webapp for gh-pages / static hosting'
+    dependsOn compileGwt
+    doLast {
+        def webappDir = layout.buildDirectory.dir('webapp').get().asFile
+        webappDir.mkdirs()
+        copy {
+            from "${projectDir}/src/main/webapp"
+            into webappDir
+        }
+        copy {
+            from layout.buildDirectory.dir('gwt/out')
+            into webappDir
+        }
+    }
+}

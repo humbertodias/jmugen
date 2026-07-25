@@ -1,0 +1,26 @@
+group = 'JMugen'
+
+sourceSets {
+    main {
+        java {
+            srcDirs = [
+                'src/main/java',
+                'srcBackground',
+                'srcForFightDef',
+                'srcIntro',
+                'srcSystem',
+                'srcSelect',
+                'srcStage'
+            ]
+            exclude '**/gwt/**'
+        }
+    }
+}
+
+dependencies {
+    api project(':jmugen-common')
+    api project(':jmugen-plugin-audio-adx')
+    api 'com.googlecode.soundlibs:vorbisspi:1.0.3.3'
+    api 'com.googlecode.soundlibs:mp3spi:1.9.5.4'
+    api 'com.googlecode.soundlibs:tritonus-share:0.3.7.4'
+}

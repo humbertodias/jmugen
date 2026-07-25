@@ -7,9 +7,9 @@
 
     <source path=""/>
     <!-- Source tree for PreloaderBundleGenerator (must differ from output; generator wipes output assets/). -->
-    <set-configuration-property name="gdx.assetpath" value="JMugen.Render.libgdx/web/target/gdx-assets"/>
+    <set-configuration-property name="gdx.assetpath" value="build/gdx-assets"/>
     <!-- Writes webapp/assets/assets.txt + hashed copies for the browser preloader. -->
-    <set-configuration-property name="gdx.assetoutputpath" value="JMugen.Render.libgdx/web/src/main/webapp/"/>
+    <set-configuration-property name="gdx.assetoutputpath" value="src/main/webapp/"/>
     <set-configuration-property name="gdx.assetfilterclass"
                                 value="org.lee.mugen.renderer.libgdx.web.JMugenGwtAssetFilter"/>
 

@@ -23,10 +23,10 @@ jmugen/
 ├── JMugen.Common/               # Shared APIs + GWT-safe common types
 ├── JMugen.Properties/           # Config / resource bundles
 ├── JMugen.plugin.audio.adx/     # ADX audio plugin (desktop engine)
-├── JMugen.Render.libgdx/        # LibGDX backends (Maven aggregator)
+├── JMugen.Render.libgdx/        # LibGDX backends (Gradle)
 │   ├── core/                    # Shared drawer, timer, keys, audio glue
 │   ├── desktop/                 # LWJGL3 — LGDXDesktopMain
-│   ├── android/                 # Android launcher + asset sync
+│   ├── android/                 # Android launcher + asset sync (-Pandroid)
 │   └── web/                     # GWT — JMugenWeb + JMugenWebClient
 ├── tools/                       # Optional / legacy tooling
 │   ├── JMugen.Debug/
@@ -35,7 +35,7 @@ jmugen/
 └── data/                        # Mugen content (copied into backends)
 ```
 
-Maven artifactIds keep the long names (e.g. `JMugen.Render.libgdx.web`); use path selectors with `-pl JMugen.Render.libgdx/web` or `:JMugen.Render.libgdx.web`.
+Gradle modules use short names (`:libgdx-desktop`, `:libgdx-web`, …). See [DEV.md](./DEV.md).
 
 **Web**
 
@@ -46,25 +46,29 @@ Details: [desktop README](./JMugen.Render.libgdx/desktop/README.md), [web README
 
 ## Run
 
-From the **repository root**. Compile with `-am`, then run only the target module with `-rf` (avoids applying the goal on the parent POM).
+From the **repository root**:
 
 ### Desktop
 
-Use `exec:exec` (not `exec:java`) on macOS so GLFW gets `-XstartOnFirstThread`.
-
 ```bash
-mvn -pl JMugen.Render.libgdx/desktop -am compile -DskipTests
-mvn -pl JMugen.Render.libgdx/desktop -rf :JMugen.Render.libgdx.desktop exec:exec
+./gradlew :libgdx-desktop:run
 ```
 
 ### Web
 
 ```bash
-mvn -pl JMugen.Render.libgdx/web -am package -DskipTests
-mvn -pl JMugen.Render.libgdx/web -rf :JMugen.Render.libgdx.web gwt:run
+./gradlew :libgdx-web:distWeb
+python3 -m http.server -d JMugen.Render.libgdx/web/build/webapp 8888
 ```
 
 Then open http://127.0.0.1:8888/index.html
+
+### Android
+
+```bash
+export ANDROID_HOME=/path/to/Android/Sdk
+./gradlew -Pandroid :libgdx-android:assembleDebug
+```
 
 ## Controls
 

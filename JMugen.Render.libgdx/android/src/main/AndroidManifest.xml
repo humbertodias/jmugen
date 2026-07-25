@@ -1,11 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.lee.mugen.renderer.libgdx.android">
-
-    <!-- targetSdk 29: avoids install error on API 30+ when resources.arsc is still compressed (android-maven-plugin). -->
-    <uses-sdk
-        android:minSdkVersion="26"
-        android:targetSdkVersion="29" />
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application
         android:allowBackup="true"

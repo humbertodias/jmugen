@@ -1,3 +1,14 @@
+# Gradle
+.gradle/
+**/.gradle/
+build/
+**/build/
+local.properties
+*.hprof
+/captures/
+.externalNativeBuild/
+.cxx/
+
 /target/
 .idea
 .vscode

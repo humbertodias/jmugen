@@ -1,0 +1,11 @@
+apply plugin: 'application'
+
+group = 'JMugen.Launcher'
+
+application {
+    mainClass = 'org.mugen.launch.Launch'
+}
+
+dependencies {
+    implementation project(':jmugen-debug')
+}
