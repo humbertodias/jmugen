@@ -1,6 +1,6 @@
 [![CI](https://github.com/humbertodias/jmugen/actions/workflows/ci.yml/badge.svg)](https://github.com/humbertodias/jmugen/actions/workflows/ci.yml)
 [![CD](https://github.com/humbertodias/jmugen/actions/workflows/cd.yml/badge.svg)](https://github.com/humbertodias/jmugen/actions/workflows/cd.yml)
-[![gh-pages](https://github.com/humbertodias/jmugen/actions/workflows/gh-pages.yml/badge.svg)](https://github.com/humbertodias/jmugen/actions/workflows/gh-pages.yml)
+[![pages](https://github.com/humbertodias/jmugen/actions/workflows/pages.yml/badge.svg)](https://github.com/humbertodias/jmugen/actions/workflows/pages.yml)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/humbertodias/jmugen)
 ![GitHub all releases](https://img.shields.io/github/downloads/humbertodias/jmugen/total)
 
@@ -96,7 +96,7 @@ LibGDX backends:
 - Android
 - Web (TeaVM / browser)
 
-Release artifacts: [releases](https://github.com/humbertodias/jmugen/releases). Pages build: [gh-pages](https://github.com/humbertodias/jmugen/actions/workflows/gh-pages.yml).
+Release artifacts: [releases](https://github.com/humbertodias/jmugen/releases). Pages build: [pages](https://github.com/humbertodias/jmugen/actions/workflows/pages.yml).
 
 ## Contribute
 

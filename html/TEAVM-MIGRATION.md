@@ -18,7 +18,7 @@ GWT `.gwt.xml` files remain in `engine/` as documentation of the original allow/
 ```bash
 ./gradlew :html:gdx_teavm_web_js_build   # compile to JS
 ./gradlew :html:gdx_teavm_web_js_run     # dev server
-./gradlew :html:distWeb                  # webapp/ for static hosting / gh-pages
+./gradlew :html:distWeb                  # webapp/ for static hosting / GitHub Pages
 ```
 
 ## TeaVM-specific notes

@@ -201,7 +201,7 @@ tasks.register('printTeavmClasspath') {
 
 tasks.register('distWeb') {
     group = 'build'
-    description = 'TeaVM JS output + static webapp for gh-pages / static hosting'
+    description = 'TeaVM JS output + static webapp for GitHub Pages / static hosting'
     dependsOn 'gdx_teavm_web_js_build'
     doLast {
         def webappDir = layout.buildDirectory.dir('webapp').get().asFile
