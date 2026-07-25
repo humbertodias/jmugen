@@ -68,10 +68,12 @@ function jmugen(){
     scriptFrame.tabIndex = -1;
     $doc_0.body.appendChild(scriptFrame);
     frameDoc = scriptFrame.contentWindow.document;
-    frameDoc.open();
-    var doctype = document.compatMode == 'CSS1Compat'?'<!doctype html>':'';
-    frameDoc.write(doctype + '<html><head><\/head><body><\/body><\/html>');
-    frameDoc.close();
+    if (navigator.userAgent.indexOf('Chrome') == -1) {
+      frameDoc.open();
+      var doctype = document.compatMode == 'CSS1Compat'?'<!doctype html>':'';
+      frameDoc.write(doctype + '<html><head><\/head><body><\/body><\/html>');
+      frameDoc.close();
+    }
   }
 
   function installScript(filename){
@@ -118,7 +120,9 @@ function jmugen(){
       var docbody = doc.body;
       var script = doc.createElement('script');
       script.language = 'javascript';
-      script.crossOrigin = '';
+      if (location.host) {
+        script.crossOrigin = '';
+      }
       script.src = code_0;
       if (jmugen.__errFn) {
         script.onerror = function(){
@@ -357,8 +361,8 @@ function jmugen(){
     }
     var strongName;
     try {
-      unflattenKeylistIntoAnswers(['safari'], '0382E70DEE14A2B045276651F21D7045');
-      unflattenKeylistIntoAnswers(['gecko1_8'], '40FB435889396B9A55DE8579F5CCC5BA');
+      unflattenKeylistIntoAnswers(['gecko1_8'], '9234A27B1C40D024798DBE32C2556128');
+      unflattenKeylistIntoAnswers(['safari'], 'E6C2B4EE773A62FAC71BE8E0848188DA');
       strongName = answers[computePropValue('user.agent')];
       var idx = strongName.indexOf(':');
       if (idx != -1) {
