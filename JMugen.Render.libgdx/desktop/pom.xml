@@ -13,7 +13,7 @@
     </parent>
 
     <properties>
-        <libgdx.version>1.14.0</libgdx.version>
+        <libgdx.version>1.14.2</libgdx.version>
         <desktop.mainClass>org.lee.mugen.renderer.libgdx.LGDXDesktopMain</desktop.mainClass>
     </properties>
 
