@@ -1,9 +1,7 @@
 package org.lee.mugen.core;
 
-import org.lee.mugen.ResourceBundleHelper;
-
 /**
- * GWT: no {@link System#getProperty(String)} / {@link java.io.File}.
+ * GWT/TeaVM: no {@link System#getProperty(String)} / {@link java.io.File}.
  */
 public final class ResourceRoots {
 
@@ -21,10 +19,14 @@ public final class ResourceRoots {
     }
 
     public static String resolveDataResourcePrefix() {
-        if (resourcePrefixOverride != null && !resourcePrefixOverride.isEmpty()) {
+        if (resourcePrefixOverride != null) {
+            if (resourcePrefixOverride.isEmpty()) {
+                return "";
+            }
             return ensureTrailingSlash(resourcePrefixOverride);
         }
-        return ResourceBundleHelper.getBundle("data").getString("resource");
+        // gdx-teavm serves repo assets/ at internal root (data/system.def, chars/…).
+        return "";
     }
 
     private static String ensureTrailingSlash(String override) {

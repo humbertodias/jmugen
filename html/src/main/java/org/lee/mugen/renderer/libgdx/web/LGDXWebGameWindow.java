@@ -10,10 +10,6 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.google.gwt.core.client.Scheduler;
-import com.google.gwt.dom.client.Document;
-import com.google.gwt.dom.client.Element;
-import com.google.gwt.dom.client.Style;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -229,17 +225,7 @@ public class LGDXWebGameWindow implements GameWindow, ApplicationListener, LGDXR
         try {
             callback.init(this);
             finishInit = true;
-            Scheduler.get()
-                .scheduleDeferred(
-                    new Scheduler.ScheduledCommand() {
-                        @Override
-                        public void execute() {
-                            Element el = Document.get().getElementById("jmugen-status");
-                            if (el != null) {
-                                el.getStyle().setDisplay(Style.Display.NONE);
-                            }
-                        }
-                    });
+            WebDomHelper.hideElementDeferred("jmugen-status");
         } catch (Exception e) {
             Gdx.app.error("JMugenWeb", "Error initializing web game", e);
             throw new RuntimeException("Failed to initialize web game callback", e);
@@ -394,17 +380,7 @@ public class LGDXWebGameWindow implements GameWindow, ApplicationListener, LGDXR
         }
         if (gesture) {
             web.onUserGesture();
-            Scheduler.get()
-                    .scheduleDeferred(
-                            new Scheduler.ScheduledCommand() {
-                                @Override
-                                public void execute() {
-                                    Element el = Document.get().getElementById("jmugen-audio-hint");
-                                    if (el != null) {
-                                        el.getStyle().setDisplay(Style.Display.NONE);
-                                    }
-                                }
-                            });
+            WebDomHelper.hideElementDeferred("jmugen-audio-hint");
         }
     }
 

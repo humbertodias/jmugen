@@ -38,3 +38,7 @@ resource/cache
 **/.cache/sfx/
 
 assets/cache
+
+# TeaVM generated / staged sources
+engine/web/src/teavmCurated/
+html/build/teavm/

@@ -38,6 +38,7 @@ jobs:
 
       - name: Verify deploy artifact size
         run: |
+          test -f html/build/webapp/app.js
           test ! -d html/build/webapp/gwt-unitCache
           find html/build/webapp -type f -size +95M -print -quit | grep -q . && exit 1 || true
 

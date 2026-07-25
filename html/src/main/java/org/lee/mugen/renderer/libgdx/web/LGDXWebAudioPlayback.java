@@ -3,22 +3,19 @@ package org.lee.mugen.renderer.libgdx.web;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.files.FileHandle;
-import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.typedarrays.shared.ArrayBuffer;
-import com.google.gwt.typedarrays.shared.Int8Array;
-import com.google.gwt.typedarrays.shared.TypedArrays;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.lee.mugen.core.sound.AudioPlayback;
+import org.teavm.jso.JSBody;
+import org.teavm.jso.JSObject;
+import org.teavm.jso.typedarrays.ArrayBuffer;
+import org.teavm.jso.typedarrays.Float32Array;
+import org.teavm.jso.typedarrays.Uint8Array;
 
 /**
- * Web {@link AudioPlayback}.
- *
- * <p>BGM uses LibGDX {@link Music} (internal assets). SFX cannot use {@code Gdx.audio.newSound} with
- * {@code FileHandle.local} — GWT's WebAudio backend only XHRs preloaded asset URLs — so WAV bytes from
- * {@code .snd} are decoded with the Web Audio API directly.
+ * Web {@link AudioPlayback} for TeaVM ({@code @JSBody} instead of GWT JSNI).
  */
 public final class LGDXWebAudioPlayback implements AudioPlayback {
 
@@ -30,9 +27,9 @@ public final class LGDXWebAudioPlayback implements AudioPlayback {
     private volatile boolean unlocked;
     private volatile String pendingMusicPath;
 
-    private JavaScriptObject sfxContext;
-    private JavaScriptObject sfxGain;
-    private final Map<String, JavaScriptObject> sfxBuffers = new HashMap<String, JavaScriptObject>();
+    private JSObject sfxContext;
+    private JSObject sfxGain;
+    private final Map<String, JSObject> sfxBuffers = new HashMap<String, JSObject>();
     private final Map<String, Boolean> sfxPendingDecode = new HashMap<String, Boolean>();
 
     private static String sfxKey(byte[] data) {
@@ -199,13 +196,11 @@ public final class LGDXWebAudioPlayback implements AudioPlayback {
         }
         resumeSfxContext();
         String key = sfxKey(data);
-        JavaScriptObject buffer = sfxBuffers.get(key);
+        JSObject buffer = sfxBuffers.get(key);
         if (buffer != null) {
             playDecodedBuffer(sfxContext, sfxGain, buffer, musicVolume);
             return;
         }
-        // MUGEN .snd samples are usually 8-bit PCM WAV. decodeAudioData is unreliable for
-        // those on some browsers — build an AudioBuffer from PCM directly when possible.
         buffer = createBufferFromPcmWav(sfxContext, data);
         if (buffer != null) {
             if (sfxBuffers.size() >= MAX_SFX_CACHE) {
@@ -218,18 +213,10 @@ public final class LGDXWebAudioPlayback implements AudioPlayback {
         if (sfxPendingDecode.containsKey(key)) {
             return;
         }
-        if (sfxBuffers.size() >= MAX_SFX_CACHE) {
-            evictOneSfxBuffer();
-        }
-        sfxPendingDecode.put(key, Boolean.TRUE);
-        ArrayBuffer ab = toArrayBuffer(data);
-        decodeSfx(sfxContext, ab, key);
+        Gdx.app.error("JMugenWebAudio", "SFX decode unsupported for non-PCM WAV on web, key=" + key);
     }
 
-    /**
-     * Build a Web Audio buffer from a PCM WAV (fmt=1). Returns null for non-PCM / invalid data.
-     */
-    private static JavaScriptObject createBufferFromPcmWav(JavaScriptObject ctx, byte[] wav) {
+    private static JSObject createBufferFromPcmWav(JSObject ctx, byte[] wav) {
         if (ctx == null || wav == null || wav.length < 44) {
             return null;
         }
@@ -290,9 +277,7 @@ public final class LGDXWebAudioPlayback implements AudioPlayback {
         if (frameCount < 1) {
             return null;
         }
-        // Mix to mono for simplicity (MUGEN fight/system samples are mono).
-        com.google.gwt.typedarrays.shared.Float32Array samples =
-                TypedArrays.createFloat32Array(frameCount);
+        Float32Array samples = Float32Array.create(frameCount);
         if (bits == 8) {
             for (int i = 0; i < frameCount; i++) {
                 int unsigned = wav[dataOff + i * frameSize] & 0xff;
@@ -320,17 +305,13 @@ public final class LGDXWebAudioPlayback implements AudioPlayback {
         return (data[off] & 0xff) | ((data[off + 1] & 0xff) << 8);
     }
 
-    private static native JavaScriptObject createMonoBuffer(
-            JavaScriptObject ctx,
-            int sampleRate,
-            com.google.gwt.typedarrays.shared.Float32Array samples) /*-{
-        var buffer = ctx.createBuffer(1, samples.length, sampleRate);
-        buffer.getChannelData(0).set(samples);
-        return buffer;
-    }-*/;
+    @JSBody(params = {"ctx", "sampleRate", "samples"}, script = ""
+            + "var buffer = ctx.createBuffer(1, samples.length, sampleRate);"
+            + "buffer.getChannelData(0).set(samples);"
+            + "return buffer;")
+    private static native JSObject createMonoBuffer(JSObject ctx, int sampleRate, Float32Array samples);
 
-    /** Called from JSNI when {@code decodeAudioData} succeeds. */
-    void onSfxDecoded(String key, JavaScriptObject buffer) {
+    void onSfxDecoded(String key, JSObject buffer) {
         sfxPendingDecode.remove(key);
         if (buffer == null) {
             Gdx.app.error("JMugenWebAudio", "SFX decode returned null for key " + key);
@@ -340,7 +321,6 @@ public final class LGDXWebAudioPlayback implements AudioPlayback {
         playDecodedBuffer(sfxContext, sfxGain, buffer, musicVolume);
     }
 
-    /** Called from JSNI when decode fails. */
     void onSfxDecodeError(String key) {
         sfxPendingDecode.remove(key);
         Gdx.app.error("JMugenWebAudio", "SFX decodeAudioData failed key=" + key);
@@ -355,11 +335,11 @@ public final class LGDXWebAudioPlayback implements AudioPlayback {
     }
 
     private static ArrayBuffer toArrayBuffer(byte[] data) {
-        Int8Array arr = TypedArrays.createInt8Array(data.length);
+        Uint8Array arr = Uint8Array.create(data.length);
         for (int i = 0; i < data.length; i++) {
             arr.set(i, data[i]);
         }
-        return arr.buffer();
+        return arr.getBuffer();
     }
 
     private void ensureSfxContext() {
@@ -384,70 +364,38 @@ public final class LGDXWebAudioPlayback implements AudioPlayback {
         }
     }
 
-    private static native JavaScriptObject createAudioContext() /*-{
-        var AC = $wnd.AudioContext || $wnd.webkitAudioContext;
-        if (!AC) {
-            return null;
-        }
-        return new AC();
-    }-*/;
+    @JSBody(params = {}, script = ""
+            + "var AC = window.AudioContext || window.webkitAudioContext;"
+            + "return AC ? new AC() : null;")
+    private static native JSObject createAudioContext();
 
-    private static native JavaScriptObject createGain(JavaScriptObject ctx, float volume) /*-{
-        var gain = ctx.createGain ? ctx.createGain() : ctx.createGainNode();
-        gain.gain.value = volume;
-        gain.connect(ctx.destination);
-        return gain;
-    }-*/;
+    @JSBody(params = {"ctx", "volume"}, script = ""
+            + "var gain = ctx.createGain ? ctx.createGain() : ctx.createGainNode();"
+            + "gain.gain.value = volume;"
+            + "gain.connect(ctx.destination);"
+            + "return gain;")
+    private static native JSObject createGain(JSObject ctx, float volume);
 
-    private static native void setGainValue(JavaScriptObject gain, float volume) /*-{
-        if (gain && gain.gain) {
-            gain.gain.value = volume;
-        }
-    }-*/;
+    @JSBody(params = {"gain", "volume"}, script = ""
+            + "if (gain && gain.gain) { gain.gain.value = volume; }")
+    private static native void setGainValue(JSObject gain, float volume);
 
-    private static native void resumeContext(JavaScriptObject ctx) /*-{
-        if (ctx && ctx.state === 'suspended' && ctx.resume) {
-            ctx.resume();
-        }
-    }-*/;
+    @JSBody(params = {"ctx"}, script = ""
+            + "if (ctx && ctx.state === 'suspended' && ctx.resume) { ctx.resume(); }")
+    private static native void resumeContext(JSObject ctx);
 
-    private native void decodeSfx(JavaScriptObject ctx, ArrayBuffer data, String key) /*-{
-        var self = this;
-        ctx.decodeAudioData(
-            data,
-            function(buffer) {
-                self.@org.lee.mugen.renderer.libgdx.web.LGDXWebAudioPlayback::onSfxDecoded(Ljava/lang/String;Lcom/google/gwt/core/client/JavaScriptObject;)(key, buffer);
-            },
-            function(err) {
-                self.@org.lee.mugen.renderer.libgdx.web.LGDXWebAudioPlayback::onSfxDecodeError(Ljava/lang/String;)(key);
-            }
-        );
-    }-*/;
-
+    @JSBody(params = {"ctx", "gain", "buffer", "volume"}, script = ""
+            + "if (!ctx || !buffer) { return; }"
+            + "if (ctx.state === 'suspended' && ctx.resume) { ctx.resume(); }"
+            + "var src = ctx.createBufferSource();"
+            + "src.buffer = buffer;"
+            + "var g = ctx.createGain ? ctx.createGain() : ctx.createGainNode();"
+            + "g.gain.value = volume;"
+            + "src.connect(g);"
+            + "if (gain) { g.connect(gain); } else { g.connect(ctx.destination); }"
+            + "if (src.start) { src.start(0); } else { src.noteOn(0); }")
     private static native void playDecodedBuffer(
-            JavaScriptObject ctx, JavaScriptObject gain, JavaScriptObject buffer, float volume) /*-{
-        if (!ctx || !buffer) {
-            return;
-        }
-        if (ctx.state === 'suspended' && ctx.resume) {
-            ctx.resume();
-        }
-        var src = ctx.createBufferSource();
-        src.buffer = buffer;
-        var g = ctx.createGain ? ctx.createGain() : ctx.createGainNode();
-        g.gain.value = volume;
-        src.connect(g);
-        if (gain) {
-            g.connect(gain);
-        } else {
-            g.connect(ctx.destination);
-        }
-        if (src.start) {
-            src.start(0);
-        } else {
-            src.noteOn(0);
-        }
-    }-*/;
+            JSObject ctx, JSObject gain, JSObject buffer, float volume);
 
     @Override
     public boolean isBackgroundStopped() {

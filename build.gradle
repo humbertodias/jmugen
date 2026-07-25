@@ -8,7 +8,7 @@ allprojects {
 }
 
 subprojects { sub ->
-    if (sub.name !in ['android', 'html']) {
+    if (sub.name !in ['android', 'html', 'engine-web']) {
         apply plugin: 'java-library'
 
         java {

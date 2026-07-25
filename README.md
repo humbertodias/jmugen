@@ -7,7 +7,7 @@
 
 # JMugen
 
-Java recreation of the classic 2D fighting engine [M.U.G.E.N](https://www.elecbyte.com/mugendocs-11b1/mugen.html), rendered with **LibGDX** (desktop, Android, and browser via GWT).
+Java recreation of the classic 2D fighting engine [M.U.G.E.N](https://www.elecbyte.com/mugendocs-11b1/mugen.html), rendered with **LibGDX** (desktop, Android, and browser via TeaVM).
 
 Forked from [code.google/jmugen](https://code.google.com/archive/p/jmugen/).
 
@@ -22,11 +22,12 @@ jmugen/
 ├── core/                        # Shared LibGDX drawer, timer, keys, audio glue
 ├── desktop/                     # LWJGL3 — LGDXDesktopMain
 ├── android/                     # Android launcher + asset sync (-Pandroid)
-├── html/                        # GWT — JMugenWeb + JMugenWebClient
+├── html/                        # TeaVM — TeaVMWebLauncher + gdx-teavm
 ├── engine/
 │   ├── main/                    # Engine (fight, menu, select, parsers)
-│   ├── common/                  # Shared APIs + GWT-safe common types
+│   ├── common/                  # Shared APIs + web-safe common types
 │   ├── properties/              # Config / resource bundles
+│   ├── web/                     # Browser overrides + TeaVM-curated sources
 │   └── adx/                     # ADX audio plugin (desktop engine)
 ├── tools/                       # Optional / legacy tooling
 │   ├── JMugen.Debug/
@@ -39,8 +40,8 @@ Gradle modules follow the [LibGDX multi-project layout](https://libgdx.com/wiki/
 
 **Web**
 
-- Shared GWT-translatable types → `engine/main`, `engine/common`, `engine/properties` (`.gwt.xml`, no `gwt/` tree)
-- All browser FQN overrides + `Gwt*` → `html/` (`JMugenWebClient.gwt.xml`, `org/lee/mugen/gwt/`)
+- Shared web-translatable types → `engine/main`, `engine/common`, `engine/properties` (`.gwt.xml` documents curation rules)
+- Browser FQN overrides + `Gwt*` + TeaVM curation → `engine/web/` (`teavm-sources.gradle`)
 
 Details: [desktop README](./desktop/README.md), [web README](./html/README.md), [DEV.md](./DEV.md).
 
@@ -93,7 +94,7 @@ LibGDX backends:
 
 - Desktop (Linux / macOS / Windows, x64 and ARM where natives allow)
 - Android
-- Web (GWT / browser)
+- Web (TeaVM / browser)
 
 Release artifacts: [releases](https://github.com/humbertodias/jmugen/releases). Pages build: [gh-pages](https://github.com/humbertodias/jmugen/actions/workflows/gh-pages.yml).
 

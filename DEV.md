@@ -2,7 +2,7 @@
 
 ## Requirements
 
-- **JDK 17+** (Gradle / LibGDX / Android / GWT compiler)
+- **JDK 17+** (Gradle / LibGDX / Android / TeaVM web)
 - Gradle wrapper: `./gradlew` (included in repo)
 
 ### SDKMAN example
@@ -29,12 +29,12 @@ From the **repository root**:
 - Working directory is the repo root (so `./assets/` resolves).
 - macOS: `-XstartOnFirstThread` is applied automatically.
 
-## Web (GWT)
+## Web (TeaVM)
 
 ```sh
 ./gradlew :html:distWeb
 # or live dev:
-./gradlew :html:gwtDevMode
+./gradlew :html:gdx_teavm_web_js_run
 ```
 
 Static hosting after `distWeb`:
@@ -72,6 +72,7 @@ APK: `android/build/outputs/apk/debug/`
 | `:engine-common` | `engine/common/` |
 | `:engine-adx` | `engine/adx/` |
 | `:engine` | `engine/main/` |
+| `:engine-web` | `engine/web/` |
 | `:core` | `core/` |
 | `:desktop` | `desktop/` |
 | `:html` | `html/` |

@@ -9,8 +9,8 @@ import org.lee.mugen.renderer.GraphicsWrapper;
  */
 public final class LGDXWebPlatform {
 
-    /** Gdx internal prefix: assets mirror repo {@code data/} under {@code data/} (see web {@code pom.xml}). */
-    public static final String DATA_PREFIX = "data/";
+    /** LibGDX internal paths are relative to bundled {@code assets/} (e.g. {@code data/system.def}). */
+    public static final String DATA_PREFIX = "";
 
     private static boolean prepared;
 

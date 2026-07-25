@@ -1,0 +1,90 @@
+plugins {
+    id 'java-library'
+}
+
+apply from: 'teavm-sources.gradle'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+def teavmOverrideRoot = file('src/main/java/org/lee/mugen')
+
+ext.teavmOverrideRelPaths = fileTree(teavmOverrideRoot) {
+    include '**/*.java'
+}.files.collect { File f ->
+    teavmOverrideRoot.toPath().relativize(f.toPath()).toString().replace('\\', '/')
+}.toSet()
+
+def curatedEngineDir = file('src/teavmCurated/java')
+
+tasks.register('syncTeavmCuratedSources') {
+    description = 'Stage GWT-equivalent engine/core/common/properties sources for TeaVM (not compiled by javac)'
+    outputs.dir(curatedEngineDir)
+
+    doLast {
+        project.delete(curatedEngineDir)
+        curatedEngineDir.mkdirs()
+
+        teavmCollectCuratedEngineSources().each { File source ->
+            String rel = null
+            for (String marker : teavmAllSourceMarkers) {
+                rel = teavmRelativeMugenPath(source, marker)
+                if (rel != null) {
+                    break
+                }
+            }
+            if (rel != null && !teavmOverrideRelPaths.contains(rel)) {
+                File dest = new File(curatedEngineDir, teavmMugenPackage + rel)
+                dest.parentFile.mkdirs()
+                java.nio.file.Files.copy(source.toPath(), dest.toPath())
+            }
+        }
+    }
+}
+
+sourceSets {
+    teavmCurated {
+        java.srcDir curatedEngineDir
+    }
+}
+
+tasks.matching { it.name == 'compileTeavmCuratedJava' }.configureEach {
+    enabled = true
+    dependsOn 'syncTeavmCuratedSources'
+    classpath = configurations.compileClasspath
+}
+
+tasks.named('compileJava').configure {
+    dependsOn 'syncTeavmCuratedSources', 'compileTeavmCuratedJava'
+}
+
+tasks.register('mergeTeavmCuratedClasses', Copy) {
+    dependsOn 'compileTeavmCuratedJava'
+    from sourceSets.teavmCurated.output
+    into sourceSets.main.java.destinationDirectory
+}
+
+tasks.named('classes').configure {
+    dependsOn 'mergeTeavmCuratedClasses'
+}
+
+tasks.named('jar').configure {
+    dependsOn 'mergeTeavmCuratedClasses'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+sourceSets.main.java {
+    exclude '**/gwt/**'
+}
+
+dependencies {
+    api project(':engine-common')
+    api project(':engine-properties')
+    compileOnly project(':engine')
+}

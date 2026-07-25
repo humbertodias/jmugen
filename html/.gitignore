@@ -9,3 +9,4 @@
 # GWT preloader output (regenerated from repo data/ via build/gdx-assets)
 /src/main/webapp/assets/
 /src/main/gdx-assets/
+/src/teavm-unified/

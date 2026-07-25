@@ -4,6 +4,13 @@ pluginManagement {
         mavenCentral()
         gradlePluginPortal()
     }
+    resolutionStrategy {
+        eachPlugin {
+            if (requested.id.id == 'com.github.xpenatan.gdx-teavm') {
+                useModule("com.github.xpenatan.gdx-teavm:gdx-teavm-plugin:${requested.version}")
+            }
+        }
+    }
 }
 
 plugins {
@@ -24,6 +31,8 @@ include 'engine-properties'
 project(':engine-properties').projectDir = file('engine/properties')
 include 'engine-adx'
 project(':engine-adx').projectDir = file('engine/adx')
+include 'engine-web'
+project(':engine-web').projectDir = file('engine/web')
 
 // Optional tooling
 include 'tools-debug'
