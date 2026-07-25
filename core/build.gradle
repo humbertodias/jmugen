@@ -1,0 +1,5 @@
+dependencies {
+    api project(':engine-common')
+    api "com.badlogicgames.gdx:gdx:$gdxVersion"
+    api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
+}

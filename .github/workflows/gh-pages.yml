@@ -34,14 +34,14 @@ jobs:
           java-version: '17'
 
       - name: Build web
-        run: ./gradlew :libgdx-web:distWeb
+        run: ./gradlew :html:distWeb
 
       - name: Upload site artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          path: JMugen.Render.libgdx/web/build/webapp/
+          path: html/build/webapp/
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: JMugen.Render.libgdx/web/build/webapp/
+          folder: html/build/webapp/

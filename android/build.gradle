@@ -1,0 +1,83 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'org.lee.mugen.renderer.libgdx.android'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId 'org.lee.mugen.renderer.libgdx.android'
+        minSdk 26
+        targetSdk 34
+        versionCode 1
+        versionName jmugenVersion
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    sourceSets {
+        main {
+            manifest.srcFile 'src/main/AndroidManifest.xml'
+            java.srcDirs = ['src/main/java']
+            res.srcDirs = ['src/main/res']
+            assets.srcDirs = ['src/main/assets']
+        }
+    }
+
+    packaging {
+        resources {
+            excludes += '/META-INF/{AL2.0,LGPL2.1}'
+        }
+    }
+}
+
+configurations {
+    natives
+    all {
+        resolutionStrategy {
+            force "androidx.core:core:$androidxCoreVersion"
+        }
+    }
+}
+
+dependencies {
+    implementation project(':core')
+    implementation(project(':engine')) {
+        exclude group: 'com.googlecode.soundlibs', module: 'vorbisspi'
+        exclude group: 'javazoom', module: 'jlayer'
+    }
+    implementation "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
+    implementation "androidx.core:core:$androidxCoreVersion"
+    natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a"
+    natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-arm64-v8a"
+}
+
+tasks.register('syncMugenGameAssets', Copy) {
+    from "${rootProject.projectDir}/assets"
+    into "${projectDir}/src/main/assets/data"
+}
+
+preBuild.dependsOn syncMugenGameAssets
+
+tasks.register('copyAndroidNatives') {
+    doFirst {
+        file('libs/arm64-v8a').mkdirs()
+        configurations.natives.files.each { jar ->
+            copy {
+                from zipTree(jar)
+                into 'libs/arm64-v8a'
+                include '**/*.so'
+                eachFile { details -> details.path = details.name }
+                includeEmptyDirs = false
+            }
+        }
+    }
+}
+
+tasks.matching { it.name.startsWith('merge') && it.name.endsWith('NativeLibs') }.configureEach {
+    dependsOn copyAndroidNatives
+}

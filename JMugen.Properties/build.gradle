@@ -1,3 +1,0 @@
-group = 'JMugen.Properties'
-
-sourceSets.main.java.exclude '**/gwt/**'

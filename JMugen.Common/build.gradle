@@ -1,6 +1,0 @@
-group = 'JMugen.Common'
-
-dependencies {
-    api project(':jmugen-properties')
-    api 'commons-io:commons-io:2.22.0'
-}

@@ -1,7 +1,0 @@
-group = 'JMugen.Render.libgdx.core'
-
-dependencies {
-    api project(':jmugen-common')
-    api "com.badlogicgames.gdx:gdx:$gdxVersion"
-    api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
-}

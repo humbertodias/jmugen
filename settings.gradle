@@ -12,37 +12,27 @@ plugins {
 
 rootProject.name = 'jmugen'
 
-include 'jmugen-properties'
-project(':jmugen-properties').projectDir = file('JMugen.Properties')
+// LibGDX backends (standard layout)
+include 'core', 'desktop', 'html'
 
-include 'jmugen-common'
-project(':jmugen-common').projectDir = file('JMugen.Common')
+// Mugen engine
+include 'engine'
+project(':engine').projectDir = file('engine/main')
+include 'engine-common'
+project(':engine-common').projectDir = file('engine/common')
+include 'engine-properties'
+project(':engine-properties').projectDir = file('engine/properties')
+include 'engine-adx'
+project(':engine-adx').projectDir = file('engine/adx')
 
-include 'jmugen-plugin-audio-adx'
-project(':jmugen-plugin-audio-adx').projectDir = file('JMugen.plugin.audio.adx')
-
-include 'jmugen-engine'
-project(':jmugen-engine').projectDir = file('JMugen')
-
-include 'libgdx-core'
-project(':libgdx-core').projectDir = file('JMugen.Render.libgdx/core')
-
-include 'libgdx-desktop'
-project(':libgdx-desktop').projectDir = file('JMugen.Render.libgdx/desktop')
-
-include 'libgdx-web'
-project(':libgdx-web').projectDir = file('JMugen.Render.libgdx/web')
-
-include 'jmugen-syntax'
-project(':jmugen-syntax').projectDir = file('tools/Syntax')
-
-include 'jmugen-debug'
-project(':jmugen-debug').projectDir = file('tools/JMugen.Debug')
-
-include 'jmugen-launcher'
-project(':jmugen-launcher').projectDir = file('tools/JMugen.Launcher')
+// Optional tooling
+include 'tools-debug'
+project(':tools-debug').projectDir = file('tools/JMugen.Debug')
+include 'tools-launcher'
+project(':tools-launcher').projectDir = file('tools/JMugen.Launcher')
+include 'tools-syntax'
+project(':tools-syntax').projectDir = file('tools/Syntax')
 
 if (gradle.startParameter.projectProperties.containsKey('android')) {
-    include 'libgdx-android'
-    project(':libgdx-android').projectDir = file('JMugen.Render.libgdx/android')
+    include 'android'
 }

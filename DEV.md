@@ -23,24 +23,24 @@ From the **repository root**:
 ## Desktop
 
 ```sh
-./gradlew :libgdx-desktop:run
+./gradlew :desktop:run
 ```
 
-- Working directory is the repo root (so `./data/` resolves).
+- Working directory is the repo root (so `./assets/` resolves).
 - macOS: `-XstartOnFirstThread` is applied automatically.
 
 ## Web (GWT)
 
 ```sh
-./gradlew :libgdx-web:distWeb
+./gradlew :html:distWeb
 # or live dev:
-./gradlew :libgdx-web:gwtDevMode
+./gradlew :html:gwtDevMode
 ```
 
 Static hosting after `distWeb`:
 
 ```sh
-python3 -m http.server -d JMugen.Render.libgdx/web/build/webapp 8888
+python3 -m http.server -d html/build/webapp 8888
 ```
 
 Open http://127.0.0.1:8888/index.html
@@ -52,15 +52,15 @@ Optional — enable with `-Pandroid` and set `ANDROID_HOME`:
 ```sh
 export ANDROID_HOME=/path/to/Android/Sdk
 echo "sdk.dir=$ANDROID_HOME" > local.properties
-./gradlew -Pandroid :libgdx-android:assembleDebug
+./gradlew -Pandroid :android:assembleDebug
 ```
 
-APK: `JMugen.Render.libgdx/android/build/outputs/apk/debug/`
+APK: `android/build/outputs/apk/debug/`
 
 ## Release jar (shaded desktop)
 
 ```sh
-./gradlew :jmugen-debug:shadowJar
+./gradlew :tools-debug:shadowJar
 # → tools/JMugen.Debug/build/libs/JMugen.Debug-0.0.1-SNAPSHOT.jar
 ```
 
@@ -68,14 +68,14 @@ APK: `JMugen.Render.libgdx/android/build/outputs/apk/debug/`
 
 | Gradle project | Directory |
 |----------------|-----------|
-| `:jmugen-properties` | `JMugen.Properties/` |
-| `:jmugen-common` | `JMugen.Common/` |
-| `:jmugen-plugin-audio-adx` | `JMugen.plugin.audio.adx/` |
-| `:jmugen-engine` | `JMugen/` |
-| `:libgdx-core` | `JMugen.Render.libgdx/core/` |
-| `:libgdx-desktop` | `JMugen.Render.libgdx/desktop/` |
-| `:libgdx-web` | `JMugen.Render.libgdx/web/` |
-| `:libgdx-android` | `JMugen.Render.libgdx/android/` (with `-Pandroid`) |
-| `:jmugen-syntax` | `tools/Syntax/` |
-| `:jmugen-debug` | `tools/JMugen.Debug/` |
-| `:jmugen-launcher` | `tools/JMugen.Launcher/` |
+| `:engine-properties` | `engine/properties/` |
+| `:engine-common` | `engine/common/` |
+| `:engine-adx` | `engine/adx/` |
+| `:engine` | `engine/main/` |
+| `:core` | `core/` |
+| `:desktop` | `desktop/` |
+| `:html` | `html/` |
+| `:android` | `android/` (with `-Pandroid`) |
+| `:tools-syntax` | `tools/Syntax/` |
+| `:tools-debug` | `tools/JMugen.Debug/` |
+| `:tools-launcher` | `tools/JMugen.Launcher/` |

@@ -1,5 +1,0 @@
-group = 'JMugen.plugin.audio.adx'
-
-dependencies {
-    implementation 'com.googlecode.soundlibs:tritonus-share:0.3.7.4'
-}

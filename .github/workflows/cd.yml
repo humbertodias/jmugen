@@ -37,13 +37,13 @@ jobs:
           java-version: '17'
 
       - name: Package desktop release jar
-        run: ./gradlew :jmugen-debug:shadowJar
+        run: ./gradlew :tools-debug:shadowJar
 
       - name: Prepare release
         run: |
-          zip -9 -r data.zip data
+          zip -9 -r assets.zip assets
           cp tools/JMugen.Debug/build/libs/JMugen.Debug-*.jar "jmugen-${GITHUB_REF_NAME}-libgdx.jar"
-          ls -lha jmugen-*-libgdx.jar data.zip
+          ls -lha jmugen-*-libgdx.jar assets.zip
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -51,7 +51,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           files: |
-            data.zip
+            assets.zip
             jmugen-*-libgdx.jar
 
   Web:
@@ -77,8 +77,8 @@ jobs:
 
       - name: Package LibGDX web
         run: |
-          ./gradlew :libgdx-web:distWeb
-          (cd JMugen.Render.libgdx/web/build/webapp && zip -9 -r "../../../../jmugen-${GITHUB_REF_NAME}-libgdx-web.zip" .)
+          ./gradlew :html:distWeb
+          (cd html/build/webapp && zip -9 -r "../../../jmugen-${GITHUB_REF_NAME}-libgdx-web.zip" .)
           ls -lha jmugen-*-libgdx-web.zip
 
       - name: Create GitHub Release
@@ -132,8 +132,8 @@ jobs:
           ANDROID_SDK_ROOT: /home/runner/android-sdk
         run: |
           echo "sdk.dir=$ANDROID_HOME" > local.properties
-          ./gradlew -Pandroid :libgdx-android:assembleDebug
-          APK=$(find JMugen.Render.libgdx/android/build/outputs/apk -name '*.apk' | head -1)
+          ./gradlew -Pandroid :android:assembleDebug
+          APK=$(find android/build/outputs/apk -name '*.apk' | head -1)
           test -n "$APK"
           cp "$APK" "jmugen-${GITHUB_REF_NAME}-libgdx-android.apk"
           ls -lha jmugen-*-android.apk

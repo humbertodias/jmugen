@@ -37,4 +37,4 @@ resource/cache
 .cache/sfx/
 **/.cache/sfx/
 
-data/cache
+assets/cache

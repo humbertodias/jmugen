@@ -19,30 +19,30 @@ See [features](./FEATURES.md) and help implement the missing ones.
 
 ```text
 jmugen/
-├── JMugen/                      # Engine (fight, menu, select, parsers)
-├── JMugen.Common/               # Shared APIs + GWT-safe common types
-├── JMugen.Properties/           # Config / resource bundles
-├── JMugen.plugin.audio.adx/     # ADX audio plugin (desktop engine)
-├── JMugen.Render.libgdx/        # LibGDX backends (Gradle)
-│   ├── core/                    # Shared drawer, timer, keys, audio glue
-│   ├── desktop/                 # LWJGL3 — LGDXDesktopMain
-│   ├── android/                 # Android launcher + asset sync (-Pandroid)
-│   └── web/                     # GWT — JMugenWeb + JMugenWebClient
+├── core/                        # Shared LibGDX drawer, timer, keys, audio glue
+├── desktop/                     # LWJGL3 — LGDXDesktopMain
+├── android/                     # Android launcher + asset sync (-Pandroid)
+├── html/                        # GWT — JMugenWeb + JMugenWebClient
+├── engine/
+│   ├── main/                    # Engine (fight, menu, select, parsers)
+│   ├── common/                  # Shared APIs + GWT-safe common types
+│   ├── properties/              # Config / resource bundles
+│   └── adx/                     # ADX audio plugin (desktop engine)
 ├── tools/                       # Optional / legacy tooling
 │   ├── JMugen.Debug/
 │   ├── JMugen.Launcher/
 │   └── Syntax/
-└── data/                        # Mugen content (copied into backends)
+└── assets/                      # Mugen content (copied into backends)
 ```
 
-Gradle modules use short names (`:libgdx-desktop`, `:libgdx-web`, …). See [DEV.md](./DEV.md).
+Gradle modules follow the [LibGDX multi-project layout](https://libgdx.com/wiki/start/project-setup) (`:core`, `:desktop`, `:html`, …). See [DEV.md](./DEV.md).
 
 **Web**
 
-- Shared GWT-translatable types → `JMugen` / `JMugen.Common` / `JMugen.Properties` (`.gwt.xml`, no `gwt/` tree)
-- All browser FQN overrides + `Gwt*` → `JMugen.Render.libgdx/web` (`JMugenWebClient.gwt.xml`, `org/lee/mugen/gwt/`)
+- Shared GWT-translatable types → `engine/main`, `engine/common`, `engine/properties` (`.gwt.xml`, no `gwt/` tree)
+- All browser FQN overrides + `Gwt*` → `html/` (`JMugenWebClient.gwt.xml`, `org/lee/mugen/gwt/`)
 
-Details: [desktop README](./JMugen.Render.libgdx/desktop/README.md), [web README](./JMugen.Render.libgdx/web/README.md), [DEV.md](./DEV.md).
+Details: [desktop README](./desktop/README.md), [web README](./html/README.md), [DEV.md](./DEV.md).
 
 ## Run
 
@@ -51,14 +51,14 @@ From the **repository root**:
 ### Desktop
 
 ```bash
-./gradlew :libgdx-desktop:run
+./gradlew :desktop:run
 ```
 
 ### Web
 
 ```bash
-./gradlew :libgdx-web:distWeb
-python3 -m http.server -d JMugen.Render.libgdx/web/build/webapp 8888
+./gradlew :html:distWeb
+python3 -m http.server -d html/build/webapp 8888
 ```
 
 Then open http://127.0.0.1:8888/index.html
@@ -67,7 +67,7 @@ Then open http://127.0.0.1:8888/index.html
 
 ```bash
 export ANDROID_HOME=/path/to/Android/Sdk
-./gradlew -Pandroid :libgdx-android:assembleDebug
+./gradlew -Pandroid :android:assembleDebug
 ```
 
 ## Controls
@@ -77,7 +77,7 @@ export ANDROID_HOME=/path/to/Android/Sdk
 | **P1** | `WASD` | `U P I` | `; J K` | `F1` or `Ctrl+H` |
 | **P2** | `Arrows` | `7 4 5` | `8 0 2` | — |
 
-On macOS, F-keys often need **`Fn`+`F1`**; prefer **`Ctrl`+`H`**. Bindings: [keys.properties](JMugen.Properties/src/main/resources/keys.properties).
+On macOS, F-keys often need **`Fn`+`F1`**; prefer **`Ctrl`+`H`**. Bindings: [keys.properties](engine/properties/src/main/resources/keys.properties).
 
 ## Debug mode
 

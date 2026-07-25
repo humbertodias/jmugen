@@ -7,5 +7,5 @@ application {
 }
 
 dependencies {
-    implementation project(':jmugen-debug')
+    implementation project(':tools-debug')
 }

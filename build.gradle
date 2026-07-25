@@ -8,7 +8,7 @@ allprojects {
 }
 
 subprojects { sub ->
-    if (sub.name !in ['libgdx-android', 'libgdx-web']) {
+    if (sub.name !in ['android', 'html']) {
         apply plugin: 'java-library'
 
         java {
