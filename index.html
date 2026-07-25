@@ -12,7 +12,6 @@
             background: #000;
             overflow: hidden;
         }
-        /* LibGDX GWT preloads /assets/assets.txt before starting; keep this below the WebGL canvas. */
         canvas {
             position: relative;
             z-index: 2;
@@ -51,9 +50,9 @@
 <body>
 <div id="jmugen-status">
     <strong>Carregando JMugen Web...</strong><br>
-    Se esta mensagem nao mudar, o modulo GWT ainda nao terminou de carregar.
+    Se esta mensagem nao mudar, o jogo ainda nao terminou de carregar.
 </div>
 <div id="jmugen-audio-hint">Clique ou pressione uma tecla para ativar o audio</div>
-<script src="jmugen/jmugen.nocache.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
