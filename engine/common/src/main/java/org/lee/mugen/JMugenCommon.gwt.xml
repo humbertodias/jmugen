@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Shared GWT-translatable types only. Browser FQN overrides live in JMugen.Render.libgdx/web. -->
+<module>
+    <source path="geom">
+        <include name="MugenPoint.java"/>
+        <include name="MugenRect.java"/>
+    </source>
+    <source path="lang">
+        <include name="Wrap.java"/>
+        <include name="WrapInt.java"/>
+        <include name="Wrapper.java"/>
+    </source>
+    <source path="util">
+        <include name="Logger.java"/>
+        <include name="MugenPatterns.java"/>
+        <include name="MugenTools.java"/>
+    </source>
+    <source path="core">
+        <include name="Game.java"/>
+        <include name="AbstractGameFight.java"/>
+        <include name="ResourceRoots.java"/>
+        <include name="JMugenConstant.java"/>
+    </source>
+    <source path="core/sound">
+        <include name="AudioPlayback.java"/>
+        <include name="AudioPlaybacks.java"/>
+    </source>
+    <source path="io">
+        <include name="MugenDataStreams.java"/>
+        <include name="IOUtils.java"/>
+        <include name="LittleEndianDataInputStream.java"/>
+    </source>
+    <source path="imageIO">
+        <include name="RawPCXImage.java"/>
+        <include name="PCXPalette.java"/>
+        <include name="PCXHeader.java"/>
+        <include name="PCXConstants.java"/>
+        <include name="ByteArrayBuilder.java"/>
+    </source>
+    <source path="input">
+        <include name="**/*.java"/>
+    </source>
+    <source path="object">
+        <include name="RawImage.java"/>
+        <include name="Rectangle.java"/>
+    </source>
+    <source path="renderer">
+        <include name="AngleDrawProperties.java"/>
+        <include name="DrawProperties.java"/>
+        <include name="GameWindow.java"/>
+        <include name="GraphicsWrapper.java"/>
+        <include name="ImageContainer.java"/>
+        <include name="MugenDrawer.java"/>
+        <include name="MugenTimer.java"/>
+        <include name="PalFxSub.java"/>
+        <include name="RGB.java"/>
+        <include name="Trans.java"/>
+        <include name="DeferedImageLoader.java"/>
+        <include name="Renderable.java"/>
+    </source>
+</module>

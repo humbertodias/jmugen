@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Optional slim module; prefer org.lee.mugen.JMugenWebClient from the web artifact. -->
+<module>
+    <inherits name="org.lee.mugen.JMugenCommon"/>
+    <inherits name="org.lee.mugen.JMugenProperties"/>
+</module>

@@ -1,0 +1,54 @@
+name: pages
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Gradle cache
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-pages-${{ runner.os }}-${{ hashFiles('**/*.gradle*', 'gradle/wrapper/gradle-wrapper.properties') }}
+          restore-keys: |
+            gradle-pages-${{ runner.os }}-
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: corretto
+          java-version: '17'
+
+      - name: Build TeaVM web
+        run: ./gradlew :html:gdx_teavm_web_js_build :html:distWeb
+
+      - name: Verify web artifact
+        run: |
+          test -f html/build/webapp/app.js
+          test -f html/build/webapp/index.html
+          test -f html/build/webapp/assets/data/system.def
+          find html/build/webapp -type f -size +95M -print -quit | grep -q . && exit 1 || true
+
+      - name: Deploy to gh-pages branch
+        if: github.event_name != 'pull_request'
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: html/build/webapp/

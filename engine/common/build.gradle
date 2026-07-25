@@ -1,0 +1,4 @@
+dependencies {
+    api project(':engine-properties')
+    api 'commons-io:commons-io:2.22.0'
+}

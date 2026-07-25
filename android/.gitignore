@@ -1,0 +1,5 @@
+/target/
+/gen/
+/proguard/
+# Populated by Maven (generate-resources) or sync-android-mugen-assets.sh — do not commit game files.
+/src/main/assets/data/

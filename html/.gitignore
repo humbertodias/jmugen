@@ -1,0 +1,12 @@
+/target/
+/war/
+/build/
+/src/main/gwt-unitCache/
+/src/main/webapp/jmugen/
+/src/main/webapp/WEB-INF/classes/
+/src/main/webapp/WEB-INF/deploy/
+/src/main/webapp/WEB-INF/lib/
+# GWT preloader output (regenerated from repo data/ via build/gdx-assets)
+/src/main/webapp/assets/
+/src/main/gdx-assets/
+/src/teavm-unified/

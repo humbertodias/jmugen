@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module>
+    <inherits name="com.badlogic.gdx"/>
+    <inherits name="org.lee.mugen.JMugenCommon"/>
+
+    <source path="">
+        <exclude name="shader/**"/>
+        <exclude name="LGDXAudioPlayback.java"/>
+    </source>
+</module>

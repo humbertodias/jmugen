@@ -1,0 +1,549 @@
+package org.lee.mugen.renderer.libgdx.web;
+
+import com.badlogic.gdx.ApplicationListener;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import org.lee.mugen.core.AbstractGameFight;
+import org.lee.mugen.core.AbstractGameFight.DebugAction;
+import org.lee.mugen.core.Game;
+import org.lee.mugen.core.sound.AudioPlayback;
+import org.lee.mugen.core.sound.AudioPlaybacks;
+import org.lee.mugen.input.CmdProcDispatcher;
+import org.lee.mugen.input.ISpriteCmdProcess;
+import org.lee.mugen.renderer.GameWindow;
+import org.lee.mugen.renderer.MugenTimer;
+import org.lee.mugen.renderer.libgdx.core.GDXKeyMapper;
+import org.lee.mugen.renderer.libgdx.core.LGDXImageLoader;
+import org.lee.mugen.renderer.libgdx.core.LGDXMugenTimer;
+import org.lee.mugen.renderer.libgdx.core.LGDXRenderContext;
+
+/**
+ * Browser-backed LibGDX game window. The drawing implementation is shared through core.
+ */
+public class LGDXWebGameWindow implements GameWindow, ApplicationListener, LGDXRenderContext {
+
+    /** Same shortcuts as desktop {@code LGDXGameWindow} / LWJGL. */
+    private static final class DebugChord {
+        final DebugAction action;
+        final int[] keys;
+        final boolean allowRepeat;
+        boolean pressed;
+
+        DebugChord(DebugAction action, int[] keys, boolean allowRepeat) {
+            this.action = action;
+            this.keys = keys;
+            this.allowRepeat = allowRepeat;
+        }
+    }
+
+    private class DebugEventManager {
+        private final List<DebugChord> chords = new ArrayList<>();
+
+        DebugEventManager() {
+            add(DebugAction.SWITCH_PLAYER_DEBUG_INFO, GDXKeyMapper.KEY_LCONTROL, GDXKeyMapper.KEY_D);
+            add(DebugAction.EXPLOD_DEBUG_INFO, GDXKeyMapper.KEY_LCONTROL, GDXKeyMapper.KEY_E);
+            add(DebugAction.INIT_PLAYER, GDXKeyMapper.KEY_SPACE);
+            add(DebugAction.SHOW_HIDE_CNS, GDXKeyMapper.KEY_LCONTROL, GDXKeyMapper.KEY_C);
+            add(DebugAction.SHOW_HIDE_ATTACK_CNS, GDXKeyMapper.KEY_LCONTROL, GDXKeyMapper.KEY_X);
+            addRepeat(DebugAction.INCREASE_FPS, GDXKeyMapper.KEY_LCONTROL, GDXKeyMapper.KEY_ADD);
+            addRepeat(DebugAction.DECREASE_FPS, GDXKeyMapper.KEY_LCONTROL, GDXKeyMapper.KEY_SUBTRACT);
+            addRepeat(DebugAction.INCREASE_FPS, GDXKeyMapper.KEY_LCONTROL, GDXKeyMapper.KEY_EQUALS);
+            addRepeat(DebugAction.DECREASE_FPS, GDXKeyMapper.KEY_LCONTROL, GDXKeyMapper.KEY_MINUS);
+            add(DebugAction.RESET_FPS, GDXKeyMapper.KEY_LCONTROL, GDXKeyMapper.KEY_MULTIPLY);
+            add(DebugAction.DEBUG_PAUSE, GDXKeyMapper.KEY_LCONTROL, GDXKeyMapper.KEY_P);
+            add(DebugAction.PAUSE_PLUS_ONE_FRAME, GDXKeyMapper.KEY_LCONTROL, GDXKeyMapper.KEY_A);
+            add(DebugAction.DISPLAY_HELP, GDXKeyMapper.KEY_F1);
+        }
+
+        private void add(DebugAction action, int... keys) {
+            chords.add(new DebugChord(action, keys, false));
+        }
+
+        private void addRepeat(DebugAction action, int... keys) {
+            chords.add(new DebugChord(action, keys, true));
+        }
+
+        void process(Game cb) {
+            if (!(cb instanceof AbstractGameFight)) {
+                return;
+            }
+            AbstractGameFight fight = (AbstractGameFight) cb;
+            for (DebugChord chord : chords) {
+                boolean all = true;
+                for (int key : chord.keys) {
+                    if (!isDebugKeyDown(key)) {
+                        all = false;
+                        break;
+                    }
+                }
+                if (chord.allowRepeat) {
+                    if (all) {
+                        fight.onDebugAction(chord.action);
+                    }
+                    continue;
+                }
+                if (all) {
+                    chord.pressed = true;
+                } else if (chord.pressed) {
+                    chord.pressed = false;
+                    fight.onDebugAction(chord.action);
+                }
+            }
+        }
+    }
+
+    private static class CmdProcessListener {
+        boolean[] areKeysPress;
+        int[] keys;
+
+        void setKeys(int[] keys) {
+            this.keys = keys;
+            areKeysPress = new boolean[keys.length];
+        }
+    }
+
+    private static class SprCmdProcessListenerAction {
+        private final ISpriteCmdProcess scp;
+        private final int[] keys;
+        private final boolean[] areKeysPress;
+
+        SprCmdProcessListenerAction(ISpriteCmdProcess scp) {
+            this.scp = scp;
+            this.keys = scp.getKeys();
+            this.areKeysPress = new boolean[keys.length];
+        }
+    }
+
+    private int width;
+    private int height;
+    private String title;
+    private Game callback;
+
+    private final LGDXMugenTimer timer = new LGDXMugenTimer();
+    private final GameWindow.MouseCtrl mouse = new GameWindow.MouseCtrl();
+    private final Vector3 unprojectTmp = new Vector3();
+    private final Matrix4 batchTransformIdentity = new Matrix4();
+    private final Matrix4 worldProjectionSnapshot = new Matrix4();
+    private final List<CmdProcessListener> cmdProcess = new LinkedList<>();
+    private final List<SprCmdProcessListenerAction> spriteCmdProcess = new LinkedList<>();
+    private final List<MugenKeyListener> mugenKeyListeners = new ArrayList<>();
+    private final DebugEventManager debugEventManager = new DebugEventManager();
+
+    private SpriteBatch batch;
+    private OrthographicCamera camera;
+    private Viewport viewport;
+    private final LGDXWebImageLoader imageLoader = new LGDXWebImageLoader();
+    private boolean finishInit;
+    private boolean gameRunning = true;
+
+    public LGDXWebGameWindow() {
+        setTitle("JMugen - LibGDX Web");
+        setResolution(640, 480);
+    }
+
+    @Override
+    public MugenTimer getTimer() {
+        return timer;
+    }
+
+    @Override
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    @Override
+    public void setResolution(int x, int y) {
+        this.width = x;
+        this.height = y;
+    }
+
+    @Override
+    public void start() {
+        // GWT starts the render loop through LGDXWebApplication.
+    }
+
+    @Override
+    public void setGameWindowCallback(Game callback) {
+        this.callback = callback;
+    }
+
+    @Override
+    public void addSpriteKeyProcessor(ISpriteCmdProcess scp) {
+        if (scp != null) {
+            spriteCmdProcess.add(new SprCmdProcessListenerAction(scp));
+        }
+    }
+
+    @Override
+    public MouseCtrl getMouseStatus() {
+        if (viewport != null) {
+            unprojectTmp.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+            viewport.unproject(unprojectTmp);
+            mouse.setX((int) unprojectTmp.x);
+            mouse.setY((int) unprojectTmp.y);
+        } else {
+            mouse.setX(Gdx.input.getX());
+            mouse.setY(Gdx.input.getY());
+        }
+        boolean left = Gdx.input.isButtonPressed(Input.Buttons.LEFT);
+        boolean right = Gdx.input.isButtonPressed(Input.Buttons.RIGHT);
+        mouse.setLeftPress(left);
+        mouse.setLeftRelease(!left);
+        mouse.setRightPress(right);
+        mouse.setRightRelease(!right);
+        return mouse;
+    }
+
+    @Override
+    public void create() {
+        batch = new SpriteBatch();
+        camera = new OrthographicCamera();
+        viewport = new FitViewport(320, 240, camera);
+        camera.setToOrtho(true, 320, 240);
+        viewport.apply();
+        batch.setProjectionMatrix(camera.combined);
+        worldProjectionSnapshot.set(camera.combined);
+
+        AudioPlaybacks.install(new LGDXWebAudioPlayback());
+        initKeys();
+
+        if (callback == null) {
+            finishInit = true;
+            return;
+        }
+
+        try {
+            callback.init(this);
+            finishInit = true;
+            WebDomHelper.hideElementDeferred("jmugen-status");
+        } catch (Exception e) {
+            Gdx.app.error("JMugenWeb", "Error initializing web game", e);
+            throw new RuntimeException("Failed to initialize web game callback", e);
+        }
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        if (viewport == null || camera == null || batch == null) {
+            return;
+        }
+        viewport.update(width, height, true);
+        camera.setToOrtho(true, 320, 240);
+        batch.setProjectionMatrix(camera.combined);
+        worldProjectionSnapshot.set(camera.combined);
+    }
+
+    @Override
+    public void render() {
+        Gdx.gl.glClearColor(0, 0, 0, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        if (viewport == null || batch == null || callback == null || !finishInit || !gameRunning) {
+            return;
+        }
+
+        unlockAudioIfNeeded();
+        keyManagementExecute();
+        viewport.apply();
+
+        try {
+            int delta = (int) (Gdx.graphics.getDeltaTime() * 1000);
+            if (delta <= 0) {
+                delta = 16;
+            }
+            callback.update(delta);
+
+            Game another = callback.getNext();
+            if (another != callback) {
+                another.init(this);
+                callback.free();
+                callback = another;
+            }
+
+            batch.setProjectionMatrix(camera.combined);
+            worldProjectionSnapshot.set(camera.combined);
+            batchTransformIdentity.idt();
+            batch.setTransformMatrix(batchTransformIdentity);
+            batch.begin();
+            try {
+                callback.render();
+            } finally {
+                if (batch.isDrawing()) {
+                    batch.end();
+                }
+            }
+        } catch (Exception e) {
+            Gdx.app.error("JMugenWeb", "Error updating web game", e);
+        }
+    }
+
+    private void initKeys() {
+        cmdProcess.clear();
+        spriteCmdProcess.clear();
+        CmdProcDispatcher.getSpriteDispatcherMap().clear();
+
+        CmdProcDispatcher p1 =
+                new CmdProcDispatcher(
+                        Input.Keys.W,
+                        Input.Keys.S,
+                        Input.Keys.A,
+                        Input.Keys.D,
+                        Input.Keys.J,
+                        Input.Keys.K,
+                        Input.Keys.L,
+                        Input.Keys.U,
+                        Input.Keys.I,
+                        Input.Keys.O,
+                        Input.Keys.SEMICOLON,
+                        Input.Keys.P);
+        CmdProcDispatcher.getSpriteDispatcherMap().put("1", p1);
+        CmdProcDispatcher.getSpriteDispatcherMap().put("menu", p1);
+        registerDispatcherKeys("1");
+
+        CmdProcDispatcher p2 =
+                new CmdProcDispatcher(
+                        Input.Keys.UP,
+                        Input.Keys.DOWN,
+                        Input.Keys.LEFT,
+                        Input.Keys.RIGHT,
+                        Input.Keys.NUM_0,
+                        Input.Keys.NUMPAD_2,
+                        Input.Keys.NUMPAD_3,
+                        Input.Keys.NUMPAD_4,
+                        Input.Keys.NUMPAD_5,
+                        Input.Keys.NUMPAD_6,
+                        Input.Keys.NUMPAD_8,
+                        Input.Keys.NUMPAD_7);
+        CmdProcDispatcher.getSpriteDispatcherMap().put("2", p2);
+        registerDispatcherKeys("2");
+
+        CmdProcessListener systemKeys = new CmdProcessListener();
+        systemKeys.setKeys(
+            new int[] {
+                GDXKeyMapper.KEY_ESCAPE,
+                Input.Keys.ENTER
+            });
+        cmdProcess.add(systemKeys);
+    }
+
+    private void registerDispatcherKeys(String id) {
+        CmdProcDispatcher dispatcher = CmdProcDispatcher.getSpriteDispatcherMap().get(id);
+        if (dispatcher == null) {
+            return;
+        }
+        CmdProcessListener listener = new CmdProcessListener();
+        listener.setKeys(dispatcher.getKeys());
+        cmdProcess.add(listener);
+    }
+
+    private static boolean isKeyDown(int key) {
+        return Gdx.input.isKeyPressed(key);
+    }
+
+    private static boolean isDebugKeyDown(int key) {
+        if (key == GDXKeyMapper.KEY_LCONTROL) {
+            return isKeyDown(GDXKeyMapper.KEY_LCONTROL) || isKeyDown(GDXKeyMapper.KEY_RCONTROL);
+        }
+        return isKeyDown(key);
+    }
+
+    /**
+     * Browsers block Music/SFX until a user gesture. Unlock on first key or pointer press.
+     */
+    private void unlockAudioIfNeeded() {
+        AudioPlayback playback = AudioPlaybacks.get();
+        if (!(playback instanceof LGDXWebAudioPlayback)) {
+            return;
+        }
+        LGDXWebAudioPlayback web = (LGDXWebAudioPlayback) playback;
+        if (web.isUnlocked()) {
+            return;
+        }
+        boolean gesture = Gdx.input.isTouched();
+        if (!gesture) {
+            for (int k = 0; k < 256; k++) {
+                if (Gdx.input.isKeyPressed(k)) {
+                    gesture = true;
+                    break;
+                }
+            }
+        }
+        if (gesture) {
+            web.onUserGesture();
+            WebDomHelper.hideElementDeferred("jmugen-audio-hint");
+        }
+    }
+
+    private void keyManagementExecute() {
+        if (callback != null) {
+            debugEventManager.process(callback);
+        }
+        for (CmdProcessListener cmd : cmdProcess) {
+            for (int i = 0; i < cmd.keys.length; ++i) {
+                int key = cmd.keys[i];
+                if (!cmd.areKeysPress[i] && isKeyDown(key)) {
+                    cmd.areKeysPress[i] = true;
+                    notifyKeyListeners(key, true);
+                } else if (cmd.areKeysPress[i] && !isKeyDown(key)) {
+                    cmd.areKeysPress[i] = false;
+                    notifyKeyListeners(key, false);
+                }
+            }
+        }
+
+        for (SprCmdProcessListenerAction action : spriteCmdProcess) {
+            for (int i = 0; i < action.keys.length; ++i) {
+                int key = action.keys[i];
+                if (!action.areKeysPress[i] && isKeyDown(key)) {
+                    action.areKeysPress[i] = true;
+                    action.scp.keyPressed(key);
+                    notifyKeyListeners(key, true);
+                } else if (action.areKeysPress[i] && !isKeyDown(key)) {
+                    action.areKeysPress[i] = false;
+                    action.scp.keyReleased(key);
+                    notifyKeyListeners(key, false);
+                }
+            }
+        }
+    }
+
+    private void notifyKeyListeners(int key, boolean isPress) {
+        for (MugenKeyListener listener : mugenKeyListeners) {
+            listener.action(key, isPress);
+        }
+    }
+
+    @Override
+    public void pause() {
+    }
+
+    @Override
+    public void resume() {
+    }
+
+    @Override
+    public void dispose() {
+        AudioPlayback playback = AudioPlaybacks.get();
+        if (playback != null) {
+            try {
+                playback.shutdown();
+            } catch (Exception ignored) {
+            }
+            AudioPlaybacks.install(null);
+        }
+        if (batch != null) {
+            batch.dispose();
+            batch = null;
+        }
+        if (callback != null) {
+            callback.free();
+            callback = null;
+        }
+        gameRunning = false;
+    }
+
+    @Override
+    public int getKeyEsc() {
+        return GDXKeyMapper.KEY_ESCAPE;
+    }
+
+    @Override
+    public int getKeyF1() {
+        return GDXKeyMapper.KEY_F1;
+    }
+
+    @Override
+    public int getKeyF2() {
+        return GDXKeyMapper.KEY_F2;
+    }
+
+    @Override
+    public int getKeyF3() {
+        return GDXKeyMapper.KEY_F3;
+    }
+
+    @Override
+    public void addActionListener(MugenKeyListener al) {
+        if (al != null) {
+            mugenKeyListeners.add(al);
+        }
+    }
+
+    @Override
+    public void clearListener() {
+        mugenKeyListeners.clear();
+    }
+
+    @Override
+    public void setRender(boolean v) {
+        gameRunning = v;
+    }
+
+    @Override
+    public boolean isRender() {
+        return gameRunning;
+    }
+
+    @Override
+    public void removeSpriteKeysProcessors() {
+        spriteCmdProcess.clear();
+    }
+
+    @Override
+    public GameWindow getGameWindow() {
+        return this;
+    }
+
+    @Override
+    public SpriteBatch getBatch() {
+        return batch;
+    }
+
+    @Override
+    public Matrix4 getWorldProjectionSnapshot() {
+        return worldProjectionSnapshot;
+    }
+
+    @Override
+    public OrthographicCamera getCamera() {
+        return camera;
+    }
+
+    @Override
+    public Viewport getViewport() {
+        return viewport;
+    }
+
+    @Override
+    public int getGameWidth() {
+        return width;
+    }
+
+    @Override
+    public int getGameHeight() {
+        return height;
+    }
+
+    @Override
+    public LGDXImageLoader getImageLoader() {
+        return imageLoader;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public boolean isFinishInit() {
+        return finishInit;
+    }
+}

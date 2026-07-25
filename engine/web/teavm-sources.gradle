@@ -1,0 +1,307 @@
+// Curates engine/core/common/properties sources for TeaVM — mirrors GWT .gwt.xml rules.
+
+ext.teavmMugenPackage = 'org/lee/mugen/'
+
+ext.teavmEngineMainRoots = [
+    'engine/main/src/main/java',
+    'engine/main/srcBackground',
+    'engine/main/srcForFightDef',
+    'engine/main/srcIntro',
+    'engine/main/srcSystem',
+    'engine/main/srcSelect',
+    'engine/main/srcStage',
+]
+
+ext.teavmAllSourceMarkers = teavmEngineMainRoots + [
+    'engine/common/src/main/java',
+    'engine/properties/src/main/java',
+]
+
+ext.teavmCommonExplicitIncludes = [
+    'geom/MugenPoint.java',
+    'geom/MugenRect.java',
+    'lang/Wrap.java',
+    'lang/WrapInt.java',
+    'lang/Wrapper.java',
+    'util/Logger.java',
+    'util/MugenPatterns.java',
+    'util/MugenTools.java',
+    'core/Game.java',
+    'core/AbstractGameFight.java',
+    'core/ResourceRoots.java',
+    'core/JMugenConstant.java',
+    'core/sound/AudioPlayback.java',
+    'core/sound/AudioPlaybacks.java',
+    'io/MugenDataStreams.java',
+    'io/IOUtils.java',
+    'io/LittleEndianDataInputStream.java',
+    'imageIO/RawPCXImage.java',
+    'imageIO/PCXPalette.java',
+    'imageIO/PCXHeader.java',
+    'imageIO/PCXConstants.java',
+    'imageIO/ByteArrayBuilder.java',
+    'object/RawImage.java',
+    'object/Rectangle.java',
+    'renderer/AngleDrawProperties.java',
+    'renderer/DrawProperties.java',
+    'renderer/GameWindow.java',
+    'renderer/GraphicsWrapper.java',
+    'renderer/ImageContainer.java',
+    'renderer/MugenDrawer.java',
+    'renderer/MugenTimer.java',
+    'renderer/PalFxSub.java',
+    'renderer/RGB.java',
+    'renderer/Trans.java',
+    'renderer/DeferedImageLoader.java',
+    'renderer/Renderable.java',
+]
+
+ext.teavmEngineMainExplicitIncludes = [
+    'core/GameMenu.java',
+    'core/renderer/game/system/TitleInfoRender.java',
+    'core/renderer/game/system/BackgroundRender.java',
+    'core/renderer/game/fight/BaseRender.java',
+    'fight/section/elem/FontType.java',
+    'fight/section/elem/SprType.java',
+    'fight/system/TitleInfo.java',
+    'fight/system/Music.java',
+    'fight/system/Info.java',
+    'fight/system/elem/Menu.java',
+    'fight/system/elem/ItemName.java',
+    'fight/system/elem/Item.java',
+    'fight/system/elem/Value.java',
+    'fight/system/elem/Cell.java',
+    'fight/system/elem/PlayerSelectInfo.java',
+    'fight/system/elem/PlayerCursor.java',
+    'fight/system/elem/Stage.java',
+    'fight/system/elem/StageDisplay.java',
+    'background/Background.java',
+    'background/BG.java',
+    'background/BGdef.java',
+    'background/BGCtrlDef.java',
+    'background/GwtBackground.java',
+    'background/BgExpression.java',
+    'fight/section/Section.java',
+    'fight/section/elem/Type.java',
+    'fight/section/elem/CommonType.java',
+    'fight/section/elem/SndType.java',
+    'fight/intro/entity/Fade.java',
+    'sprite/parser/Parser.java',
+    'sprite/common/resource/FontParser.java',
+    'sprite/common/resource/FontProducer.java',
+    'sprite/common/resource/Desc.java',
+    'sprite/base/AbstractAnimManager.java',
+    'sprite/baseForParse/SpriteSFF.java',
+    'sprite/baseForParse/ImageSpriteSFF.java',
+    'sprite/baseForParse/GroupSpriteSFF.java',
+    'sprite/character/AnimGroup.java',
+    'sprite/character/AnimElement.java',
+]
+
+ext.teavmEngineMainIncludePrefixes = [
+    'sff',
+    'snd',
+    'parser/air',
+]
+
+ext.teavmCommonIncludePrefixes = [
+    'input',
+]
+
+ext.teavmEngineMainExcludes = [
+    'sprite/character/Sprite.java',
+    'sprite/character/SpriteCns.java',
+    'sprite/character/SpriteDef.java',
+    'sprite/character/SpriteHelper.java',
+    'sprite/character/SpriteState.java',
+    'sprite/character/SpriteAnimManager.java',
+    'sprite/character/spiteCnsSubClass/',
+    'sprite/entity/AfterImageSprite.java',
+    'sprite/entity/ExplodSprite.java',
+    'sprite/entity/ProjectileSprite.java',
+    'sprite/entity/MakeDustSpriteManager.java',
+    'sprite/entity/BindToParentSub.java',
+    'sprite/entity/BindToTargetSub.java',
+    'sprite/entity/BindToSub.java',
+    'sprite/entity/CoupleOfAttrTypeAndLevel.java',
+    'sprite/entity/HitOverrideSub.java',
+    'sprite/entity/ExplodSub.java',
+    'sprite/entity/HelperSub.java',
+    'sprite/entity/ProjectileSub.java',
+    'sprite/entity/Postype.java',
+    'sprite/entity/AssertSpecialEval.java',
+    'sprite/entity/Shake.java',
+    'sprite/entity/StartFightSprite.java',
+    'sprite/entity/AnimTypeSprite.java',
+    'sprite/common/resource/FntRaw.java',
+    'fight/system/VsScreen.java',
+    'fight/system/elem/PlayerVsScreen.java',
+    'sprite/others/',
+    'sprite/parser/CmdParser.java',
+    'sprite/cns/StateCtrl.java',
+    'sprite/cns/eval/function/MathFunction.java',
+    'sprite/cns/eval/function/StateCtrlFunctionDef.java',
+    'sprite/cns/eval/trigger/',
+    'sprite/cns/type/',
+    'sprite/cns/eval/redirect/',
+    'sprite/parser/ExpressionFactory.java',
+    'sprite/parser/CnsParse.java',
+    'sprite/cns/StateDef.java',
+    'core/FightEngine.java',
+    'core/GameState.java',
+    'core/GameGlobalEvents.java',
+    'core/GameFight.java',
+    'stage/Stage.java',
+    'fight/section/Fightdef.java',
+    'fight/section/Lifebar.java',
+    'fight/section/Powerbar.java',
+    'fight/section/Round.java',
+    'core/renderer/game/fight/LifeBarRender.java',
+    'core/renderer/game/fight/PowerBarRender.java',
+    'core/renderer/game/fight/TimeRender.java',
+    'core/renderer/game/fight/FaceRender.java',
+    'core/renderer/game/fight/RoundRender.java',
+    'core/renderer/game/fight/FightdefRender.java',
+    'sprite/base/AbstractSprite.java',
+    'core/sound/SoundSystem.java',
+    'fight/system/Files.java',
+    'fight/system/MugenSystem.java',
+    'fight/section/SimulLifebar.java',
+    'fight/section/TurnsLifebar.java',
+    'fight/section/Fightfx.java',
+    'fight/section/elem/AnimType.java',
+    'fight/section/Files.java',
+    'stage/section/',
+    'background/bgCtrlFunction/',
+    'sprite/cns/eval/function/SpriteCnsFunctionDef.java',
+    'fight/intro/',
+    'fight/select/Select.java',
+    'fight/select/Characters.java',
+    'fight/select/ExtraStages.java',
+    'fight/select/Options.java',
+    'lang/',
+    'core/gameSelect/SelectionController.java',
+        'core/physics/',
+        'ExternalBundleControl.java',
+        'core/renderer/game/SparkRender.java',
+]
+
+ext.teavmPropertiesExcludes = [
+    'ResourceBundleHelper.java',
+    'ExternalBundleControl.java',
+]
+
+ext.teavmCoreExcludes = [
+    'shader/',
+    'LGDXAudioPlayback.java',
+]
+
+ext.teavmRelativeMugenPath = { File file, String marker ->
+    String path = file.absolutePath.replace('\\', '/')
+    int idx = path.indexOf('/' + marker + '/')
+    if (idx < 0) {
+        return null
+    }
+    String rel = path.substring(idx + marker.length() + 2)
+    if (!rel.startsWith(teavmMugenPackage)) {
+        return null
+    }
+    return rel.substring(teavmMugenPackage.length())
+}
+
+ext.teavmMatchesExclude = { String relPath, List excludes ->
+    for (String rule : excludes) {
+        if (rule.endsWith('/')) {
+            if (relPath.startsWith(rule)) {
+                return true
+            }
+        } else if (relPath == rule || relPath.endsWith('/' + rule)) {
+            return true
+        }
+    }
+    return false
+}
+
+ext.teavmIsEngineMainAllowed = { String relPath ->
+    if (teavmEngineMainExplicitIncludes.contains(relPath)) {
+        return true
+    }
+    for (String prefix : teavmEngineMainIncludePrefixes) {
+        if (relPath.startsWith(prefix + '/')) {
+            return true
+        }
+    }
+    if (teavmMatchesExclude(relPath, teavmEngineMainExcludes)) {
+        return false
+    }
+    // Mirror JMugen.gwt.xml <source path=""> catch-all (everything except excludes).
+    return true
+}
+
+ext.teavmIsCommonAllowed = { String relPath ->
+    if (teavmCommonExplicitIncludes.contains(relPath)) {
+        return true
+    }
+    for (String prefix : teavmCommonIncludePrefixes) {
+        if (relPath.startsWith(prefix + '/')) {
+            return true
+        }
+    }
+    return false
+}
+
+ext.teavmCollectCuratedEngineSources = {
+    def root = rootProject.projectDir
+    def result = new LinkedHashSet<File>()
+
+    def commonMarker = 'engine/common/src/main/java'
+    fileTree("${root}/${commonMarker}/${teavmMugenPackage}") {
+        include '**/*.java'
+    }.each { File file ->
+        String rel = teavmRelativeMugenPath(file, commonMarker)
+        if (rel != null && teavmIsCommonAllowed(rel)) {
+            result.add(file)
+        }
+    }
+
+    def propsMarker = 'engine/properties/src/main/java'
+    fileTree("${root}/${propsMarker}/${teavmMugenPackage}") {
+        include '**/*.java'
+        exclude 'gwt/**'
+    }.each { File file ->
+        String rel = teavmRelativeMugenPath(file, propsMarker)
+        if (rel != null && !teavmPropertiesExcludes.contains(rel)) {
+            result.add(file)
+        }
+    }
+
+    teavmEngineMainRoots.each { String marker ->
+        fileTree("${root}/${marker}/${teavmMugenPackage}") {
+            include '**/*.java'
+            exclude '**/gwt/**'
+        }.each { File file ->
+            String rel = teavmRelativeMugenPath(file, marker)
+            if (rel != null && teavmIsEngineMainAllowed(rel)) {
+                result.add(file)
+            }
+        }
+    }
+
+    return result
+}
+
+ext.teavmCollectCuratedSources = {
+    Set<File> result = new LinkedHashSet<>(teavmCollectCuratedEngineSources())
+
+    def coreMarker = 'core/src/main/java'
+    fileTree("${rootProject.projectDir}/${coreMarker}/${teavmMugenPackage}") {
+        include '**/*.java'
+    }.each { File file ->
+        String rel = teavmRelativeMugenPath(file, coreMarker)
+        if (rel != null && !teavmMatchesExclude(rel, teavmCoreExcludes)) {
+            result.add(file)
+        }
+    }
+
+    return result
+}

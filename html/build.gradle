@@ -1,0 +1,221 @@
+plugins {
+    id 'java-library'
+    id 'com.github.xpenatan.gdx-teavm' version '1.6.0'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+dependencies {
+    implementation project(':core')
+    implementation project(':engine-web')
+    implementation project(':engine-common')
+    implementation project(':engine-properties')
+    compileOnly "com.badlogicgames.gdx:gdx:$gdxVersion"
+}
+
+configurations.configureEach {
+    exclude group: 'com.github.xpenatan.gdx-teavm', module: 'engine-adx'
+}
+
+gdxTeaVM {
+    assets.from("${rootProject.projectDir}/assets")
+    reflection.add('org.lee.mugen.**')
+    reflection.add('com.badlogic.gdx.**')
+
+    js {
+        mainClass.set('org.lee.mugen.renderer.libgdx.web.TeaVMWebLauncher')
+        htmlTitle.set('JMugen - LibGDX Web')
+        htmlWidth.set(640)
+        htmlHeight.set(480)
+        processMemory.set(4096)
+        optimization.set(org.teavm.gradle.api.OptimizationLevel.BALANCED)
+        debugInformation.set(true)
+    }
+}
+
+def teavmOverrideRoot = file("${rootProject.projectDir}/engine/web/src/main/java/org/lee/mugen")
+def teavmCuratedRoot = file("${rootProject.projectDir}/engine/web/src/teavmCurated/java")
+
+def teavmOverrideRelPaths = fileTree(teavmOverrideRoot) {
+    include '**/*.java'
+}.files.collect { File f ->
+    teavmOverrideRoot.toPath().relativize(f.toPath()).toString().replace('\\', '/')
+}.toSet()
+
+def teavmMugenPackage = 'org/lee/mugen/'
+
+def teavmSourceMarkers = [
+    'engine/web/src/teavmCurated/java',
+    'engine/web/src/main/java',
+    'engine/common/src/main/java',
+    'engine/properties/src/main/java',
+    'engine/main/src/main/java',
+    'engine/main/srcBackground',
+    'engine/main/srcForFightDef',
+    'engine/main/srcIntro',
+    'engine/main/srcSystem',
+    'engine/main/srcSelect',
+    'engine/main/srcStage',
+    'core/src/main/java',
+    'html/src/main/java',
+]
+
+def teavmExcludedSourceMarkers = [
+    'engine/common/src/main/java',
+    'engine/properties/src/main/java',
+    'engine/main/src/main/java',
+    'engine/main/srcBackground',
+    'engine/main/srcForFightDef',
+    'engine/main/srcIntro',
+    'engine/main/srcSystem',
+    'engine/main/srcSelect',
+    'engine/main/srcStage',
+]
+
+def teavmRelativeMugenPath = { File file ->
+    String path = file.absolutePath.replace('\\', '/')
+    for (String marker : teavmSourceMarkers) {
+        int idx = path.indexOf('/' + marker + '/')
+        if (idx >= 0) {
+            String rel = path.substring(idx + marker.length() + 2)
+            if (rel.startsWith(teavmMugenPackage)) {
+                return rel.substring(teavmMugenPackage.length())
+            }
+        }
+    }
+    return null
+}
+
+def teavmFilterClasspath = { FileCollection classpath ->
+    classpath.filter { File file ->
+        String p = file.absolutePath.replace('\\', '/')
+        !p.contains('/engine/main/build/')
+                && !p.contains('/engine/adx/build/')
+                && !p.contains('/engine/common/build/')
+                && !p.contains('/engine/properties/build/')
+                && !p.contains('/engine/build/libs/')
+    }
+}
+
+def teavmFilteredGdxJar = layout.buildDirectory.file('teavm/gdx-teavm-filtered.jar')
+
+tasks.register('prepareGdxTeavmJar') {
+    outputs.file(teavmFilteredGdxJar)
+    doLast {
+        File gdxJar = configurations.runtimeClasspath.find { File file ->
+            String name = file.name
+            name.startsWith('gdx-') && name.endsWith('.jar')
+                    && !name.contains('freetype') && !name.contains('jnigen')
+        }
+        if (gdxJar == null) {
+            throw new GradleException('gdx.jar not found on runtime classpath')
+        }
+        copy {
+            from zipTree(gdxJar)
+            exclude 'com/badlogic/gdx/net/NetJavaImpl*.class'
+            exclude 'com/badlogic/gdx/net/NetJavaSocketImpl.class'
+            exclude 'com/badlogic/gdx/net/NetJavaServerSocketImpl.class'
+            exclude 'com/badlogic/gdx/utils/async/AsyncExecutor*.class'
+            into layout.buildDirectory.dir('teavm/gdx-filtered-classes')
+        }
+        ant.jar(destfile: teavmFilteredGdxJar.get().asFile) {
+            fileset(dir: layout.buildDirectory.dir('teavm/gdx-filtered-classes').get().asFile)
+        }
+    }
+}
+
+def teavmReplaceGdxJar = { FileCollection classpath ->
+    File gdxJar = classpath.files.find { File file ->
+        String name = file.name
+        name.startsWith('gdx-') && name.endsWith('.jar')
+                && !name.contains('freetype') && !name.contains('jnigen')
+    }
+    if (gdxJar == null) {
+        return classpath
+    }
+    def filtered = files(teavmFilteredGdxJar)
+    return classpath.filter { it != gdxJar } + filtered
+}
+
+def configureTeavmTask = { org.teavm.gradle.tasks.TeaVMTask task ->
+    task.dependsOn ':engine-web:classes', 'prepareGdxTeavmJar'
+
+    def overrides = files(fileTree(teavmOverrideRoot))
+    def curated = files(fileTree(teavmCuratedRoot) { include '**/*.java' })
+    def htmlSources = files(fileTree("${projectDir}/src/main/java") { include '**/*.java' })
+
+    def dependencySources = task.sourceFiles.files.findAll { File file ->
+        if (!file.name.endsWith('.java')) {
+            return true
+        }
+        String path = file.absolutePath.replace('\\', '/')
+        if (path.endsWith('/com/badlogic/gdx/net/NetJavaImpl.java')
+                || path.endsWith('/com/badlogic/gdx/utils/async/AsyncExecutor.java')) {
+            return false
+        }
+        for (String marker : teavmExcludedSourceMarkers) {
+            if (path.contains('/' + marker + '/')) {
+                return false
+            }
+        }
+        String rel = teavmRelativeMugenPath(file)
+        if (rel != null && teavmOverrideRelPaths.contains(rel)) {
+            return false
+        }
+        return true
+    }
+
+    task.sourceFiles.setFrom(overrides, curated, htmlSources, dependencySources)
+    task.classpath = teavmReplaceGdxJar(teavmFilterClasspath(task.classpath))
+}
+
+afterEvaluate {
+    tasks.named('compileJava').configure {
+        dependsOn ':engine-web:classes'
+    }
+
+    tasks.withType(org.teavm.gradle.tasks.GenerateJavaScriptTask).configureEach(configureTeavmTask)
+    tasks.withType(org.teavm.gradle.tasks.DevServerTask).configureEach(configureTeavmTask)
+}
+
+tasks.register('syncUnifiedTeavmSources') {
+    dependsOn ':engine-web:syncTeavmCuratedSources'
+}
+
+tasks.register('printTeavmClasspath') {
+    dependsOn ':engine-web:classes'
+    doLast {
+        def t = tasks.named('generateJavaScript').get() as org.teavm.gradle.tasks.GenerateJavaScriptTask
+        configureTeavmTask(t)
+        println 'classpath entries (filtered):'
+        t.classpath.files.each { println "  $it" }
+    }
+}
+
+tasks.register('distWeb') {
+    group = 'build'
+    description = 'TeaVM JS output + static webapp for GitHub Pages / static hosting'
+    dependsOn 'gdx_teavm_web_js_build'
+    doLast {
+        def webappDir = layout.buildDirectory.dir('webapp').get().asFile
+        def generatedDir = layout.buildDirectory.dir('dist/js/webapp').get().asFile
+        webappDir.mkdirs()
+        copy {
+            from generatedDir
+            into webappDir
+        }
+        // Keep gdx-teavm output but replace index.html with our overlay (canvas + main() + status UI).
+        copy {
+            from "${projectDir}/src/main/webapp"
+            into webappDir
+            include 'index.html'
+        }
+    }
+}

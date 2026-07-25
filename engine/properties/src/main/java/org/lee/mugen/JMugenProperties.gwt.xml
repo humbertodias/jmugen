@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Shared Properties types for GWT. JVM ResourceBundleHelper is excluded;
+  the browser override is super-source in JMugen.Render.libgdx/web.
+-->
+<module>
+    <source path="">
+        <exclude name="gwt/**"/>
+        <exclude name="ResourceBundleHelper.java"/>
+        <exclude name="ExternalBundleControl.java"/>
+    </source>
+</module>

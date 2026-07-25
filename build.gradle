@@ -1,0 +1,23 @@
+allprojects {
+    version = jmugenVersion
+
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+subprojects { sub ->
+    if (sub.name !in ['android', 'html', 'engine-web']) {
+        apply plugin: 'java-library'
+
+        java {
+            sourceCompatibility = JavaVersion.VERSION_1_8
+            targetCompatibility = JavaVersion.VERSION_1_8
+        }
+
+        tasks.withType(JavaCompile).configureEach {
+            options.encoding = 'UTF-8'
+        }
+    }
+}

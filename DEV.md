@@ -1,65 +1,82 @@
-
 # JMugen Development Guide
 
 ## Requirements
 
-Before starting, make sure you have the following installed:
+- **JDK 17+** (Gradle / LibGDX / Android / TeaVM web)
+- Gradle wrapper: `./gradlew` (included in repo)
 
-- [SDKMAN](https://sdkman.io/install)
-- Java 17 or higher
-- Maven 3.6.3 or higher
-
-### Installation Steps
-
-1. Install Java and Maven using SDKMAN:
+### SDKMAN example
 
 ```sh
 sdk install java 17.0.14-amzn
-sdk install maven 3.6.3
 ```
 
-2. Switch to the correct Java and Maven versions:
+## Build
+
+From the **repository root**:
 
 ```sh
-sdk use java 17.0.14-amzn
-sdk use maven 3.6.3
+./gradlew build              # everything except Android
+./gradlew -Pandroid build    # include Android APK (needs ANDROID_HOME)
 ```
 
-## Running the Project
-
-To compile and run the project, follow these steps:
-
-1. Build the project with Maven:
+## Desktop
 
 ```sh
-mvn package
+./gradlew :desktop:run
 ```
 
-2. Run the application with the following command:
+- Working directory is the repo root (so `./assets/` resolves).
+- macOS: `-XstartOnFirstThread` is applied automatically.
+
+## Web (TeaVM)
 
 ```sh
-java $JAVA_OPTS -cp JMugen.Debug/target/JMugen.Debug-0.0.1-SNAPSHOT.jar org.lee.mugen.test.TestGameFight
+./gradlew :html:distWeb
+# or live dev:
+./gradlew :html:gdx_teavm_web_js_run
 ```
 
-## Debugging
+Static hosting after `distWeb`:
 
-To debug the project, use the following Java options:
-
-```properties
-JAVA_OPTS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=0.0.0.0:5005"
+```sh
+python3 -m http.server -d html/build/webapp 8888
 ```
 
+Open http://127.0.0.1:8888/index.html
 
-## Release version
+## Android
 
-```shell
-mvn package
-java $JAVA_OPTS -jar JMugen.Launcher/target/JMugen.Launcher-0.0.1-SNAPSHOT.jar
+Optional — enable with `-Pandroid` and set `ANDROID_HOME`:
+
+```sh
+export ANDROID_HOME=/path/to/Android/Sdk
+echo "sdk.dir=$ANDROID_HOME" > local.properties
+./gradlew -Pandroid :android:assembleDebug
 ```
 
-## References
+APK: `android/build/outputs/apk/debug/`
 
-- [Download JMugen 0.2 Alpha](https://sourceforge.net/projects/mugen-net/files/)
-- [Mugen Engine Wikipedia](https://en.wikipedia.org/wiki/Mugen_(game_engine))
-- [Google Code Archive: JMugen](https://code.google.com/archive/p/jmugen/)
-- [JMugen Live Debug and Expression Watch (YouTube)](https://www.youtube.com/watch?v=6uVFrC91OU8)
+## Release jar (shaded desktop)
+
+```sh
+./gradlew :tools-debug:shadowJar
+# → tools/JMugen.Debug/build/libs/JMugen.Debug-0.0.1-SNAPSHOT.jar
+```
+
+## Gradle modules
+
+| Gradle project | Directory |
+|----------------|-----------|
+| `:engine-properties` | `engine/properties/` |
+| `:engine-common` | `engine/common/` |
+| `:engine-adx` | `engine/adx/` |
+| `:engine` | `engine/main/` |
+| `:engine-web` | `engine/web/` |
+| `:core` | `core/` |
+| `:desktop` | `desktop/` |
+| `:html` | `html/` |
+| `:android` | `android/` (with `-Pandroid`) |
+| `:tools-syntax` | `tools/Syntax/` |
+| `:tools-debug` | `tools/JMugen.Debug/` |
+| `:tools-launcher` | `tools/JMugen.Launcher/` |
