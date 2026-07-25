@@ -205,11 +205,13 @@ tasks.register('distWeb') {
     dependsOn 'gdx_teavm_web_js_build'
     doLast {
         def webappDir = layout.buildDirectory.dir('webapp').get().asFile
+        def generatedDir = layout.buildDirectory.dir('dist/js/webapp').get().asFile
         webappDir.mkdirs()
         copy {
-            from layout.buildDirectory.dir('dist/js/webapp')
+            from generatedDir
             into webappDir
         }
+        // Keep gdx-teavm output but replace index.html with our overlay (canvas + main() + status UI).
         copy {
             from "${projectDir}/src/main/webapp"
             into webappDir
