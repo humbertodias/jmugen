@@ -33,6 +33,13 @@ From the **repository root**:
 
 ```sh
 ./gradlew :libgdx-web:distWeb
+# or live dev:
+./gradlew :libgdx-web:gwtDevMode
+```
+
+Static hosting after `distWeb`:
+
+```sh
 python3 -m http.server -d JMugen.Render.libgdx/web/build/webapp 8888
 ```
 

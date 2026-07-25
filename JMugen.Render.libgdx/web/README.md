@@ -14,10 +14,16 @@ Open http://127.0.0.1:8888/index.html
 ## Recompile GWT only
 
 ```bash
-./gradlew :libgdx-web:compileGwt
+./gradlew :libgdx-web:gwtCompile
 ```
 
-Output: `JMugen.Render.libgdx/web/build/gwt/out/`
+## Dev mode (Super Dev + embedded server)
+
+```bash
+./gradlew :libgdx-web:gwtDevMode
+```
+
+Output: `JMugen.Render.libgdx/web/build/gwt/`
 
 ## Layout
 

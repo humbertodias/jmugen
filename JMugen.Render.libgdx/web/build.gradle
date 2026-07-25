@@ -1,17 +1,7 @@
-buildscript {
-    dependencies {
-        classpath "org.docstr:gwt-gradle-plugin:$gwtPluginVersion"
-        classpath "org.gretty:gretty:$grettyVersion"
-    }
-}
-
 plugins {
     id 'java-library'
+    id 'org.docstr.gwt' version '2.2.9'
 }
-
-apply plugin: 'gwt'
-apply plugin: 'war'
-apply plugin: 'org.gretty'
 
 group = 'JMugen.Render.libgdx.web'
 
@@ -27,10 +17,6 @@ tasks.withType(JavaCompile).configureEach {
 sourceSets.main.java {
     exclude '**/gwt/**'
     exclude '**/Gwt*.java'
-}
-
-configurations.all {
-    exclude group: 'org.eclipse.jetty', module: 'apache-jsp'
 }
 
 configurations {
@@ -54,52 +40,52 @@ dependencies {
     gwtSources("com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion") {
         artifact { classifier = 'sources' }
     }
-    compileOnly "org.gwtproject:gwt-dev:$gwtVersion"
 }
 
 def gwtProjectModules = [':jmugen-engine', ':jmugen-common', ':jmugen-properties', ':libgdx-core']
+
+def gwtModuleSourceDirs = gwtProjectModules.collectMany { path ->
+    def p = project(path)
+    p.sourceSets.main.java.srcDirs + p.sourceSets.main.resources.srcDirs
+}
 
 tasks.register('syncGdxAssets', Copy) {
     from "${rootProject.projectDir}/data"
     into layout.buildDirectory.dir('gdx-assets/data')
 }
 
-tasks.register('unpackGwtSources', Sync) {
-    dependsOn syncGdxAssets
+// LibGDX GWT sources (for gwtCompile only — not javac).
+tasks.register('unpackGwtLibSources', Sync) {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    gwtProjectModules.each { path ->
-        def p = project(path)
-        from p.sourceSets.main.java.srcDirs
-        from p.sourceSets.main.resources.srcDirs
-    }
-    from sourceSets.main.resources.srcDirs
     from configurations.gwtSources.collect { zipTree(it) }
-    into layout.buildDirectory.dir('gwt-src')
+    into layout.buildDirectory.dir('gwt-lib-src')
 }
 
 gwt {
-    gwtVersion = gwtVersion
+    gwtVersion = providers.gradleProperty('gwtVersion').get()
+    modules = ['org.lee.mugen.renderer.libgdx.web.JMugenWeb']
+    style = 'PRETTY'
     maxHeapSize = '1024M'
     minHeapSize = '512M'
-    src = files("${projectDir}/src/main/java", layout.buildDirectory.dir('gwt-src'))
-    modules 'org.lee.mugen.renderer.libgdx.web.JMugenWeb'
-    devModules 'org.lee.mugen.renderer.libgdx.web.JMugenWeb'
-    compiler.style = 'PRETTY'
+    war = layout.buildDirectory.dir('gwt').get().asFile
+    extraSourceDirs = files(gwtModuleSourceDirs)
+    devMode {
+        port = 8888
+        codeServerPort = 9876
+        startupUrl = 'http://127.0.0.1:8888/index.html'
+    }
 }
 
-gretty {
-    httpPort = 8888
-    contextPath = '/'
-    servletContainer = 'jetty11'
+tasks.named('gwtCompile').configure {
+    dependsOn syncGdxAssets, unpackGwtLibSources
+    // Append LibGDX source trees without polluting compileJava (Gradle 9 task validation).
+    gwt.extraSourceDirs.from(layout.buildDirectory.dir('gwt-lib-src'))
 }
-
-tasks.named('compileGwt').configure { dependsOn unpackGwtSources }
-tasks.named('draftCompileGwt').configure { dependsOn unpackGwtSources }
 
 tasks.register('distWeb') {
     group = 'build'
     description = 'GWT output + static webapp for gh-pages / static hosting'
-    dependsOn compileGwt
+    dependsOn tasks.named('gwtCompile')
     doLast {
         def webappDir = layout.buildDirectory.dir('webapp').get().asFile
         webappDir.mkdirs()
@@ -108,8 +94,13 @@ tasks.register('distWeb') {
             into webappDir
         }
         copy {
-            from layout.buildDirectory.dir('gwt/out')
+            from layout.buildDirectory.dir('gwt')
             into webappDir
         }
     }
+}
+
+// Alias for docs/scripts that still say compileGwt
+tasks.register('compileGwt') {
+    dependsOn tasks.named('gwtCompile')
 }
