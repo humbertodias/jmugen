@@ -1,6 +1,6 @@
 plugins {
     id 'java-library'
-    id 'com.github.xpenatan.gdx-teavm' version '1.6.1'
+    id 'com.github.xpenatan.gdx-teavm' version '1.6.2'
 }
 
 java {
